@@ -62,36 +62,48 @@
             margin-top: 20px;
         }
         .btn:hover { opacity: 0.9; }
-        /* 简单的页脚 */
-        footer { text-align: center; color: var(--text-secondary); font-size: 0.8rem; margin-top: 80px; }
+        footer { text-align: center; color: var(--text-secondary); font-size: 0.8rem; margin-top: 80px; padding-bottom: 40px;}
+        
+        /* 地图容器样式：纯白背景以适配地图显示 */
+        .map-container { 
+            text-align: center; 
+            padding: 20px;
+            background: white; 
+            border-radius: 12px;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
         <header>
-            <h1>张旭</h1>
+            <h1>张旭 </h1>
             <p class="tagline">从安哥拉机场建设到 AI 一人公司</p>
             <p style="color: var(--text-secondary); max-width: 600px; margin: 20px auto;">
                 我是中航国际工程公司的项目经理，常驻安哥拉。目前正利用业余时间探索 AI 编程，
                 致力于通过技术解决实际问题，构建属于自己的“一人企业”。
             </p>
-            <a href="mailto:silencezx007@gmail.com" class="btn">联系我</a>
+            <a href="mailto:silencezx007@gmail.com" class="btn">邮件联系我</a>
         </header>
 
         <div class="section">
+            <div class="section-title">🌍 访客足迹 (World Map)</div>
+            <div class="card" style="background: white; text-align: center;">
+                <p style="color: #333; margin-bottom: 10px;">Welcome from around the world</p>
+                <script type="text/javascript" id="clustrmaps" src="https://clustrmaps.com/map_v2.js?d=ySM20hB-3YkYP8muEWVoS0IaDwGhazD0U1zaupA4sA8&cl=ffffff&w=a"></script>
+            </div>
+        </div>
+
+        <div class="section">
             <div class="section-title">🚀 进行中的项目</div>
-            
             <div class="card">
                 <h3>✈️ 罗安达新国际机场运维</h3>
                 <p>负责安哥拉内图博士国际机场（AIAAN）的运维项目管理。处理包括登机桥、行李系统及地面电源单元（GPU）的技术协调与合同管理。</p>
             </div>
-
             <div class="card">
                 <h3>🤖 AI 实时翻译应用</h3>
                 <p>基于 Deepgram 和 Gemini API 开发的实时语音翻译工具。旨在打破语言障碍，帮助海外工程人员更高效地沟通。</p>
             </div>
-
             <div class="card">
                 <h3>💼 个人券商/离岸金融探索</h3>
                 <p>研究并实践低成本的全球资产配置方案，包括长桥证券、IBKR 及香港银行账户的开立与优化策略。</p>
@@ -102,6 +114,8 @@
             <p>© 2026 张旭. All rights reserved. | Hosted on GitHub Pages</p>
         </footer>
     </div>
+
+    <script src="//code.tidio.co/hmava4sypxdtlxsbqexjicbnweyhenfj.js" async></script>
 
 </body>
 </html>
