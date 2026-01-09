@@ -2,21 +2,106 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>张旭的个人主页</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>张旭 | 工程管理 & AI 开发者</title>
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 50px; background-color: #f0f2f5; }
-        .container { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 600px; margin: 0 auto; }
-        h1 { color: #333; }
-        p { color: #666; line-height: 1.6; }
-        .btn { display: inline-block; margin-top: 20px; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; }
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #38bdf8;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        header {
+            text-align: center;
+            padding: 60px 0;
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .tagline { color: var(--accent); font-size: 1.2rem; font-weight: 500; }
+        .section { margin-bottom: 50px; }
+        .section-title {
+            border-bottom: 2px solid var(--card-bg);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+        .card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .card:hover { transform: translateY(-5px); border-color: var(--accent); }
+        .card h3 { margin-top: 0; color: var(--text-primary); }
+        .card p { color: var(--text-secondary); font-size: 0.95rem; }
+        .btn {
+            display: inline-block;
+            background: var(--accent);
+            color: #0f172a;
+            padding: 10px 25px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .btn:hover { opacity: 0.9; }
+        /* 简单的页脚 */
+        footer { text-align: center; color: var(--text-secondary); font-size: 0.8rem; margin-top: 80px; }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <h1>你好，我是张旭</h1>
-        <p>这是我的个人网站。我目前在安哥拉从事工程项目管理工作。</p>
-        <p>我也正在探索 AI 开发与“一人公司”的无限可能。</p>
-        <a href="mailto:your-email@example.com" class="btn">联系我</a>
+        <header>
+            <h1>张旭 (SilenceZX)</h1>
+            <p class="tagline">从安哥拉机场建设到 AI 一人公司</p>
+            <p style="color: var(--text-secondary); max-width: 600px; margin: 20px auto;">
+                我是中航国际工程公司的项目经理，常驻安哥拉。目前正利用业余时间探索 AI 编程，
+                致力于通过技术解决实际问题，构建属于自己的“一人企业”。
+            </p>
+            <a href="mailto:silencezx007@gmail.com" class="btn">联系我</a>
+        </header>
+
+        <div class="section">
+            <div class="section-title">🚀 进行中的项目</div>
+            
+            <div class="card">
+                <h3>✈️ 罗安达新国际机场运维</h3>
+                <p>负责安哥拉内图博士国际机场（AIAAN）的运维项目管理。处理包括登机桥、行李系统及地面电源单元（GPU）的技术协调与合同管理。</p>
+            </div>
+
+            <div class="card">
+                <h3>🤖 AI 实时翻译应用</h3>
+                <p>基于 Deepgram 和 Gemini API 开发的实时语音翻译工具。旨在打破语言障碍，帮助海外工程人员更高效地沟通。</p>
+            </div>
+
+            <div class="card">
+                <h3>💼 个人券商/离岸金融探索</h3>
+                <p>研究并实践低成本的全球资产配置方案，包括长桥证券、IBKR 及香港银行账户的开立与优化策略。</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2026 张旭. All rights reserved. | Hosted on GitHub Pages</p>
+        </footer>
     </div>
+
 </body>
 </html>
