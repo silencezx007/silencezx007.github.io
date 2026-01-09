@@ -27,6 +27,7 @@
             --accent-green: #10b981;
             --accent-red: #ef4444;
             --accent-orange: #f59e0b;
+            --accent-purple: #8b5cf6;
             --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
         }
 
@@ -68,113 +69,45 @@
             padding: 1rem;
         }
 
-        /* Language Selector */
-        .language-selector {
+        /* Auto Detect Info */
+        .auto-detect-info {
             background: var(--bg-card);
             border-radius: 16px;
-            padding: 1.25rem;
+            padding: 1rem 1.25rem;
             margin-bottom: 1rem;
             border: 1px solid var(--border-color);
-        }
-
-        .language-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.75rem;
-        }
-
-        .lang-btn {
-            flex: 1;
-            padding: 0.875rem 1rem;
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: center;
-        }
-
-        .lang-btn:hover {
-            border-color: var(--accent-blue);
-            background: rgba(59, 130, 246, 0.1);
-        }
-
-        .lang-btn.active {
-            border-color: var(--accent-blue);
-            background: rgba(59, 130, 246, 0.15);
-            color: var(--accent-blue);
-        }
-
-        .swap-btn {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: 2px solid var(--border-color);
-            background: var(--bg-secondary);
-            color: var(--text-secondary);
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
-            flex-shrink: 0;
+            gap: 0.75rem;
         }
 
-        .swap-btn:hover {
-            border-color: var(--accent-blue);
+        .auto-detect-icon {
+            width: 24px;
+            height: 24px;
             color: var(--accent-blue);
-            transform: rotate(180deg);
         }
 
-        .swap-btn svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        /* Output Language Options */
-        .output-options {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .output-label {
-            font-size: 0.75rem;
+        .auto-detect-text {
+            font-size: 0.9rem;
             color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
-        .output-btns {
-            display: flex;
+        .detected-lang {
+            display: inline-flex;
+            align-items: center;
             gap: 0.5rem;
-        }
-
-        .output-btn {
-            padding: 0.5rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background: transparent;
-            color: var(--text-secondary);
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .output-btn:hover {
-            border-color: var(--accent-blue);
-            color: var(--text-primary);
-        }
-
-        .output-btn.active {
-            border-color: var(--accent-blue);
+            padding: 0.35rem 0.75rem;
             background: rgba(59, 130, 246, 0.15);
+            border-radius: 8px;
             color: var(--accent-blue);
+            font-weight: 500;
+            font-size: 0.85rem;
+            margin-left: 0.5rem;
+        }
+
+        .detected-lang.hidden {
+            display: none;
         }
 
         /* Record Button */
@@ -297,6 +230,11 @@
             padding: 1.25rem;
             border: 1px solid var(--border-color);
             margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .result-card:hover {
+            border-color: rgba(59, 130, 246, 0.3);
         }
 
         .result-header {
@@ -325,14 +263,29 @@
             font-weight: 600;
         }
 
+        .lang-tag.zh {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+        }
+
+        .lang-tag.en {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+        }
+
+        .lang-tag.pt {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-purple);
+        }
+
         .result-actions {
             display: flex;
             gap: 0.5rem;
         }
 
         .action-btn {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
             background: transparent;
@@ -350,16 +303,35 @@
             background: rgba(59, 130, 246, 0.1);
         }
 
+        .action-btn.speaking {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+            background: rgba(16, 185, 129, 0.1);
+            animation: speakPulse 1s infinite;
+        }
+
+        @keyframes speakPulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+        }
+
         .action-btn svg {
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
         }
 
         .result-text {
             font-size: 1.1rem;
             line-height: 1.7;
             color: var(--text-primary);
-            min-height: 60px;
+            min-height: 50px;
         }
 
         .result-text.placeholder {
@@ -367,14 +339,37 @@
             font-style: italic;
         }
 
-        .translated-text {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
-            border-color: rgba(59, 130, 246, 0.3);
+        .result-text.large {
+            font-size: 1.3rem;
+            font-weight: 500;
         }
 
-        .translated-text .result-text {
-            font-size: 1.25rem;
-            font-weight: 500;
+        /* Translation Cards with accent borders */
+        .translation-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .translation-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            border-radius: 4px 0 0 4px;
+        }
+
+        .translation-card.zh::before {
+            background: linear-gradient(180deg, #ef4444, #f87171);
+        }
+
+        .translation-card.en::before {
+            background: linear-gradient(180deg, #10b981, #34d399);
+        }
+
+        .translation-card.pt::before {
+            background: linear-gradient(180deg, #8b5cf6, #a78bfa);
         }
 
         /* History Section */
@@ -438,9 +433,24 @@
             margin-bottom: 0.5rem;
         }
 
-        .history-translated {
-            font-size: 1rem;
+        .history-translations {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .history-trans-item {
+            font-size: 0.85rem;
             color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .history-trans-item .mini-tag {
+            font-size: 0.65rem;
+            padding: 0.15rem 0.35rem;
+            border-radius: 3px;
         }
 
         .history-meta {
@@ -657,11 +667,6 @@
                 font-size: 1.25rem;
             }
 
-            .lang-btn {
-                padding: 0.75rem 0.5rem;
-                font-size: 0.8rem;
-            }
-
             .record-btn {
                 width: 90px;
                 height: 90px;
@@ -671,6 +676,64 @@
                 width: 32px;
                 height: 32px;
             }
+
+            .result-text {
+                font-size: 1rem;
+            }
+
+            .result-text.large {
+                font-size: 1.15rem;
+            }
+        }
+
+        /* Auto-speak toggle */
+        .auto-speak-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .toggle-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            background: var(--bg-secondary);
+            border-radius: 13px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .toggle-switch.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(22px);
         }
     </style>
 </head>
@@ -693,31 +756,17 @@
     </header>
 
     <main class="container">
-        <!-- Language Selector -->
-        <div class="language-selector">
-            <div class="language-row">
-                <button class="lang-btn active" id="inputLangZh" onclick="setInputLang('zh')">
-                    🇨🇳 中文
-                </button>
-                <button class="swap-btn" onclick="swapLanguages()" title="交换语言">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                    </svg>
-                </button>
-                <button class="lang-btn" id="inputLangPt" onclick="setInputLang('pt')">
-                    🇵🇹 葡萄牙语
-                </button>
-            </div>
-
-            <!-- Output Language Options (shown when input is Chinese) -->
-            <div class="output-options" id="outputOptions">
-                <div class="output-label">输出语言</div>
-                <div class="output-btns">
-                    <button class="output-btn" id="outputEn" onclick="setOutputLang('en')">🇬🇧 英语</button>
-                    <button class="output-btn active" id="outputPt" onclick="setOutputLang('pt')">🇵🇹 葡萄牙语</button>
-                </div>
-            </div>
+        <!-- Auto Detect Info -->
+        <div class="auto-detect-info">
+            <svg class="auto-detect-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+            <span class="auto-detect-text">自动检测语言</span>
+            <span class="detected-lang hidden" id="detectedLang">
+                <span id="detectedLangText">中文</span>
+            </span>
         </div>
 
         <!-- Record Button -->
@@ -729,19 +778,32 @@
                         d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                 </svg>
             </button>
-            <div class="record-hint" id="recordHint">点击开始录音</div>
+            <div class="record-hint" id="recordHint">点击开始录音（支持中/英/葡语）</div>
+        </div>
+
+        <!-- Auto Speak Toggle -->
+        <div class="auto-speak-toggle">
+            <span class="toggle-label">🔊 自动朗读翻译结果</span>
+            <div class="toggle-switch" id="autoSpeakToggle" onclick="toggleAutoSpeak()"></div>
         </div>
 
         <!-- Result Cards -->
         <div class="result-section">
             <!-- Original Text -->
-            <div class="result-card">
+            <div class="result-card" id="originalCard">
                 <div class="result-header">
                     <span class="result-label">
                         原文
-                        <span class="lang-tag" id="originalLangTag">中文</span>
+                        <span class="lang-tag" id="originalLangTag">自动检测</span>
                     </span>
                     <div class="result-actions">
+                        <button class="action-btn" id="originalSpeakBtn" onclick="speakText('original')" title="朗读">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                            </svg>
+                        </button>
                         <button class="action-btn" onclick="copyText('original')" title="复制">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
@@ -754,22 +816,22 @@
                 <div class="result-text placeholder" id="originalText">等待语音输入...</div>
             </div>
 
-            <!-- Translated Text -->
-            <div class="result-card translated-text">
+            <!-- Translation 1 -->
+            <div class="result-card translation-card en" id="trans1Card">
                 <div class="result-header">
                     <span class="result-label">
                         译文
-                        <span class="lang-tag" id="translatedLangTag">葡萄牙语</span>
+                        <span class="lang-tag en" id="trans1LangTag">英语</span>
                     </span>
                     <div class="result-actions">
-                        <button class="action-btn" onclick="speakText('translated')" title="朗读">
+                        <button class="action-btn" id="trans1SpeakBtn" onclick="speakText('trans1')" title="朗读">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                             </svg>
                         </button>
-                        <button class="action-btn" onclick="copyText('translated')" title="复制">
+                        <button class="action-btn" onclick="copyText('trans1')" title="复制">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -778,7 +840,34 @@
                         </button>
                     </div>
                 </div>
-                <div class="result-text placeholder" id="translatedText">翻译结果将在此显示...</div>
+                <div class="result-text large placeholder" id="trans1Text">翻译结果将在此显示...</div>
+            </div>
+
+            <!-- Translation 2 -->
+            <div class="result-card translation-card pt" id="trans2Card">
+                <div class="result-header">
+                    <span class="result-label">
+                        译文
+                        <span class="lang-tag pt" id="trans2LangTag">葡萄牙语</span>
+                    </span>
+                    <div class="result-actions">
+                        <button class="action-btn" id="trans2SpeakBtn" onclick="speakText('trans2')" title="朗读">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                            </svg>
+                        </button>
+                        <button class="action-btn" onclick="copyText('trans2')" title="复制">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="result-text large placeholder" id="trans2Text">翻译结果将在此显示...</div>
             </div>
         </div>
 
@@ -831,11 +920,13 @@
     <script>
         // State
         let isRecording = false;
-        let inputLang = 'zh'; // zh, pt, en
-        let outputLang = 'pt'; // pt, en (when input is zh)
+        let detectedLang = null; // zh, pt, en
         let recognition = null;
         let history = [];
         let apiKey = localStorage.getItem('gemini_api_key') || '';
+        let autoSpeak = localStorage.getItem('auto_speak') === 'true';
+        let currentTexts = { original: '', trans1: '', trans2: '' };
+        let currentLangs = { original: '', trans1: '', trans2: '' };
 
         // Language display names
         const langNames = {
@@ -850,10 +941,16 @@
             'en': 'en-US'
         };
 
+        const langFlags = {
+            'zh': '🇨🇳',
+            'pt': '🇵🇹',
+            'en': '🇬🇧'
+        };
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             loadHistory();
-            updateUI();
+            updateAutoSpeakUI();
 
             // Check if API key is set
             if (!apiKey) {
@@ -866,6 +963,8 @@
                 recognition = new SpeechRecognition();
                 recognition.continuous = true;
                 recognition.interimResults = true;
+                // Use multi-language detection
+                recognition.lang = 'zh-CN'; // Default, will try to detect
 
                 recognition.onresult = handleSpeechResult;
                 recognition.onerror = handleSpeechError;
@@ -875,60 +974,16 @@
             }
         });
 
-        // Set input language
-        function setInputLang(lang) {
-            inputLang = lang;
-
-            // Update button states
-            document.getElementById('inputLangZh').classList.toggle('active', lang === 'zh');
-            document.getElementById('inputLangPt').classList.toggle('active', lang === 'pt');
-
-            // Show/hide output options
-            const outputOptions = document.getElementById('outputOptions');
-            if (lang === 'zh') {
-                outputOptions.style.display = 'block';
-            } else {
-                outputOptions.style.display = 'none';
-                outputLang = 'zh'; // When input is PT/EN, output is always ZH
-            }
-
-            updateUI();
+        // Toggle auto speak
+        function toggleAutoSpeak() {
+            autoSpeak = !autoSpeak;
+            localStorage.setItem('auto_speak', autoSpeak);
+            updateAutoSpeakUI();
         }
 
-        // Set output language
-        function setOutputLang(lang) {
-            outputLang = lang;
-            document.getElementById('outputEn').classList.toggle('active', lang === 'en');
-            document.getElementById('outputPt').classList.toggle('active', lang === 'pt');
-            updateUI();
-        }
-
-        // Swap languages
-        function swapLanguages() {
-            if (inputLang === 'zh') {
-                setInputLang('pt');
-            } else {
-                setInputLang('zh');
-            }
-        }
-
-        // Update UI based on current state
-        function updateUI() {
-            const originalLangTag = document.getElementById('originalLangTag');
-            const translatedLangTag = document.getElementById('translatedLangTag');
-
-            originalLangTag.textContent = langNames[inputLang];
-
-            if (inputLang === 'zh') {
-                translatedLangTag.textContent = langNames[outputLang];
-            } else {
-                translatedLangTag.textContent = langNames['zh'];
-            }
-
-            // Update recognition language
-            if (recognition) {
-                recognition.lang = langCodes[inputLang];
-            }
+        function updateAutoSpeakUI() {
+            const toggle = document.getElementById('autoSpeakToggle');
+            toggle.classList.toggle('active', autoSpeak);
         }
 
         // Toggle recording
@@ -954,13 +1009,16 @@
         // Start recording
         function startRecording() {
             isRecording = true;
+            detectedLang = null;
             const recordBtn = document.getElementById('recordBtn');
             const recordHint = document.getElementById('recordHint');
 
             recordBtn.classList.add('recording');
             recordHint.innerHTML = '<div class="recording-status"><span class="recording-dot"></span>正在录音...</div>';
 
-            recognition.lang = langCodes[inputLang];
+            // Reset detected language display
+            document.getElementById('detectedLang').classList.add('hidden');
+
             recognition.start();
         }
 
@@ -971,7 +1029,7 @@
             const recordHint = document.getElementById('recordHint');
 
             recordBtn.classList.remove('recording');
-            recordHint.textContent = '点击开始录音';
+            recordHint.textContent = '点击开始录音（支持中/英/葡语）';
 
             recognition.stop();
         }
@@ -994,9 +1052,9 @@
             originalText.classList.remove('placeholder');
             originalText.textContent = finalTranscript + interimTranscript;
 
-            // If we have final transcript, translate it
+            // If we have final transcript, detect language and translate
             if (finalTranscript) {
-                translateText(finalTranscript);
+                detectAndTranslate(finalTranscript);
                 finalTranscript = '';
             }
         }
@@ -1023,23 +1081,36 @@
             }
         }
 
-        // Translate text using Gemini API
-        async function translateText(text) {
+        // Detect language and translate to other two languages
+        async function detectAndTranslate(text) {
             if (!text.trim()) return;
 
-            const translatedTextEl = document.getElementById('translatedText');
-            translatedTextEl.classList.remove('placeholder');
-            translatedTextEl.textContent = '翻译中...';
+            const trans1Text = document.getElementById('trans1Text');
+            const trans2Text = document.getElementById('trans2Text');
+
+            trans1Text.classList.remove('placeholder');
+            trans2Text.classList.remove('placeholder');
+            trans1Text.textContent = '翻译中...';
+            trans2Text.textContent = '翻译中...';
 
             try {
-                let targetLang = inputLang === 'zh' ? outputLang : 'zh';
-                let targetLangName = inputLang === 'zh'
-                    ? (outputLang === 'pt' ? 'Portuguese (Portugal)' : 'English')
-                    : 'Chinese (Simplified)';
+                const prompt = `You are a professional translator for airport operations in Angola. 
 
-                const prompt = `You are a professional translator for airport operations in Angola. Translate the following text to ${targetLangName}. Only output the translation, nothing else.
+First, detect the language of the following text. It can be Chinese, English, or Portuguese.
 
-Text to translate: ${text}`;
+Then translate it to the OTHER TWO languages (not the detected source language).
+
+Text: "${text}"
+
+Respond in this exact JSON format only, no other text:
+{
+  "detected": "zh" or "en" or "pt",
+  "translations": {
+    "zh": "Chinese translation or null if source is Chinese",
+    "en": "English translation or null if source is English", 
+    "pt": "Portuguese translation or null if source is Portuguese"
+  }
+}`;
 
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
                     method: 'POST',
@@ -1053,7 +1124,7 @@ Text to translate: ${text}`;
                             }]
                         }],
                         generationConfig: {
-                            temperature: 0.3,
+                            temperature: 0.2,
                             maxOutputTokens: 1024,
                         }
                     })
@@ -1064,28 +1135,85 @@ Text to translate: ${text}`;
                 }
 
                 const data = await response.json();
-                const translation = data.candidates[0].content.parts[0].text.trim();
+                let resultText = data.candidates[0].content.parts[0].text.trim();
 
-                translatedTextEl.textContent = translation;
+                // Clean up markdown code blocks if present
+                resultText = resultText.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+
+                const result = JSON.parse(resultText);
+
+                detectedLang = result.detected;
+
+                // Update detected language display
+                const detectedLangEl = document.getElementById('detectedLang');
+                const detectedLangText = document.getElementById('detectedLangText');
+                detectedLangEl.classList.remove('hidden');
+                detectedLangText.textContent = `${langFlags[detectedLang]} ${langNames[detectedLang]}`;
+
+                // Update original card
+                const originalLangTag = document.getElementById('originalLangTag');
+                originalLangTag.textContent = langNames[detectedLang];
+                originalLangTag.className = 'lang-tag ' + detectedLang;
+
+                // Determine which languages to show
+                const otherLangs = ['zh', 'en', 'pt'].filter(l => l !== detectedLang);
+
+                // Update translation cards
+                const trans1LangTag = document.getElementById('trans1LangTag');
+                const trans2LangTag = document.getElementById('trans2LangTag');
+                const trans1Card = document.getElementById('trans1Card');
+                const trans2Card = document.getElementById('trans2Card');
+
+                // First translation
+                trans1LangTag.textContent = langNames[otherLangs[0]];
+                trans1LangTag.className = 'lang-tag ' + otherLangs[0];
+                trans1Card.className = 'result-card translation-card ' + otherLangs[0];
+                trans1Text.textContent = result.translations[otherLangs[0]] || '';
+
+                // Second translation
+                trans2LangTag.textContent = langNames[otherLangs[1]];
+                trans2LangTag.className = 'lang-tag ' + otherLangs[1];
+                trans2Card.className = 'result-card translation-card ' + otherLangs[1];
+                trans2Text.textContent = result.translations[otherLangs[1]] || '';
+
+                // Store current texts and langs for speaking
+                currentTexts = {
+                    original: text,
+                    trans1: result.translations[otherLangs[0]] || '',
+                    trans2: result.translations[otherLangs[1]] || ''
+                };
+                currentLangs = {
+                    original: detectedLang,
+                    trans1: otherLangs[0],
+                    trans2: otherLangs[1]
+                };
 
                 // Add to history
-                addToHistory(text, translation, inputLang, targetLang);
+                addToHistory(text, result.translations, detectedLang);
+
+                // Auto speak if enabled
+                if (autoSpeak) {
+                    // Speak the first translation after a short delay
+                    setTimeout(() => {
+                        speakText('trans1');
+                    }, 300);
+                }
 
             } catch (error) {
                 console.error('Translation error:', error);
-                translatedTextEl.textContent = '翻译失败，请重试';
+                trans1Text.textContent = '翻译失败，请重试';
+                trans2Text.textContent = '翻译失败，请重试';
                 showToast('翻译失败: ' + error.message, 'error');
             }
         }
 
         // Add to history
-        function addToHistory(original, translated, fromLang, toLang) {
+        function addToHistory(original, translations, sourceLang) {
             const item = {
                 id: Date.now(),
                 original,
-                translated,
-                fromLang,
-                toLang,
+                translations,
+                sourceLang,
                 timestamp: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
             };
 
@@ -1114,26 +1242,74 @@ Text to translate: ${text}`;
                 return;
             }
 
-            historyList.innerHTML = history.map(item => `
-                <div class="history-item" onclick="loadHistoryItem(${item.id})">
-                    <div class="history-original">${item.original}</div>
-                    <div class="history-translated">${item.translated}</div>
-                    <div class="history-meta">
-                        <span>${langNames[item.fromLang]} → ${langNames[item.toLang]}</span>
-                        <span>${item.timestamp}</span>
+            historyList.innerHTML = history.map(item => {
+                const otherLangs = ['zh', 'en', 'pt'].filter(l => l !== item.sourceLang);
+                return `
+                    <div class="history-item" onclick="loadHistoryItem(${item.id})">
+                        <div class="history-original">${langFlags[item.sourceLang]} ${item.original}</div>
+                        <div class="history-translations">
+                            ${otherLangs.map(lang => `
+                                <div class="history-trans-item">
+                                    <span class="mini-tag lang-tag ${lang}">${langNames[lang]}</span>
+                                    ${item.translations[lang] || ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="history-meta">
+                            <span>${item.timestamp}</span>
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         // Load history item
         function loadHistoryItem(id) {
             const item = history.find(h => h.id === id);
             if (item) {
+                const otherLangs = ['zh', 'en', 'pt'].filter(l => l !== item.sourceLang);
+
+                // Update original
                 document.getElementById('originalText').textContent = item.original;
                 document.getElementById('originalText').classList.remove('placeholder');
-                document.getElementById('translatedText').textContent = item.translated;
-                document.getElementById('translatedText').classList.remove('placeholder');
+                document.getElementById('originalLangTag').textContent = langNames[item.sourceLang];
+                document.getElementById('originalLangTag').className = 'lang-tag ' + item.sourceLang;
+
+                // Update detected language display
+                document.getElementById('detectedLang').classList.remove('hidden');
+                document.getElementById('detectedLangText').textContent = `${langFlags[item.sourceLang]} ${langNames[item.sourceLang]}`;
+
+                // Update translations
+                const trans1Text = document.getElementById('trans1Text');
+                const trans2Text = document.getElementById('trans2Text');
+                const trans1LangTag = document.getElementById('trans1LangTag');
+                const trans2LangTag = document.getElementById('trans2LangTag');
+                const trans1Card = document.getElementById('trans1Card');
+                const trans2Card = document.getElementById('trans2Card');
+
+                trans1Text.textContent = item.translations[otherLangs[0]] || '';
+                trans1Text.classList.remove('placeholder');
+                trans1LangTag.textContent = langNames[otherLangs[0]];
+                trans1LangTag.className = 'lang-tag ' + otherLangs[0];
+                trans1Card.className = 'result-card translation-card ' + otherLangs[0];
+
+                trans2Text.textContent = item.translations[otherLangs[1]] || '';
+                trans2Text.classList.remove('placeholder');
+                trans2LangTag.textContent = langNames[otherLangs[1]];
+                trans2LangTag.className = 'lang-tag ' + otherLangs[1];
+                trans2Card.className = 'result-card translation-card ' + otherLangs[1];
+
+                // Update current texts/langs for speaking
+                currentTexts = {
+                    original: item.original,
+                    trans1: item.translations[otherLangs[0]] || '',
+                    trans2: item.translations[otherLangs[1]] || ''
+                };
+                currentLangs = {
+                    original: item.sourceLang,
+                    trans1: otherLangs[0],
+                    trans2: otherLangs[1]
+                };
             }
         }
 
@@ -1159,7 +1335,7 @@ Text to translate: ${text}`;
 
         // Copy text
         function copyText(type) {
-            const el = document.getElementById(type === 'original' ? 'originalText' : 'translatedText');
+            const el = document.getElementById(type === 'original' ? 'originalText' : type + 'Text');
             const text = el.textContent;
 
             if (text && !el.classList.contains('placeholder')) {
@@ -1169,23 +1345,37 @@ Text to translate: ${text}`;
             }
         }
 
-        // Speak text
+        // Speak text with visual feedback
         function speakText(type) {
-            const el = document.getElementById(type === 'original' ? 'originalText' : 'translatedText');
-            const text = el.textContent;
+            const text = currentTexts[type];
+            const lang = currentLangs[type];
 
-            if (text && !el.classList.contains('placeholder')) {
-                const utterance = new SpeechSynthesisUtterance(text);
+            if (!text) return;
 
-                // Determine language
-                if (type === 'translated') {
-                    utterance.lang = inputLang === 'zh' ? langCodes[outputLang] : langCodes['zh'];
-                } else {
-                    utterance.lang = langCodes[inputLang];
-                }
+            // Cancel any ongoing speech
+            speechSynthesis.cancel();
 
-                speechSynthesis.speak(utterance);
-            }
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = langCodes[lang];
+            utterance.rate = 0.9;
+
+            // Get the button
+            const btnId = type === 'original' ? 'originalSpeakBtn' : type + 'SpeakBtn';
+            const btn = document.getElementById(btnId);
+
+            utterance.onstart = () => {
+                btn.classList.add('speaking');
+            };
+
+            utterance.onend = () => {
+                btn.classList.remove('speaking');
+            };
+
+            utterance.onerror = () => {
+                btn.classList.remove('speaking');
+            };
+
+            speechSynthesis.speak(utterance);
         }
 
         // Toast notification
