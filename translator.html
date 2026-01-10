@@ -4,1427 +4,1024 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 实时翻译应用 - 中葡英互译</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>AI 实时翻译 - 中葡英互译</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+                        dark: { 100: '#1e1e2e', 200: '#181825', 300: '#11111b', 400: '#0a0a0f' }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg-primary: #0a0a0f;
-            --bg-secondary: #12121a;
-            --bg-card: #1a1a24;
-            --border-color: #2a2a3a;
-            --text-primary: #ffffff;
-            --text-secondary: #a0a0b0;
-            --accent-blue: #3b82f6;
-            --accent-blue-hover: #2563eb;
-            --accent-green: #10b981;
-            --accent-red: #ef4444;
-            --accent-orange: #f59e0b;
-            --accent-purple: #8b5cf6;
-            --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            line-height: 1.6;
+            font-family: 'Inter', sans-serif;
         }
 
-        /* Header */
-        .header {
-            padding: 1.5rem 1rem;
-            text-align: center;
-            border-bottom: 1px solid var(--border-color);
-            background: var(--bg-secondary);
+        .glass {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
 
-        .header h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            background: var(--gradient-blue);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 0.25rem;
+        @keyframes ripple {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
         }
 
-        .header p {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
+        .recording-ripple {
+            animation: ripple 1.5s linear infinite;
         }
 
-        /* Main Container */
-        .container {
-            max-width: 640px;
-            margin: 0 auto;
-            padding: 1rem;
+        @keyframes typewriter {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
-        /* Auto Detect Info */
-        .auto-detect-info {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 1rem 1.25rem;
-            margin-bottom: 1rem;
-            border: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
+        .typewriter span {
+            animation: typewriter 0.05s ease-in-out forwards;
+            opacity: 0;
         }
 
-        .auto-detect-icon {
-            width: 24px;
-            height: 24px;
-            color: var(--accent-blue);
-        }
-
-        .auto-detect-text {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .detected-lang {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.35rem 0.75rem;
-            background: rgba(59, 130, 246, 0.15);
-            border-radius: 8px;
-            color: var(--accent-blue);
-            font-weight: 500;
-            font-size: 0.85rem;
-            margin-left: 0.5rem;
-        }
-
-        .detected-lang.hidden {
+        .scrollbar-hide::-webkit-scrollbar {
             display: none;
         }
 
-        /* Record Button */
-        .record-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 2rem 0;
-        }
-
-        .record-btn {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 3px solid var(--accent-blue);
-            background: linear-gradient(145deg, var(--bg-card), var(--bg-secondary));
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            position: relative;
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
-        }
-
-        .record-btn::before {
-            content: '';
-            position: absolute;
-            inset: -8px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            background: linear-gradient(135deg, var(--accent-blue), transparent) border-box;
-            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .record-btn:hover::before {
-            opacity: 1;
-        }
-
-        .record-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 50px rgba(59, 130, 246, 0.4);
-        }
-
-        .record-btn.recording {
-            border-color: var(--accent-red);
-            animation: pulse 1.5s infinite;
-            box-shadow: 0 0 50px rgba(239, 68, 68, 0.4);
-        }
-
-        .record-btn.recording .mic-icon {
-            color: var(--accent-red);
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.08);
-            }
-        }
-
-        .mic-icon {
-            width: 36px;
-            height: 36px;
-            color: var(--accent-blue);
-            transition: color 0.3s ease;
-        }
-
-        .record-hint {
-            margin-top: 1rem;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-
-        .recording-status {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--accent-red);
-            font-weight: 500;
-        }
-
-        .recording-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--accent-red);
-            border-radius: 50%;
-            animation: blink 1s infinite;
-        }
-
-        @keyframes blink {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.3;
-            }
-        }
-
-        /* Result Cards */
-        .result-section {
-            margin-bottom: 1rem;
-        }
-
-        .result-card {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 1.25rem;
-            border: 1px solid var(--border-color);
-            margin-bottom: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .result-card:hover {
-            border-color: rgba(59, 130, 246, 0.3);
-        }
-
-        .result-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 0.75rem;
-        }
-
-        .result-label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .lang-tag {
-            padding: 0.25rem 0.5rem;
-            background: rgba(59, 130, 246, 0.15);
-            border-radius: 4px;
-            color: var(--accent-blue);
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-
-        .lang-tag.zh {
-            background: rgba(239, 68, 68, 0.15);
-            color: #f87171;
-        }
-
-        .lang-tag.en {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--accent-green);
-        }
-
-        .lang-tag.pt {
-            background: rgba(139, 92, 246, 0.15);
-            color: var(--accent-purple);
-        }
-
-        .result-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .action-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: transparent;
-            color: var(--text-secondary);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-
-        .action-btn:hover {
-            border-color: var(--accent-blue);
-            color: var(--accent-blue);
-            background: rgba(59, 130, 246, 0.1);
-        }
-
-        .action-btn.speaking {
-            border-color: var(--accent-green);
-            color: var(--accent-green);
-            background: rgba(16, 185, 129, 0.1);
-            animation: speakPulse 1s infinite;
-        }
-
-        @keyframes speakPulse {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.6;
-            }
-        }
-
-        .action-btn svg {
-            width: 18px;
-            height: 18px;
-        }
-
-        .result-text {
-            font-size: 1.1rem;
-            line-height: 1.7;
-            color: var(--text-primary);
-            min-height: 50px;
-        }
-
-        .result-text.placeholder {
-            color: var(--text-secondary);
-            font-style: italic;
-        }
-
-        .result-text.large {
-            font-size: 1.3rem;
-            font-weight: 500;
-        }
-
-        /* Translation Cards with accent borders */
-        .translation-card {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .translation-card::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            border-radius: 4px 0 0 4px;
-        }
-
-        .translation-card.zh::before {
-            background: linear-gradient(180deg, #ef4444, #f87171);
-        }
-
-        .translation-card.en::before {
-            background: linear-gradient(180deg, #10b981, #34d399);
-        }
-
-        .translation-card.pt::before {
-            background: linear-gradient(180deg, #8b5cf6, #a78bfa);
-        }
-
-        /* History Section */
-        .history-section {
-            margin-top: 2rem;
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-
-        .section-title {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .clear-btn {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-        }
-
-        .clear-btn:hover {
-            color: var(--accent-red);
-            background: rgba(239, 68, 68, 0.1);
-        }
-
-        .history-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .history-item {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 1rem;
-            border: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .history-item:hover {
-            border-color: var(--accent-blue);
-            transform: translateY(-2px);
-        }
-
-        .history-original {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-        }
-
-        .history-translations {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-
-        .history-trans-item {
-            font-size: 0.85rem;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .history-trans-item .mini-tag {
-            font-size: 0.65rem;
-            padding: 0.15rem 0.35rem;
-            border-radius: 3px;
-        }
-
-        .history-meta {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 0.5rem;
-            font-size: 0.7rem;
-            color: var(--text-secondary);
-        }
-
-        /* Status Toast */
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1rem 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            opacity: 0;
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
-        .toast.success {
-            border-color: var(--accent-green);
-        }
-
-        .toast.error {
-            border-color: var(--accent-red);
-        }
-
-        .toast-icon {
-            width: 20px;
-            height: 20px;
-        }
-
-        .toast.success .toast-icon {
-            color: var(--accent-green);
-        }
-
-        .toast.error .toast-icon {
-            color: var(--accent-red);
-        }
-
-        /* API Key Modal */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .modal-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal {
-            background: var(--bg-card);
-            border-radius: 20px;
-            padding: 2rem;
-            max-width: 400px;
-            width: 100%;
-            border: 1px solid var(--border-color);
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
-        }
-
-        .modal-overlay.show .modal {
-            transform: scale(1);
-        }
-
-        .modal-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .modal-desc {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
-        }
-
-        .input-group {
-            margin-bottom: 1rem;
-        }
-
-        .input-label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 0.875rem 1rem;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            transition: border-color 0.2s ease;
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: var(--accent-blue);
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 1.5rem;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 0.875rem 1.5rem;
-            border-radius: 10px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-secondary {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-        }
-
-        .btn-secondary:hover {
-            border-color: var(--text-secondary);
-            color: var(--text-primary);
-        }
-
-        .btn-primary {
-            background: var(--gradient-blue);
-            border: none;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-
-        /* Settings Button */
-        .settings-btn {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-card);
-            color: var(--text-secondary);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            z-index: 100;
-        }
-
-        .settings-btn:hover {
-            border-color: var(--accent-blue);
-            color: var(--accent-blue);
-        }
-
-        .settings-btn svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-secondary);
-        }
-
-        .empty-icon {
-            width: 48px;
-            height: 48px;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-
-        /* Responsive */
-        @media (max-width: 480px) {
-            .header h1 {
-                font-size: 1.25rem;
-            }
-
-            .record-btn {
-                width: 90px;
-                height: 90px;
-            }
-
-            .mic-icon {
-                width: 32px;
-                height: 32px;
-            }
-
-            .result-text {
-                font-size: 1rem;
-            }
-
-            .result-text.large {
-                font-size: 1.15rem;
-            }
-        }
-
-        /* Auto-speak toggle */
-        .auto-speak-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-            margin-top: 1rem;
-            padding: 0.75rem;
-            background: var(--bg-card);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-
-        .toggle-label {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-
-        .toggle-switch {
-            position: relative;
-            width: 48px;
-            height: 26px;
-            background: var(--bg-secondary);
-            border-radius: 13px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            border: 1px solid var(--border-color);
-        }
-
-        .toggle-switch.active {
-            background: var(--accent-blue);
-            border-color: var(--accent-blue);
-        }
-
-        .toggle-switch::after {
-            content: '';
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            width: 18px;
-            height: 18px;
-            background: white;
-            border-radius: 50%;
-            transition: transform 0.3s ease;
-        }
-
-        .toggle-switch.active::after {
-            transform: translateX(22px);
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
     </style>
 </head>
 
-<body>
-    <!-- Settings Button -->
-    <button class="settings-btn" onclick="showApiKeyModal()" title="设置 API">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-    </button>
+<body
+    class="bg-gradient-to-br from-slate-50 to-blue-50 dark:from-dark-400 dark:to-dark-300 min-h-screen transition-colors duration-300">
+    <div id="app" class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header
+            class="sticky top-0 z-50 glass bg-white/80 dark:bg-dark-200/80 border-b border-slate-200/50 dark:border-slate-700/50">
+            <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-purple-600 flex items-center justify-center">
+                        <i class="fas fa-language text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-semibold text-slate-800 dark:text-white">AI 实时翻译</h1>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">安哥拉机场运维</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleTheme()"
+                        class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-dark-100 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center transition-all"
+                        title="切换主题">
+                        <i class="fas fa-sun text-amber-500 dark:hidden"></i>
+                        <i class="fas fa-moon text-blue-400 hidden dark:block"></i>
+                    </button>
+                    <button onclick="showSettings()"
+                        class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-dark-100 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center transition-all"
+                        title="设置">
+                        <i class="fas fa-cog text-slate-600 dark:text-slate-300"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
 
-    <!-- Header -->
-    <header class="header">
-        <h1>🎙️ AI 实时翻译</h1>
-        <p>安哥拉机场运维 · 中葡英互译</p>
-    </header>
+        <!-- Main Content -->
+        <main class="flex-1 max-w-4xl mx-auto w-full px-4 py-6">
+            <!-- API Key Warning -->
+            <div id="apiWarning"
+                class="hidden mb-4 p-4 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-exclamation-triangle text-amber-500"></i>
+                    <p class="text-sm text-amber-700 dark:text-amber-300">请先配置 API Key 以使用翻译功能</p>
+                    <button onclick="showSettings()"
+                        class="ml-auto px-3 py-1 text-xs bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors">去设置</button>
+                </div>
+            </div>
 
-    <main class="container">
-        <!-- Auto Detect Info -->
-        <div class="auto-detect-info">
-            <svg class="auto-detect-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-            </svg>
-            <span class="auto-detect-text">自动检测语言</span>
-            <span class="detected-lang hidden" id="detectedLang">
-                <span id="detectedLangText">中文</span>
-            </span>
-        </div>
+            <!-- Language Selector -->
+            <div
+                class="glass bg-white/60 dark:bg-dark-100/60 rounded-2xl p-4 mb-4 border border-slate-200/50 dark:border-slate-700/50">
+                <div class="flex items-center gap-3">
+                    <div class="flex-1">
+                        <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1.5 font-medium">源语言</label>
+                        <select id="sourceLang" onchange="onLanguageChange()"
+                            class="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-dark-200 border-0 text-slate-700 dark:text-slate-200 font-medium focus:ring-2 focus:ring-primary-500 transition-all cursor-pointer">
+                            <option value="auto">🌐 自动检测</option>
+                            <option value="zh">🇨🇳 中文</option>
+                            <option value="en">🇬🇧 英语</option>
+                            <option value="pt">🇵🇹 葡萄牙语</option>
+                            <option value="ja">🇯🇵 日语</option>
+                            <option value="ko">🇰🇷 韩语</option>
+                            <option value="fr">🇫🇷 法语</option>
+                            <option value="de">🇩🇪 德语</option>
+                            <option value="es">🇪🇸 西班牙语</option>
+                            <option value="ru">🇷🇺 俄语</option>
+                        </select>
+                    </div>
+                    <button onclick="swapLanguages()"
+                        class="w-12 h-12 mt-5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary-500/30">
+                        <i class="fas fa-exchange-alt"></i>
+                    </button>
+                    <div class="flex-1">
+                        <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1.5 font-medium">目标语言</label>
+                        <select id="targetLang" onchange="onLanguageChange()"
+                            class="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-dark-200 border-0 text-slate-700 dark:text-slate-200 font-medium focus:ring-2 focus:ring-primary-500 transition-all cursor-pointer">
+                            <option value="en">🇬🇧 英语</option>
+                            <option value="zh">🇨🇳 中文</option>
+                            <option value="pt" selected>🇵🇹 葡萄牙语</option>
+                            <option value="ja">🇯🇵 日语</option>
+                            <option value="ko">🇰🇷 韩语</option>
+                            <option value="fr">🇫🇷 法语</option>
+                            <option value="de">🇩🇪 德语</option>
+                            <option value="es">🇪🇸 西班牙语</option>
+                            <option value="ru">🇷🇺 俄语</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
-        <!-- Record Button -->
-        <div class="record-section">
-            <button class="record-btn" id="recordBtn" onclick="toggleRecording()">
-                <svg class="mic-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                </svg>
-            </button>
-            <div class="record-hint" id="recordHint">点击开始录音（支持中/英/葡语）</div>
-        </div>
-
-        <!-- Auto Speak Toggle -->
-        <div class="auto-speak-toggle">
-            <span class="toggle-label">🔊 自动朗读翻译结果</span>
-            <div class="toggle-switch" id="autoSpeakToggle" onclick="toggleAutoSpeak()"></div>
-        </div>
-
-        <!-- Result Cards -->
-        <div class="result-section">
-            <!-- Original Text -->
-            <div class="result-card" id="originalCard">
-                <div class="result-header">
-                    <span class="result-label">
-                        原文
-                        <span class="lang-tag" id="originalLangTag">自动检测</span>
-                    </span>
-                    <div class="result-actions">
-                        <button class="action-btn" id="originalSpeakBtn" onclick="speakText('original')" title="朗读">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                            </svg>
+            <!-- Input Area -->
+            <div
+                class="glass bg-white/60 dark:bg-dark-100/60 rounded-2xl p-4 mb-4 border border-slate-200/50 dark:border-slate-700/50">
+                <div class="flex items-center justify-between mb-3">
+                    <span
+                        class="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wide">输入</span>
+                    <div class="flex items-center gap-2">
+                        <button onclick="clearInput()"
+                            class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-dark-200 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                            title="清空">
+                            <i class="fas fa-times"></i>
                         </button>
-                        <button class="action-btn" onclick="copyText('original')" title="复制">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                            </svg>
+                        <button onclick="pasteFromClipboard()"
+                            class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-dark-200 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                            title="粘贴">
+                            <i class="fas fa-paste"></i>
                         </button>
                     </div>
                 </div>
-                <div class="result-text placeholder" id="originalText">等待语音输入...</div>
+                <textarea id="inputText" rows="4" placeholder="输入或粘贴要翻译的文本..." oninput="onInputChange()"
+                    class="w-full bg-transparent text-slate-700 dark:text-slate-200 placeholder-slate-400 resize-none focus:outline-none text-lg leading-relaxed scrollbar-hide"></textarea>
+                <div
+                    class="flex items-center justify-between mt-3 pt-3 border-t border-slate-200/50 dark:border-slate-700/50">
+                    <span id="charCount" class="text-xs text-slate-400">0 字符</span>
+                    <button onclick="translateText()"
+                        class="px-5 py-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium rounded-xl transition-all hover:shadow-lg hover:shadow-primary-500/30 active:scale-95">
+                        <i class="fas fa-language mr-2"></i>翻译
+                    </button>
+                </div>
             </div>
 
-            <!-- Translation 1 -->
-            <div class="result-card translation-card en" id="trans1Card">
-                <div class="result-header">
-                    <span class="result-label">
-                        译文
-                        <span class="lang-tag en" id="trans1LangTag">英语</span>
-                    </span>
-                    <div class="result-actions">
-                        <button class="action-btn" id="trans1SpeakBtn" onclick="speakText('trans1')" title="朗读">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                            </svg>
-                        </button>
-                        <button class="action-btn" onclick="copyText('trans1')" title="复制">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                            </svg>
-                        </button>
+            <!-- Voice Recording -->
+            <div class="flex justify-center mb-6">
+                <div class="relative">
+                    <div id="ripple1" class="absolute inset-0 rounded-full bg-primary-500/30 hidden recording-ripple">
+                    </div>
+                    <div id="ripple2" class="absolute inset-0 rounded-full bg-primary-500/20 hidden recording-ripple"
+                        style="animation-delay: 0.5s"></div>
+                    <button id="micBtn" onclick="toggleRecording()"
+                        class="relative w-20 h-20 rounded-full bg-gradient-to-br from-primary-500 to-purple-600 hover:from-primary-600 hover:to-purple-700 text-white flex items-center justify-center transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-primary-500/40">
+                        <i id="micIcon" class="fas fa-microphone text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            <p id="recordHint" class="text-center text-sm text-slate-500 dark:text-slate-400 mb-4">点击麦克风开始语音输入</p>
+
+            <!-- Auto Stop Options -->
+            <div class="flex items-center justify-center gap-4 mb-6">
+                <span class="text-xs text-slate-500 dark:text-slate-400">静音后自动停止：</span>
+                <div class="flex gap-2">
+                    <label class="flex items-center gap-1 cursor-pointer">
+                        <input type="radio" name="autoStop" value="0" class="w-3 h-3 text-primary-500"
+                            onchange="onAutoStopChange()">
+                        <span class="text-xs text-slate-600 dark:text-slate-300">关闭</span>
+                    </label>
+                    <label class="flex items-center gap-1 cursor-pointer">
+                        <input type="radio" name="autoStop" value="3" class="w-3 h-3 text-primary-500" checked
+                            onchange="onAutoStopChange()">
+                        <span class="text-xs text-slate-600 dark:text-slate-300">3秒</span>
+                    </label>
+                    <label class="flex items-center gap-1 cursor-pointer">
+                        <input type="radio" name="autoStop" value="5" class="w-3 h-3 text-primary-500"
+                            onchange="onAutoStopChange()">
+                        <span class="text-xs text-slate-600 dark:text-slate-300">5秒</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Result Area -->
+            <div id="resultArea"
+                class="glass bg-white/60 dark:bg-dark-100/60 rounded-2xl p-4 border border-slate-200/50 dark:border-slate-700/50 min-h-[200px]">
+                <div class="flex items-center justify-between mb-4">
+                    <span
+                        class="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wide">翻译结果</span>
+                    <div class="flex items-center gap-2">
+                        <label
+                            class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 cursor-pointer">
+                            <input type="checkbox" id="autoSpeak" onchange="saveSettings()"
+                                class="w-4 h-4 rounded border-slate-300 text-primary-500 focus:ring-primary-500">
+                            <span>自动朗读</span>
+                        </label>
                     </div>
                 </div>
-                <div class="result-text large placeholder" id="trans1Text">翻译结果将在此显示...</div>
-            </div>
 
-            <!-- Translation 2 -->
-            <div class="result-card translation-card pt" id="trans2Card">
-                <div class="result-header">
-                    <span class="result-label">
-                        译文
-                        <span class="lang-tag pt" id="trans2LangTag">葡萄牙语</span>
-                    </span>
-                    <div class="result-actions">
-                        <button class="action-btn" id="trans2SpeakBtn" onclick="speakText('trans2')" title="朗读">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                            </svg>
-                        </button>
-                        <button class="action-btn" onclick="copyText('trans2')" title="复制">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                            </svg>
-                        </button>
+                <!-- Result Container (order will be dynamic based on target language) -->
+                <div id="resultsContainer">
+                    <!-- Translated Text (Primary - shown first) -->
+                    <div id="translatedSection" class="mb-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span id="targetLangBadge"
+                                class="px-2 py-0.5 text-xs rounded-md bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400">译文</span>
+                            <button onclick="speakText('translated')" id="speakBtn"
+                                class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-dark-200 text-slate-400 hover:text-primary-500 transition-colors"
+                                title="朗读">
+                                <i class="fas fa-volume-up text-sm"></i>
+                            </button>
+                            <button onclick="copyText('translated')"
+                                class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-dark-200 text-slate-400 hover:text-primary-500 transition-colors"
+                                title="复制">
+                                <i class="fas fa-copy text-sm"></i>
+                            </button>
+                        </div>
+                        <p id="translatedText"
+                            class="text-slate-700 dark:text-slate-200 text-2xl font-semibold leading-relaxed">
+                            翻译结果将显示在这里...</p>
+                    </div>
+
+                    <!-- Original Text (Secondary - shown after) -->
+                    <div id="originalSection" class="hidden pt-4 border-t border-slate-200/50 dark:border-slate-700/50">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span id="detectedLangBadge"
+                                class="px-2 py-0.5 text-xs rounded-md bg-slate-200 dark:bg-dark-200 text-slate-600 dark:text-slate-400">原文</span>
+                            <button onclick="speakText('original')"
+                                class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-dark-200 text-slate-400 hover:text-primary-500 transition-colors"
+                                title="朗读">
+                                <i class="fas fa-volume-up text-sm"></i>
+                            </button>
+                            <button onclick="copyText('original')"
+                                class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-dark-200 text-slate-400 hover:text-primary-500 transition-colors"
+                                title="复制">
+                                <i class="fas fa-copy text-sm"></i>
+                            </button>
+                        </div>
+                        <p id="originalText" class="text-slate-500 dark:text-slate-400 text-base leading-relaxed"></p>
                     </div>
                 </div>
-                <div class="result-text large placeholder" id="trans2Text">翻译结果将在此显示...</div>
             </div>
-        </div>
 
-        <!-- History Section -->
-        <div class="history-section">
-            <div class="section-header">
-                <span class="section-title">📋 历史记录</span>
-                <button class="clear-btn" onclick="clearHistory()">清空</button>
-            </div>
-            <div class="history-list" id="historyList">
-                <div class="empty-state">
-                    <svg class="empty-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
-                    <p>暂无翻译记录</p>
+            <!-- History -->
+            <div class="mt-6">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-medium text-slate-600 dark:text-slate-300"><i
+                            class="fas fa-history mr-2"></i>历史记录</h3>
+                    <button onclick="clearHistory()"
+                        class="text-xs text-slate-400 hover:text-red-500 transition-colors">清空</button>
+                </div>
+                <div id="historyList" class="space-y-2 max-h-64 overflow-y-auto scrollbar-hide">
+                    <p class="text-center text-sm text-slate-400 py-8">暂无历史记录</p>
                 </div>
             </div>
-        </div>
-    </main>
-
-    <!-- Toast -->
-    <div class="toast" id="toast">
-        <svg class="toast-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-        </svg>
-        <span id="toastMessage">操作成功</span>
+        </main>
     </div>
 
-    <!-- API Key Modal -->
-    <div class="modal-overlay" id="apiKeyModal">
-        <div class="modal">
-            <h2 class="modal-title">⚙️ API 设置</h2>
-            <p class="modal-desc">配置翻译服务 API（使用 Google Gemini API）</p>
-
-            <div class="input-group">
-                <label class="input-label" for="apiKeyInput">Gemini API Key</label>
-                <input type="password" class="input-field" id="apiKeyInput" placeholder="输入你的 Gemini API Key">
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="hideSettings()"></div>
+        <div
+            class="absolute inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md bg-white dark:bg-dark-100 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-slate-800 dark:text-white"><i
+                        class="fas fa-cog mr-2 text-primary-500"></i>设置</h2>
+                <button onclick="hideSettings()"
+                    class="w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-dark-200 flex items-center justify-center transition-colors">
+                    <i class="fas fa-times text-slate-400"></i>
+                </button>
             </div>
+            <div class="p-4 overflow-y-auto flex-1">
+                <!-- Provider Select -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">翻译服务提供商</label>
+                    <select id="providerSelect" onchange="onProviderChange()"
+                        class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-dark-200 border-0 text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-primary-500">
+                        <option value="gemini">🌟 Google Gemini (免费额度)</option>
+                        <option value="groq">⚡ Groq (完全免费，推荐)</option>
+                        <option value="siliconflow">🇨🇳 硅基流动 (国内免费)</option>
+                        <option value="deepseek">💰 DeepSeek (超低成本)</option>
+                        <option value="openai">🤖 OpenAI GPT-4o-mini</option>
+                        <option value="openrouter">🌐 OpenRouter (多模型)</option>
+                    </select>
+                    <p id="providerInfo" class="mt-2 text-xs text-slate-500 dark:text-slate-400"></p>
+                </div>
 
-            <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="hideApiKeyModal()">取消</button>
-                <button class="btn btn-primary" onclick="saveApiKey()">保存</button>
+                <!-- API Key -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">API Key</label>
+                    <div class="relative">
+                        <input type="password" id="apiKeyInput" placeholder="输入你的 API Key"
+                            class="w-full px-4 py-3 pr-12 rounded-xl bg-slate-100 dark:bg-dark-200 border-0 text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-primary-500">
+                        <button onclick="toggleApiKeyVisibility()"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+                            <i id="eyeIcon" class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Voice Options -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">🔊 朗读语音风格</label>
+                    <select id="voiceSelect"
+                        class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-dark-200 border-0 text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-primary-500">
+                        <option value="default">系统默认</option>
+                        <option value="natural">自然人声 (推荐)</option>
+                        <option value="female">女声</option>
+                        <option value="male">男声</option>
+                    </select>
+                    <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">选择朗读声音类型，实际可用声音取决于浏览器</p>
+                </div>
+
+                <!-- Speech Rate -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">语速调节</label>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs text-slate-400">慢</span>
+                        <input type="range" id="speechRate" min="0.5" max="1.5" step="0.1" value="0.9"
+                            class="flex-1 h-2 bg-slate-200 dark:bg-dark-300 rounded-lg appearance-none cursor-pointer">
+                        <span class="text-xs text-slate-400">快</span>
+                        <span id="rateValue" class="text-xs text-primary-500 font-medium w-8">0.9x</span>
+                    </div>
+                </div>
+
+                <!-- Provider Links -->
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-dark-200 mb-4">
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">获取免费 API Key：</p>
+                    <div class="flex flex-wrap gap-2">
+                        <a href="https://console.groq.com/keys" target="_blank"
+                            class="text-xs px-2 py-1 rounded-lg bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 hover:bg-primary-200 transition-colors">Groq
+                            ⚡</a>
+                        <a href="https://aistudio.google.com/apikey" target="_blank"
+                            class="text-xs px-2 py-1 rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 hover:bg-amber-200 transition-colors">Gemini
+                            🌟</a>
+                        <a href="https://cloud.siliconflow.cn/account/ak" target="_blank"
+                            class="text-xs px-2 py-1 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-200 transition-colors">硅基流动
+                            🇨🇳</a>
+                        <a href="https://platform.deepseek.com/api_keys" target="_blank"
+                            class="text-xs px-2 py-1 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 hover:bg-purple-200 transition-colors">DeepSeek
+                            💰</a>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 border-t border-slate-200 dark:border-slate-700">
+                <button onclick="saveAndClose()"
+                    class="w-full py-3 bg-gradient-to-r from-primary-500 to-purple-600 hover:from-primary-600 hover:to-purple-700 text-white font-medium rounded-xl transition-all hover:shadow-lg active:scale-[0.98]">
+                    <i class="fas fa-check mr-2"></i>保存设置
+                </button>
             </div>
         </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast"
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-3 rounded-xl bg-slate-800 dark:bg-slate-700 text-white text-sm shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-2 z-50">
+        <i id="toastIcon" class="fas fa-check-circle text-green-400"></i>
+        <span id="toastMsg">操作成功</span>
     </div>
 
     <script>
-        // State
-        let isRecording = false;
-        let detectedLang = null; // zh, pt, en
-        let recognition = null;
-        let history = [];
-        let apiKey = localStorage.getItem('gemini_api_key') || '';
-        let autoSpeak = localStorage.getItem('auto_speak') === 'true';
-        let currentTexts = { original: '', trans1: '', trans2: '' };
-        let currentLangs = { original: '', trans1: '', trans2: '' };
-
-        // Language display names
-        const langNames = {
-            'zh': '中文',
-            'pt': '葡萄牙语',
-            'en': '英语'
+        // ========== Config ==========
+        const PROVIDERS = {
+            gemini: {
+                name: 'Google Gemini',
+                info: '免费额度：每分钟 15 次请求，每天 1500 次',
+                endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
+                request: (prompt, key) => ({
+                    url: `${PROVIDERS.gemini.endpoint}?key=${key}`,
+                    body: { contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.1 } }
+                }),
+                parse: data => data.candidates?.[0]?.content?.parts?.[0]?.text || ''
+            },
+            groq: {
+                name: 'Groq',
+                info: '完全免费，速度极快，强烈推荐！',
+                endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+                request: (prompt, key) => ({
+                    url: PROVIDERS.groq.endpoint,
+                    headers: { 'Authorization': `Bearer ${key}` },
+                    body: { model: 'llama-3.3-70b-versatile', messages: [{ role: 'user', content: prompt }], temperature: 0.1 }
+                }),
+                parse: data => data.choices?.[0]?.message?.content || ''
+            },
+            siliconflow: {
+                name: '硅基流动',
+                info: '国内服务，注册即送 2000 万 tokens',
+                endpoint: 'https://api.siliconflow.cn/v1/chat/completions',
+                request: (prompt, key) => ({
+                    url: PROVIDERS.siliconflow.endpoint,
+                    headers: { 'Authorization': `Bearer ${key}` },
+                    body: { model: 'Qwen/Qwen2.5-7B-Instruct', messages: [{ role: 'user', content: prompt }], temperature: 0.1 }
+                }),
+                parse: data => data.choices?.[0]?.message?.content || ''
+            },
+            deepseek: {
+                name: 'DeepSeek',
+                info: '超低成本，每百万 tokens 约 ¥1',
+                endpoint: 'https://api.deepseek.com/v1/chat/completions',
+                request: (prompt, key) => ({
+                    url: PROVIDERS.deepseek.endpoint,
+                    headers: { 'Authorization': `Bearer ${key}` },
+                    body: { model: 'deepseek-chat', messages: [{ role: 'user', content: prompt }], temperature: 0.1 }
+                }),
+                parse: data => data.choices?.[0]?.message?.content || ''
+            },
+            openai: {
+                name: 'OpenAI',
+                info: 'GPT-4o-mini，性价比高',
+                endpoint: 'https://api.openai.com/v1/chat/completions',
+                request: (prompt, key) => ({
+                    url: PROVIDERS.openai.endpoint,
+                    headers: { 'Authorization': `Bearer ${key}` },
+                    body: { model: 'gpt-4o-mini', messages: [{ role: 'user', content: prompt }], temperature: 0.1 }
+                }),
+                parse: data => data.choices?.[0]?.message?.content || ''
+            },
+            openrouter: {
+                name: 'OpenRouter',
+                info: '统一接口访问多种模型',
+                endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+                request: (prompt, key) => ({
+                    url: PROVIDERS.openrouter.endpoint,
+                    headers: { 'Authorization': `Bearer ${key}` },
+                    body: { model: 'meta-llama/llama-3.3-70b-instruct:free', messages: [{ role: 'user', content: prompt }], temperature: 0.1 }
+                }),
+                parse: data => data.choices?.[0]?.message?.content || ''
+            }
         };
 
-        const langCodes = {
-            'zh': 'zh-CN',
-            'pt': 'pt-PT',
-            'en': 'en-US'
+        const LANGUAGES = {
+            auto: { name: '自动检测', code: '', flag: '🌐' },
+            zh: { name: '中文', code: 'zh-CN', flag: '🇨🇳' },
+            en: { name: '英语', code: 'en-US', flag: '🇬🇧' },
+            pt: { name: '葡萄牙语', code: 'pt-PT', flag: '🇵🇹' },
+            ja: { name: '日语', code: 'ja-JP', flag: '🇯🇵' },
+            ko: { name: '韩语', code: 'ko-KR', flag: '🇰🇷' },
+            fr: { name: '法语', code: 'fr-FR', flag: '🇫🇷' },
+            de: { name: '德语', code: 'de-DE', flag: '🇩🇪' },
+            es: { name: '西班牙语', code: 'es-ES', flag: '🇪🇸' },
+            ru: { name: '俄语', code: 'ru-RU', flag: '🇷🇺' }
         };
 
-        const langFlags = {
-            'zh': '🇨🇳',
-            'pt': '🇵🇹',
-            'en': '🇬🇧'
+        // ========== State ==========
+        let state = {
+            provider: localStorage.getItem('provider') || 'groq',
+            apiKey: localStorage.getItem('apiKey') || '',
+            autoSpeak: localStorage.getItem('autoSpeak') === 'true',
+            theme: localStorage.getItem('theme') || 'light',
+            sourceLang: localStorage.getItem('sourceLang') || 'auto',
+            targetLang: localStorage.getItem('targetLang') || 'pt',
+            history: JSON.parse(localStorage.getItem('history') || '[]'),
+            isRecording: false,
+            recognition: null,
+            currentOriginal: '',
+            currentTranslated: '',
+            detectedLang: '',
+            autoStopDelay: parseInt(localStorage.getItem('autoStopDelay') || '3'),
+            silenceTimer: null,
+            accumulatedText: '',
+            voiceType: localStorage.getItem('voiceType') || 'natural',
+            speechRate: parseFloat(localStorage.getItem('speechRate') || '0.9'),
+            availableVoices: []
         };
 
-        // Initialize
+        // ========== Init ==========
         document.addEventListener('DOMContentLoaded', () => {
-            loadHistory();
-            updateAutoSpeakUI();
-
-            // Check if API key is set
-            if (!apiKey) {
-                setTimeout(() => showApiKeyModal(), 500);
+            // Apply theme
+            if (state.theme === 'dark' || (!state.theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                state.theme = 'dark';
             }
 
-            // Initialize Speech Recognition
-            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                recognition = new SpeechRecognition();
-                recognition.continuous = true;
-                recognition.interimResults = true;
-                // Use multi-language detection
-                recognition.lang = 'zh-CN'; // Default, will try to detect
+            // Load settings
+            document.getElementById('sourceLang').value = state.sourceLang;
+            document.getElementById('targetLang').value = state.targetLang;
+            document.getElementById('autoSpeak').checked = state.autoSpeak;
+            document.getElementById('providerSelect').value = state.provider;
+            document.getElementById('apiKeyInput').value = state.apiKey;
+            document.getElementById('voiceSelect').value = state.voiceType;
+            document.getElementById('speechRate').value = state.speechRate;
+            document.getElementById('rateValue').textContent = state.speechRate + 'x';
 
-                recognition.onresult = handleSpeechResult;
-                recognition.onerror = handleSpeechError;
-                recognition.onend = handleSpeechEnd;
-            } else {
-                showToast('您的浏览器不支持语音识别', 'error');
+            // Speech rate slider event
+            document.getElementById('speechRate').addEventListener('input', (e) => {
+                document.getElementById('rateValue').textContent = e.target.value + 'x';
+            });
+
+            onProviderChange();
+            renderHistory();
+
+            // Check API key
+            if (!state.apiKey) {
+                document.getElementById('apiWarning').classList.remove('hidden');
+            }
+
+            // Init speech recognition
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SR) {
+                state.recognition = new SR();
+                state.recognition.continuous = true;
+                state.recognition.interimResults = true;
+                state.recognition.onresult = onSpeechResult;
+                state.recognition.onerror = onSpeechError;
+                state.recognition.onend = () => { if (state.isRecording) state.recognition.start(); };
+            }
+
+            // Init auto stop option
+            const autoStopRadio = document.querySelector(`input[name="autoStop"][value="${state.autoStopDelay}"]`);
+            if (autoStopRadio) autoStopRadio.checked = true;
+
+            // Load available voices
+            loadVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = loadVoices;
             }
         });
 
-        // Toggle auto speak
-        function toggleAutoSpeak() {
-            autoSpeak = !autoSpeak;
-            localStorage.setItem('auto_speak', autoSpeak);
-            updateAutoSpeakUI();
+        function loadVoices() {
+            state.availableVoices = speechSynthesis.getVoices();
         }
 
-        function updateAutoSpeakUI() {
-            const toggle = document.getElementById('autoSpeakToggle');
-            toggle.classList.toggle('active', autoSpeak);
+        // ========== Theme ==========
+        function toggleTheme() {
+            state.theme = state.theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', state.theme);
         }
 
-        // Toggle recording
+        // ========== Language ==========
+        function onLanguageChange() {
+            state.sourceLang = document.getElementById('sourceLang').value;
+            state.targetLang = document.getElementById('targetLang').value;
+            localStorage.setItem('sourceLang', state.sourceLang);
+            localStorage.setItem('targetLang', state.targetLang);
+            if (state.recognition) {
+                state.recognition.lang = state.sourceLang === 'auto' ? 'zh-CN' : LANGUAGES[state.sourceLang].code;
+            }
+        }
+
+        function swapLanguages() {
+            const source = document.getElementById('sourceLang');
+            const target = document.getElementById('targetLang');
+            if (source.value === 'auto') {
+                toast('自动检测模式下无法交换', 'error');
+                return;
+            }
+            [source.value, target.value] = [target.value, source.value];
+            onLanguageChange();
+            // Swap text if exists
+            if (state.currentOriginal && state.currentTranslated) {
+                document.getElementById('inputText').value = state.currentTranslated;
+                onInputChange();
+            }
+        }
+
+        // ========== Input ==========
+        function onInputChange() {
+            const input = document.getElementById('inputText');
+            document.getElementById('charCount').textContent = `${input.value.length} 字符`;
+        }
+
+        function clearInput() {
+            document.getElementById('inputText').value = '';
+            onInputChange();
+        }
+
+        async function pasteFromClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                document.getElementById('inputText').value = text;
+                onInputChange();
+                toast('已粘贴');
+            } catch (e) {
+                toast('无法访问剪贴板', 'error');
+            }
+        }
+
+        // ========== Recording ==========
+        function onAutoStopChange() {
+            const selected = document.querySelector('input[name="autoStop"]:checked');
+            state.autoStopDelay = parseInt(selected.value);
+            localStorage.setItem('autoStopDelay', state.autoStopDelay);
+        }
+
         function toggleRecording() {
-            if (!recognition) {
-                showToast('语音识别不可用', 'error');
+            if (!state.recognition) {
+                toast('语音识别不可用，请使用 Chrome 浏览器并通过 HTTP 服务器访问', 'error');
                 return;
             }
-
-            if (!apiKey) {
-                showApiKeyModal();
-                showToast('请先设置 API Key', 'error');
-                return;
-            }
-
-            if (isRecording) {
-                stopRecording();
-            } else {
-                startRecording();
-            }
+            state.isRecording ? stopRecording(true) : startRecording();
         }
 
-        // Start recording
         function startRecording() {
-            isRecording = true;
-            detectedLang = null;
-            const recordBtn = document.getElementById('recordBtn');
-            const recordHint = document.getElementById('recordHint');
+            if (!state.apiKey) {
+                showSettings();
+                toast('请先配置 API Key', 'error');
+                return;
+            }
+            state.isRecording = true;
+            state.accumulatedText = '';  // 清空累积文本
 
-            recordBtn.classList.add('recording');
-            recordHint.innerHTML = '<div class="recording-status"><span class="recording-dot"></span>正在录音...</div>';
+            const lang = state.sourceLang === 'auto' ? 'zh-CN' : LANGUAGES[state.sourceLang].code;
+            state.recognition.lang = lang;
+            state.recognition.start();
 
-            // Reset detected language display
-            document.getElementById('detectedLang').classList.add('hidden');
-
-            recognition.start();
+            document.getElementById('micBtn').classList.add('bg-red-500', 'from-red-500', 'to-red-600');
+            document.getElementById('micIcon').classList.replace('fa-microphone', 'fa-stop');
+            document.getElementById('ripple1').classList.remove('hidden');
+            document.getElementById('ripple2').classList.remove('hidden');
+            document.getElementById('recordHint').innerHTML = '<span class="text-red-500 font-medium">正在录音...</span> 再次点击停止';
         }
 
-        // Stop recording
-        function stopRecording() {
-            isRecording = false;
-            const recordBtn = document.getElementById('recordBtn');
-            const recordHint = document.getElementById('recordHint');
+        function stopRecording(manual = false) {
+            state.isRecording = false;
+            state.recognition.stop();
+            clearSilenceTimer();
 
-            recordBtn.classList.remove('recording');
-            recordHint.textContent = '点击开始录音（支持中/英/葡语）';
+            document.getElementById('micBtn').classList.remove('bg-red-500', 'from-red-500', 'to-red-600');
+            document.getElementById('micIcon').classList.replace('fa-stop', 'fa-microphone');
+            document.getElementById('ripple1').classList.add('hidden');
+            document.getElementById('ripple2').classList.add('hidden');
+            document.getElementById('recordHint').textContent = '点击麦克风开始语音输入';
 
-            recognition.stop();
+            // 如果有累积的文本，执行翻译
+            if (state.accumulatedText.trim()) {
+                document.getElementById('inputText').value = state.accumulatedText;
+                onInputChange();
+                translateText();
+            }
         }
 
-        // Handle speech result
-        let finalTranscript = '';
-        function handleSpeechResult(event) {
-            let interimTranscript = '';
+        function clearSilenceTimer() {
+            if (state.silenceTimer) {
+                clearTimeout(state.silenceTimer);
+                state.silenceTimer = null;
+            }
+        }
 
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                const transcript = event.results[i][0].transcript;
-                if (event.results[i].isFinal) {
-                    finalTranscript += transcript;
+        function resetSilenceTimer() {
+            clearSilenceTimer();
+            if (state.autoStopDelay > 0 && state.isRecording) {
+                state.silenceTimer = setTimeout(() => {
+                    if (state.isRecording) {
+                        toast(`静音 ${state.autoStopDelay} 秒，自动停止录音`);
+                        stopRecording(false);
+                    }
+                }, state.autoStopDelay * 1000);
+            }
+        }
+
+        function onSpeechResult(e) {
+            let interimText = '';
+
+            for (let i = e.resultIndex; i < e.results.length; i++) {
+                const transcript = e.results[i][0].transcript;
+                if (e.results[i].isFinal) {
+                    // 累积最终结果
+                    state.accumulatedText += transcript;
                 } else {
-                    interimTranscript += transcript;
+                    interimText += transcript;
                 }
             }
 
-            const originalText = document.getElementById('originalText');
-            originalText.classList.remove('placeholder');
-            originalText.textContent = finalTranscript + interimTranscript;
+            // 更新输入框显示（累积文本 + 临时文本）
+            document.getElementById('inputText').value = state.accumulatedText + interimText;
+            onInputChange();
 
-            // If we have final transcript, detect language and translate
-            if (finalTranscript) {
-                detectAndTranslate(finalTranscript);
-                finalTranscript = '';
-            }
+            // 重置静音计时器
+            resetSilenceTimer();
         }
 
-        // Handle speech error
-        function handleSpeechError(event) {
-            console.error('Speech recognition error:', event.error);
-            stopRecording();
-
-            let message = '语音识别出错';
-            if (event.error === 'not-allowed') {
-                message = '请允许麦克风权限';
-            } else if (event.error === 'no-speech') {
-                message = '未检测到语音';
+        function onSpeechError(e) {
+            if (e.error === 'no-speech') {
+                // 静音时不停止录音，只显示提示
+                if (state.isRecording) {
+                    toast('正在等待语音输入...', 'info');
+                    return;
+                }
             }
-            showToast(message, 'error');
+            stopRecording(false);
+            const msgs = { 'not-allowed': '请允许麦克风权限', 'network': '网络错误', 'aborted': '录音已中止' };
+            toast(msgs[e.error] || `语音识别错误: ${e.error}`, 'error');
         }
 
-        // Handle speech end
-        function handleSpeechEnd() {
-            if (isRecording) {
-                // Restart if still recording
-                recognition.start();
-            }
-        }
+        // ========== Translation ==========
+        async function translateText() {
+            const text = document.getElementById('inputText').value.trim();
+            if (!text) { toast('请输入要翻译的文本', 'error'); return; }
+            if (!state.apiKey) { showSettings(); toast('请先配置 API Key', 'error'); return; }
 
-        // Detect language and translate to other two languages
-        async function detectAndTranslate(text) {
-            if (!text.trim()) return;
+            const translated = document.getElementById('translatedText');
+            translated.textContent = '翻译中...';
+            document.getElementById('originalSection').classList.add('hidden');
 
-            const trans1Text = document.getElementById('trans1Text');
-            const trans2Text = document.getElementById('trans2Text');
+            const sourceLang = state.sourceLang === 'auto' ? '(自动检测语言)' : LANGUAGES[state.sourceLang].name;
+            const targetLang = LANGUAGES[state.targetLang].name;
 
-            trans1Text.classList.remove('placeholder');
-            trans2Text.classList.remove('placeholder');
-            trans1Text.textContent = '翻译中...';
-            trans2Text.textContent = '翻译中...';
+            const prompt = `You are a professional translator. Translate the following text from ${sourceLang} to ${targetLang}.
+Only output the translation, nothing else. Do not include any explanations or notes.
+
+Text to translate:
+${text}`;
 
             try {
-                const prompt = `You are a professional translator for airport operations in Angola. 
-
-First, detect the language of the following text. It can be Chinese, English, or Portuguese.
-
-Then translate it to the OTHER TWO languages (not the detected source language).
-
-Text: "${text}"
-
-Respond in this exact JSON format only, no other text:
-{
-  "detected": "zh" or "en" or "pt",
-  "translations": {
-    "zh": "Chinese translation or null if source is Chinese",
-    "en": "English translation or null if source is English", 
-    "pt": "Portuguese translation or null if source is Portuguese"
-  }
-}`;
-
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+                const p = PROVIDERS[state.provider];
+                const req = p.request(prompt, state.apiKey);
+                const res = await fetch(req.url, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [{
-                                text: prompt
-                            }]
-                        }],
-                        generationConfig: {
-                            temperature: 0.2,
-                            maxOutputTokens: 1024,
-                        }
-                    })
+                    headers: { 'Content-Type': 'application/json', ...req.headers },
+                    body: JSON.stringify(req.body)
                 });
 
-                if (!response.ok) {
-                    throw new Error(`API error: ${response.status}`);
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.error?.message || `请求失败 (${res.status})`);
                 }
 
-                const data = await response.json();
-                let resultText = data.candidates[0].content.parts[0].text.trim();
+                const data = await res.json();
+                const result = p.parse(data).trim();
 
-                // Clean up markdown code blocks if present
-                resultText = resultText.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+                state.currentOriginal = text;
+                state.currentTranslated = result;
+                state.detectedLang = state.sourceLang === 'auto' ? detectLanguage(text) : state.sourceLang;
 
-                const result = JSON.parse(resultText);
+                // Show original section
+                document.getElementById('originalSection').classList.remove('hidden');
+                document.getElementById('originalText').textContent = text;
+                document.getElementById('detectedLangBadge').textContent = `${LANGUAGES[state.detectedLang]?.flag || '🌐'} ${LANGUAGES[state.detectedLang]?.name || '原文'}`;
 
-                detectedLang = result.detected;
-
-                // Update detected language display
-                const detectedLangEl = document.getElementById('detectedLang');
-                const detectedLangText = document.getElementById('detectedLangText');
-                detectedLangEl.classList.remove('hidden');
-                detectedLangText.textContent = `${langFlags[detectedLang]} ${langNames[detectedLang]}`;
-
-                // Update original card
-                const originalLangTag = document.getElementById('originalLangTag');
-                originalLangTag.textContent = langNames[detectedLang];
-                originalLangTag.className = 'lang-tag ' + detectedLang;
-
-                // Determine which languages to show
-                const otherLangs = ['zh', 'en', 'pt'].filter(l => l !== detectedLang);
-
-                // Update translation cards
-                const trans1LangTag = document.getElementById('trans1LangTag');
-                const trans2LangTag = document.getElementById('trans2LangTag');
-                const trans1Card = document.getElementById('trans1Card');
-                const trans2Card = document.getElementById('trans2Card');
-
-                // First translation
-                trans1LangTag.textContent = langNames[otherLangs[0]];
-                trans1LangTag.className = 'lang-tag ' + otherLangs[0];
-                trans1Card.className = 'result-card translation-card ' + otherLangs[0];
-                trans1Text.textContent = result.translations[otherLangs[0]] || '';
-
-                // Second translation
-                trans2LangTag.textContent = langNames[otherLangs[1]];
-                trans2LangTag.className = 'lang-tag ' + otherLangs[1];
-                trans2Card.className = 'result-card translation-card ' + otherLangs[1];
-                trans2Text.textContent = result.translations[otherLangs[1]] || '';
-
-                // Store current texts and langs for speaking
-                currentTexts = {
-                    original: text,
-                    trans1: result.translations[otherLangs[0]] || '',
-                    trans2: result.translations[otherLangs[1]] || ''
-                };
-                currentLangs = {
-                    original: detectedLang,
-                    trans1: otherLangs[0],
-                    trans2: otherLangs[1]
-                };
+                // Show translated with typewriter effect
+                typewriterEffect(translated, result);
+                document.getElementById('targetLangBadge').textContent = `${LANGUAGES[state.targetLang].flag} ${LANGUAGES[state.targetLang].name}`;
 
                 // Add to history
-                addToHistory(text, result.translations, detectedLang);
+                addHistory(text, result, state.detectedLang, state.targetLang);
 
-                // Auto speak if enabled
-                if (autoSpeak) {
-                    // Speak the first translation after a short delay
-                    setTimeout(() => {
-                        speakText('trans1');
-                    }, 300);
+                // Auto speak
+                if (state.autoSpeak) {
+                    setTimeout(() => speakText('translated'), 500);
                 }
 
-            } catch (error) {
-                console.error('Translation error:', error);
-                trans1Text.textContent = '翻译失败，请重试';
-                trans2Text.textContent = '翻译失败，请重试';
-                showToast('翻译失败: ' + error.message, 'error');
+            } catch (err) {
+                translated.textContent = '翻译失败';
+                toast(`翻译失败: ${err.message}`, 'error');
             }
         }
 
-        // Add to history
-        function addToHistory(original, translations, sourceLang) {
-            const item = {
-                id: Date.now(),
-                original,
-                translations,
-                sourceLang,
-                timestamp: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
-            };
+        function typewriterEffect(el, text) {
+            el.innerHTML = '';
+            const chars = text.split('');
+            chars.forEach((char, i) => {
+                const span = document.createElement('span');
+                span.textContent = char;
+                span.style.animationDelay = `${i * 20}ms`;
+                el.appendChild(span);
+            });
+        }
 
-            history.unshift(item);
-            if (history.length > 20) {
-                history.pop();
+        function detectLanguage(text) {
+            if (/[\u4e00-\u9fa5]/.test(text)) return 'zh';
+            if (/[\u3040-\u309f\u30a0-\u30ff]/.test(text)) return 'ja';
+            if (/[\uac00-\ud7af]/.test(text)) return 'ko';
+            if (/[\u0400-\u04ff]/.test(text)) return 'ru';
+            return 'en';
+        }
+
+        // ========== TTS ==========
+        function getBestVoice(langCode) {
+            if (!state.availableVoices.length) {
+                state.availableVoices = speechSynthesis.getVoices();
             }
 
-            saveHistory();
+            const voices = state.availableVoices;
+            const lang = langCode.split('-')[0]; // e.g. 'zh' from 'zh-CN'
+
+            // Filter voices by language
+            let candidates = voices.filter(v => v.lang.startsWith(lang));
+            if (!candidates.length) {
+                candidates = voices.filter(v => v.lang.includes(lang));
+            }
+            if (!candidates.length) {
+                candidates = voices;
+            }
+
+            // Sort by preference based on voiceType
+            const voiceType = state.voiceType;
+
+            if (voiceType === 'natural') {
+                // Prefer Google, Microsoft Neural, or voices with Natural/Neural in name
+                candidates.sort((a, b) => {
+                    const aNatural = /natural|neural|google|microsoft/i.test(a.name);
+                    const bNatural = /natural|neural|google|microsoft/i.test(b.name);
+                    if (aNatural && !bNatural) return -1;
+                    if (!aNatural && bNatural) return 1;
+                    return 0;
+                });
+            } else if (voiceType === 'female') {
+                candidates.sort((a, b) => {
+                    const aFemale = /female|woman|girl|zira|hazel|susan|samantha|xiaoxiao|xiaoyun/i.test(a.name);
+                    const bFemale = /female|woman|girl|zira|hazel|susan|samantha|xiaoxiao|xiaoyun/i.test(b.name);
+                    if (aFemale && !bFemale) return -1;
+                    if (!aFemale && bFemale) return 1;
+                    return 0;
+                });
+            } else if (voiceType === 'male') {
+                candidates.sort((a, b) => {
+                    const aMale = /male|man|david|mark|yunyang|yunxi/i.test(a.name);
+                    const bMale = /male|man|david|mark|yunyang|yunxi/i.test(b.name);
+                    if (aMale && !bMale) return -1;
+                    if (!aMale && bMale) return 1;
+                    return 0;
+                });
+            }
+
+            return candidates[0] || null;
+        }
+
+        function speakText(type) {
+            const text = type === 'original' ? state.currentOriginal : state.currentTranslated;
+            const lang = type === 'original' ? state.detectedLang : state.targetLang;
+            if (!text) return;
+
+            speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = LANGUAGES[lang]?.code || 'en-US';
+            u.rate = state.speechRate;
+            u.pitch = 1.0;
+
+            // Select best voice
+            const voice = getBestVoice(u.lang);
+            if (voice) {
+                u.voice = voice;
+            }
+
+            speechSynthesis.speak(u);
+        }
+
+        // ========== Copy ==========
+        function copyText(type) {
+            const text = type === 'original' ? state.currentOriginal : state.currentTranslated;
+            if (!text) return;
+            navigator.clipboard.writeText(text).then(() => toast('已复制到剪贴板'));
+        }
+
+        // ========== History ==========
+        function addHistory(orig, trans, from, to) {
+            state.history.unshift({
+                id: Date.now(),
+                orig, trans, from, to,
+                time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+            });
+            if (state.history.length > 20) state.history.pop();
+            localStorage.setItem('history', JSON.stringify(state.history));
             renderHistory();
         }
 
-        // Render history
         function renderHistory() {
-            const historyList = document.getElementById('historyList');
-
-            if (history.length === 0) {
-                historyList.innerHTML = `
-                    <div class="empty-state">
-                        <svg class="empty-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                        </svg>
-                        <p>暂无翻译记录</p>
-                    </div>
-                `;
+            const el = document.getElementById('historyList');
+            if (!state.history.length) {
+                el.innerHTML = '<p class="text-center text-sm text-slate-400 py-8">暂无历史记录</p>';
                 return;
             }
-
-            historyList.innerHTML = history.map(item => {
-                const otherLangs = ['zh', 'en', 'pt'].filter(l => l !== item.sourceLang);
-                return `
-                    <div class="history-item" onclick="loadHistoryItem(${item.id})">
-                        <div class="history-original">${langFlags[item.sourceLang]} ${item.original}</div>
-                        <div class="history-translations">
-                            ${otherLangs.map(lang => `
-                                <div class="history-trans-item">
-                                    <span class="mini-tag lang-tag ${lang}">${langNames[lang]}</span>
-                                    ${item.translations[lang] || ''}
-                                </div>
-                            `).join('')}
-                        </div>
-                        <div class="history-meta">
-                            <span>${item.timestamp}</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+            el.innerHTML = state.history.map(h => `
+        <div onclick="loadHistory(${h.id})" class="p-3 rounded-xl bg-white/50 dark:bg-dark-200/50 border border-slate-200/50 dark:border-slate-700/50 cursor-pointer hover:border-primary-500/50 transition-colors">
+            <p class="text-sm text-slate-500 dark:text-slate-400 truncate">${h.orig}</p>
+            <p class="text-base text-slate-700 dark:text-slate-200 font-medium truncate mt-1">${h.trans}</p>
+            <div class="flex items-center gap-2 mt-2 text-xs text-slate-400">
+                <span>${LANGUAGES[h.from]?.flag || '🌐'} → ${LANGUAGES[h.to]?.flag || '🌐'}</span>
+                <span class="ml-auto">${h.time}</span>
+            </div>
+        </div>
+    `).join('');
         }
 
-        // Load history item
-        function loadHistoryItem(id) {
-            const item = history.find(h => h.id === id);
-            if (item) {
-                const otherLangs = ['zh', 'en', 'pt'].filter(l => l !== item.sourceLang);
+        function loadHistory(id) {
+            const h = state.history.find(x => x.id === id);
+            if (!h) return;
+            document.getElementById('inputText').value = h.orig;
+            onInputChange();
+            state.currentOriginal = h.orig;
+            state.currentTranslated = h.trans;
+            state.detectedLang = h.from;
 
-                // Update original
-                document.getElementById('originalText').textContent = item.original;
-                document.getElementById('originalText').classList.remove('placeholder');
-                document.getElementById('originalLangTag').textContent = langNames[item.sourceLang];
-                document.getElementById('originalLangTag').className = 'lang-tag ' + item.sourceLang;
+            document.getElementById('originalSection').classList.remove('hidden');
+            document.getElementById('originalText').textContent = h.orig;
+            document.getElementById('detectedLangBadge').textContent = `${LANGUAGES[h.from]?.flag || '🌐'} ${LANGUAGES[h.from]?.name || '原文'}`;
+            document.getElementById('translatedText').textContent = h.trans;
+            document.getElementById('targetLangBadge').textContent = `${LANGUAGES[h.to].flag} ${LANGUAGES[h.to].name}`;
 
-                // Update detected language display
-                document.getElementById('detectedLang').classList.remove('hidden');
-                document.getElementById('detectedLangText').textContent = `${langFlags[item.sourceLang]} ${langNames[item.sourceLang]}`;
-
-                // Update translations
-                const trans1Text = document.getElementById('trans1Text');
-                const trans2Text = document.getElementById('trans2Text');
-                const trans1LangTag = document.getElementById('trans1LangTag');
-                const trans2LangTag = document.getElementById('trans2LangTag');
-                const trans1Card = document.getElementById('trans1Card');
-                const trans2Card = document.getElementById('trans2Card');
-
-                trans1Text.textContent = item.translations[otherLangs[0]] || '';
-                trans1Text.classList.remove('placeholder');
-                trans1LangTag.textContent = langNames[otherLangs[0]];
-                trans1LangTag.className = 'lang-tag ' + otherLangs[0];
-                trans1Card.className = 'result-card translation-card ' + otherLangs[0];
-
-                trans2Text.textContent = item.translations[otherLangs[1]] || '';
-                trans2Text.classList.remove('placeholder');
-                trans2LangTag.textContent = langNames[otherLangs[1]];
-                trans2LangTag.className = 'lang-tag ' + otherLangs[1];
-                trans2Card.className = 'result-card translation-card ' + otherLangs[1];
-
-                // Update current texts/langs for speaking
-                currentTexts = {
-                    original: item.original,
-                    trans1: item.translations[otherLangs[0]] || '',
-                    trans2: item.translations[otherLangs[1]] || ''
-                };
-                currentLangs = {
-                    original: item.sourceLang,
-                    trans1: otherLangs[0],
-                    trans2: otherLangs[1]
-                };
-            }
-        }
-
-        // Save/Load history
-        function saveHistory() {
-            localStorage.setItem('translator_history', JSON.stringify(history));
-        }
-
-        function loadHistory() {
-            const saved = localStorage.getItem('translator_history');
-            if (saved) {
-                history = JSON.parse(saved);
-                renderHistory();
-            }
+            document.getElementById('targetLang').value = h.to;
+            onLanguageChange();
         }
 
         function clearHistory() {
-            history = [];
-            saveHistory();
+            state.history = [];
+            localStorage.setItem('history', '[]');
             renderHistory();
-            showToast('历史记录已清空', 'success');
+            toast('历史已清空');
         }
 
-        // Copy text
-        function copyText(type) {
-            const el = document.getElementById(type === 'original' ? 'originalText' : type + 'Text');
-            const text = el.textContent;
-
-            if (text && !el.classList.contains('placeholder')) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showToast('已复制到剪贴板', 'success');
-                });
-            }
+        // ========== Settings ==========
+        function showSettings() {
+            document.getElementById('settingsModal').classList.remove('hidden');
+            document.getElementById('providerSelect').value = state.provider;
+            document.getElementById('apiKeyInput').value = state.apiKey;
+            onProviderChange();
         }
 
-        // Speak text with visual feedback
-        function speakText(type) {
-            const text = currentTexts[type];
-            const lang = currentLangs[type];
-
-            if (!text) return;
-
-            // Cancel any ongoing speech
-            speechSynthesis.cancel();
-
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = langCodes[lang];
-            utterance.rate = 0.9;
-
-            // Get the button
-            const btnId = type === 'original' ? 'originalSpeakBtn' : type + 'SpeakBtn';
-            const btn = document.getElementById(btnId);
-
-            utterance.onstart = () => {
-                btn.classList.add('speaking');
-            };
-
-            utterance.onend = () => {
-                btn.classList.remove('speaking');
-            };
-
-            utterance.onerror = () => {
-                btn.classList.remove('speaking');
-            };
-
-            speechSynthesis.speak(utterance);
+        function hideSettings() {
+            document.getElementById('settingsModal').classList.add('hidden');
         }
 
-        // Toast notification
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toastMessage');
+        function onProviderChange() {
+            const p = document.getElementById('providerSelect').value;
+            document.getElementById('providerInfo').textContent = PROVIDERS[p].info;
+        }
 
-            toastMessage.textContent = message;
-            toast.className = 'toast ' + type;
-
-            // Update icon
-            const icon = toast.querySelector('.toast-icon');
-            if (type === 'success') {
-                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>';
+        function toggleApiKeyVisibility() {
+            const input = document.getElementById('apiKeyInput');
+            const icon = document.getElementById('eyeIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
             } else {
-                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>';
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        function saveSettings() {
+            state.autoSpeak = document.getElementById('autoSpeak').checked;
+            localStorage.setItem('autoSpeak', state.autoSpeak);
+        }
+
+        function saveAndClose() {
+            state.provider = document.getElementById('providerSelect').value;
+            state.apiKey = document.getElementById('apiKeyInput').value.trim();
+            state.voiceType = document.getElementById('voiceSelect').value;
+            state.speechRate = parseFloat(document.getElementById('speechRate').value);
+
+            localStorage.setItem('provider', state.provider);
+            localStorage.setItem('apiKey', state.apiKey);
+            localStorage.setItem('voiceType', state.voiceType);
+            localStorage.setItem('speechRate', state.speechRate);
+
+            if (state.apiKey) {
+                document.getElementById('apiWarning').classList.add('hidden');
             }
 
-            toast.classList.add('show');
+            hideSettings();
+            toast('设置已保存');
+        }
+
+        // ========== Toast ==========
+        function toast(msg, type = 'success') {
+            const el = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            document.getElementById('toastMsg').textContent = msg;
+
+            const iconClasses = {
+                success: 'fas fa-check-circle text-green-400',
+                error: 'fas fa-exclamation-circle text-red-400',
+                info: 'fas fa-info-circle text-blue-400'
+            };
+            icon.className = iconClasses[type] || iconClasses.success;
+
+            el.classList.remove('translate-y-20', 'opacity-0');
+            el.classList.add('translate-y-0', 'opacity-100');
 
             setTimeout(() => {
-                toast.classList.remove('show');
+                el.classList.add('translate-y-20', 'opacity-0');
+                el.classList.remove('translate-y-0', 'opacity-100');
             }, 3000);
         }
-
-        // API Key Modal
-        function showApiKeyModal() {
-            document.getElementById('apiKeyInput').value = apiKey;
-            document.getElementById('apiKeyModal').classList.add('show');
-        }
-
-        function hideApiKeyModal() {
-            document.getElementById('apiKeyModal').classList.remove('show');
-        }
-
-        function saveApiKey() {
-            const input = document.getElementById('apiKeyInput');
-            apiKey = input.value.trim();
-            localStorage.setItem('gemini_api_key', apiKey);
-            hideApiKeyModal();
-            showToast('API Key 已保存', 'success');
-        }
-
-        // Close modal on overlay click
-        document.getElementById('apiKeyModal').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('apiKeyModal')) {
-                hideApiKeyModal();
-            }
-        });
     </script>
 </body>
 
