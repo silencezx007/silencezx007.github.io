@@ -1,0 +1,4 @@
+{
+    "useProxy": true,
+    "note": "Change to true to force Supabase proxy usage. Hosted on GitHub Pages."
+}
