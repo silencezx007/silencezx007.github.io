@@ -9,10 +9,10 @@ interface LayoutProps {
 }
 
 const navigationItems = [
-  { href: '#projects', label: '项目' },
-  { href: '#focus', label: '方向' },
-  { href: '#process', label: '方法' },
-  { href: '#contact', label: '联系' },
+  { href: '#works', label: '作品' },
+  { href: '#strengths', label: '特点' },
+  { href: '#now', label: '近况' },
+  { href: '#contact', label: '链接' },
 ];
 
 export function Layout({ children }: LayoutProps) {
@@ -64,9 +64,9 @@ export function Layout({ children }: LayoutProps) {
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-semibold tracking-[0.2em] text-foreground/80">
-                个人主页
+                张旭
               </span>
-              <span className="text-xs text-muted-foreground">持续打磨中</span>
+              <span className="text-xs text-muted-foreground">个人主页</span>
             </div>
           </a>
 
@@ -88,14 +88,14 @@ export function Layout({ children }: LayoutProps) {
 
           <div className="flex items-center gap-3">
             <a
-              href="#contact"
+              href="#works"
               className={`hidden items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all md:inline-flex ${
                 mode === 'zen'
                   ? 'bg-foreground text-background hover:opacity-90'
                   : 'bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/20'
               }`}
             >
-              继续完善
+              查看作品
               <ArrowUpRight className="h-4 w-4" />
             </a>
             <ModeSwitcher />
@@ -111,7 +111,7 @@ export function Layout({ children }: LayoutProps) {
         href="#contact"
         className="fixed bottom-6 right-6 z-50 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-transform hover:scale-105 md:hidden"
       >
-        继续完善
+        查看链接
         <ArrowUpRight className="h-4 w-4" />
       </a>
     </div>
