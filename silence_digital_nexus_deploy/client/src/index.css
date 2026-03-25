@@ -1,0 +1,185 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  
+  --color-glass: var(--glass);
+  --color-glass-border: var(--glass-border);
+  --color-neon-cyan: var(--neon-cyan);
+  --color-neon-magenta: var(--neon-magenta);
+}
+
+/* 
+  Design Philosophy: "Premium Tech"
+  Light Mode: "Ultra Minimal" - Pure white, subtle greys, razor-sharp lines.
+  Dark Mode: "Deep Space" - Charcoal greys, sophisticated slate, muted gold/blue accents.
+*/
+
+:root {
+  /* Light Mode (Ultra Minimal Tech) */
+  --background: oklch(0.99 0 0); /* Pure White */
+  --foreground: oklch(0.15 0 0); /* Sharp Black */
+  
+  --card: oklch(1 0 0); /* White Card */
+  --card-foreground: oklch(0.15 0 0);
+  
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0 0);
+  
+  --primary: oklch(0.15 0 0); /* Black Primary */
+  --primary-foreground: oklch(1 0 0);
+  
+  --secondary: oklch(0.96 0 0); /* Very Light Grey */
+  --secondary-foreground: oklch(0.15 0 0);
+  
+  --muted: oklch(0.96 0 0);
+  --muted-foreground: oklch(0.55 0 0); /* Medium Grey */
+  
+  --accent: oklch(0.96 0 0);
+  --accent-foreground: oklch(0.15 0 0);
+  
+  --destructive: oklch(0.6 0.2 20);
+  --destructive-foreground: oklch(0.98 0 0);
+  
+  --border: oklch(0.92 0 0); /* Subtle Border */
+  --input: oklch(0.92 0 0);
+  --ring: oklch(0.7 0 0);
+  
+  --radius: 0.5rem; /* Sharper corners for tech feel */
+  
+  /* Custom Glass & Effects */
+  --glass: oklch(1 0 0 / 0.8);
+  --glass-border: oklch(0.9 0 0);
+  --neon-cyan: oklch(0.6 0.15 240); /* Muted Blue for Light Mode */
+  --neon-magenta: oklch(0.6 0.15 320);
+}
+
+.dark {
+  /* Dark Mode (Premium Deep Space) */
+  --background: oklch(0.2 0.02 260); /* Lighter Charcoal Blue, not pure black */
+  --foreground: oklch(0.95 0.01 260); /* Soft White */
+  
+  --card: oklch(0.25 0.02 260 / 0.7); /* Lighter Panel */
+  --card-foreground: oklch(0.95 0.01 260);
+  
+  --popover: oklch(0.25 0.02 260);
+  --popover-foreground: oklch(0.95 0.01 260);
+  
+  --primary: oklch(0.7 0.15 250); /* Sophisticated Blue-Purple */
+  --primary-foreground: oklch(1 0 0);
+  
+  --secondary: oklch(0.3 0.03 260);
+  --secondary-foreground: oklch(0.95 0.01 260);
+  
+  --muted: oklch(0.3 0.03 260);
+  --muted-foreground: oklch(0.7 0.02 260);
+  
+  --accent: oklch(0.3 0.03 260);
+  --accent-foreground: oklch(0.95 0.01 260);
+  
+  --destructive: oklch(0.6 0.2 20);
+  --destructive-foreground: oklch(1 0 0);
+  
+  --border: oklch(1 0 0 / 0.1); /* Subtle White Border */
+  --input: oklch(1 0 0 / 0.1);
+  --ring: oklch(0.6 0.1 250);
+  
+  /* Custom Glass & Effects */
+  --glass: oklch(0.25 0.02 260 / 0.6);
+  --glass-border: oklch(1 0 0 / 0.15);
+  --neon-cyan: oklch(0.75 0.1 230); /* Muted Cyan */
+  --neon-magenta: oklch(0.75 0.1 300); /* Muted Magenta */
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased transition-colors duration-700 ease-in-out;
+  }
+  
+  /* Typography Defaults */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
+  }
+  
+  code, pre, kbd {
+    @apply font-mono;
+  }
+}
+
+@layer components {
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+      max-width: 1280px;
+    }
+  }
+  
+  /* Glassmorphism Utilities */
+  .glass-panel {
+    @apply bg-glass backdrop-blur-xl border border-glass-border shadow-sm;
+  }
+  
+  .glass-button {
+    @apply bg-glass hover:bg-accent/50 backdrop-blur-md border border-glass-border transition-all duration-300;
+  }
+}
