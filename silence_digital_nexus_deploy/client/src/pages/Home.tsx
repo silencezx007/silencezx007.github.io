@@ -22,14 +22,14 @@ const manifesto = {
   lead: '把想法做成作品，',
   emphasis: '把经历写成答案。',
   description:
-    '每一张卡片都对应一个真实方向：项目、原型和持续探索。这里不讲过程感，而是直接展示能被看见的结果。',
+    '聚焦真实项目、真实能力和真实结果，让每一次访问都能快速建立信任。',
 };
 
 const featuredCards = [
   {
     title: 'AI 实时翻译原型',
     summary:
-      '面向真实沟通场景的翻译原型，支持中、葡、英多语切换。核心目标是输入顺滑、输出准确、交互可复用。',
+      '面向真实沟通场景的翻译原型，支持中、葡、英多语切换，强调速度、准确和稳定体验。',
     status: '可直接体验',
     label: 'AI / Translation',
     href: '/translator/',
@@ -39,7 +39,7 @@ const featuredCards = [
   {
     title: '机场项目协作经验',
     summary:
-      '长期一线协作与节奏推进经验，关注跨角色沟通、任务闭环和现场执行效率，强调真实可落地。',
+      '长期一线协作与节奏推进经验，覆盖跨角色沟通、任务闭环和现场执行，强调真实可落地。',
     status: '真实经历',
     label: 'Project / Field',
     href: '#strengths',
@@ -49,7 +49,7 @@ const featuredCards = [
   {
     title: 'AI 工具实践',
     summary:
-      '持续把 AI 能力落到小工具和工作流里，优先做可展示、可复用、可迭代的产品雏形，而不是概念 Demo。',
+      '持续把 AI 能力落到小工具和工作流中，优先交付可展示、可复用、可迭代的实用成果。',
     status: '持续迭代',
     label: 'AI / Workflow',
     href: '#now',
@@ -57,11 +57,11 @@ const featuredCards = [
     icon: Bot,
   },
   {
-    title: '个人主页设计',
+    title: '个人品牌主页',
     summary:
-      '把个人表达改造成卡片式展示首页，突出作品入口、价值主张和可分享性，让页面像作品集而不是说明书。',
+      '统一个人入口，集中展示项目能力、协作经验和联系方式，帮助访问者快速完成认知与判断。',
     status: '当前版本',
-    label: 'Design / Web',
+    label: 'Brand / Web',
     href: '#manifesto',
     actionLabel: '查看宣言',
     icon: LayoutGrid,
@@ -70,37 +70,37 @@ const featuredCards = [
 
 const strengthCards = [
   {
-    title: '真实导向',
+    title: '结果导向',
     description:
-      '我更重视“是否真的有用”，而不是表面复杂。每一段内容都尽量对应真实项目或真实场景。',
+      '优先交付可验证的成果，用可体验的产品与可复盘的项目价值来建立信任。',
     icon: Globe,
   },
   {
     title: '表达清晰',
     description:
-      '把复杂经历翻译成易读页面，让第一次访问的人也能快速理解你在做什么、为什么值得看。',
+      '把复杂经验转成易理解的信息结构，让第一次访问的人也能快速抓住重点。',
     icon: MonitorSmartphone,
   },
   {
-    title: '长期迭代',
+    title: '持续交付',
     description:
-      '从结构上保证可持续升级，后续新增项目、截图、联系方式都能自然接入，不会破坏整体节奏。',
+      '保持稳定更新节奏，让能力展示、项目沉淀和合作价值持续增长。',
     icon: Workflow,
   },
 ];
 
 const nowCards = [
   {
-    title: '继续打磨展示力',
-    text: '目标是让页面一屏就有记忆点，三屏就建立信任感。',
+    title: 'OPC 场景探索',
+    text: '把技术能力与业务场景结合，持续产出可直接体验的作品。',
   },
   {
-    title: '补齐真实项目素材',
-    text: '下一步优先补截图、上线链接和成果数据，强化说服力。',
+    title: 'AI 应用落地',
+    text: '聚焦翻译、效率与协作场景，提升真实使用中的体验与效率。',
   },
   {
-    title: '统一个人品牌入口',
-    text: '公开分享时只给这一个主页地址，形成稳定一致的个人名片。',
+    title: '长期合作价值',
+    text: '通过可靠交付和稳定输出，建立值得长期合作的专业信任。',
   },
 ];
 
@@ -137,7 +137,7 @@ export default function Home() {
               </h2>
             </div>
             <p className="max-w-2xl text-sm leading-7 text-muted-foreground">
-              这里先放可感知的结果。能点开的原型、能理解的经历、能延展的方向，比任何长篇自述都更有说服力。
+              可体验的产品原型、可验证的项目经历、可持续的能力方向，构成这张个人名片。
             </p>
           </div>
 
@@ -304,8 +304,8 @@ export default function Home() {
                     <div className="mt-1 text-lg font-semibold">项目经验 + AI 工具实践</div>
                   </div>
                   <div>
-                    <div className="text-sm text-muted-foreground">主页风格</div>
-                    <div className="mt-1 text-lg font-semibold">卡片式、现代、可分享</div>
+                    <div className="text-sm text-muted-foreground">核心能力</div>
+                    <div className="mt-1 text-lg font-semibold">落地执行、跨场景协作、产品表达</div>
                   </div>
                   <div>
                     <div className="text-sm text-muted-foreground">核心宣言</div>
@@ -348,7 +348,7 @@ export default function Home() {
             <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground">核心特点</p>
             <h2 className="mt-3 text-3xl font-semibold tracking-tight">把复杂经验，变成清晰表达</h2>
             <p className="mt-5 text-sm leading-8 text-muted-foreground">
-              当朋友第一次打开这页，我希望他不用滚太久，就能明白你的方向、你的能力和你已经交付过的结果。
+              通过结构化表达和真实案例，让访问者快速看到你的专业价值与合作潜力。
             </p>
           </div>
 
@@ -414,10 +414,10 @@ export default function Home() {
             <div className="max-w-2xl">
               <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground">继续浏览</p>
               <h2 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
-                从这里继续点开你的真实世界
+                从这里进入我的项目与能力
               </h2>
               <p className="mt-4 text-sm leading-8 text-muted-foreground">
-                下一步建议补充项目截图、上线链接和联系方式入口，让“看起来不错”升级成“值得联系”。
+                欢迎通过原型与 GitHub 继续了解我的工作方式、技术路径与实际成果。
               </p>
             </div>
 
