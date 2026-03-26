@@ -10,8 +10,8 @@ interface LayoutProps {
 
 const navigationItems = [
   { href: '#works', label: '作品' },
+  { href: '#manifesto', label: '宣言' },
   { href: '#strengths', label: '特点' },
-  { href: '#now', label: '近况' },
   { href: '#contact', label: '链接' },
 ];
 
@@ -63,9 +63,7 @@ export function Layout({ children }: LayoutProps) {
               <Sparkles className="h-4 w-4" />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-semibold tracking-[0.2em] text-foreground/80">
-                张旭
-              </span>
+              <span className="text-sm font-semibold tracking-[0.2em] text-foreground/80">张旭</span>
               <span className="text-xs text-muted-foreground">个人主页</span>
             </div>
           </a>

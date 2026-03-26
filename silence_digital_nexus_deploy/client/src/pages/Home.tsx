@@ -17,13 +17,19 @@ import {
 
 const ownerName = '张旭';
 
-const heroFacts = ['OPC 探索', 'AI 实践', '真实项目'];
+const manifesto = {
+  badge: 'OPC 的探索之路',
+  lead: '把想法做成作品，',
+  emphasis: '把经历写成答案。',
+  description:
+    '每一张卡片都对应一个真实方向：项目、原型和持续探索。这里不讲过程感，而是直接展示能被看见的结果。',
+};
 
 const featuredCards = [
   {
     title: 'AI 实时翻译原型',
     summary:
-      '把跨语言沟通里最直接的需求做成可打开、可体验的页面原型，适合向朋友快速展示一个真实可用的作品入口。',
+      '面向真实沟通场景的翻译原型，支持中、葡、英多语切换。核心目标是输入顺滑、输出准确、交互可复用。',
     status: '可直接体验',
     label: 'AI / Translation',
     href: '/translator/',
@@ -33,7 +39,7 @@ const featuredCards = [
   {
     title: '机场项目协作经验',
     summary:
-      '长期现场协作、节奏推进和跨语言沟通，让我更在意项目能否真正落地，而不是只停留在概念描述里。',
+      '长期一线协作与节奏推进经验，关注跨角色沟通、任务闭环和现场执行效率，强调真实可落地。',
     status: '真实经历',
     label: 'Project / Field',
     href: '#strengths',
@@ -43,7 +49,7 @@ const featuredCards = [
   {
     title: 'AI 工具实践',
     summary:
-      '最近持续把 AI 能力往小工具、工作流和个人效率场景里落，优先做看得见结果、讲得清价值的东西。',
+      '持续把 AI 能力落到小工具和工作流里，优先做可展示、可复用、可迭代的产品雏形，而不是概念 Demo。',
     status: '持续迭代',
     label: 'AI / Workflow',
     href: '#now',
@@ -53,48 +59,48 @@ const featuredCards = [
   {
     title: '个人主页设计',
     summary:
-      '这版主页不再介绍建站过程，而是把内容收成可分享的展示卡片，让整体观感更像作品集首页。',
+      '把个人表达改造成卡片式展示首页，突出作品入口、价值主张和可分享性，让页面像作品集而不是说明书。',
     status: '当前版本',
     label: 'Design / Web',
-    href: '#contact',
-    actionLabel: '查看链接',
+    href: '#manifesto',
+    actionLabel: '查看宣言',
     icon: LayoutGrid,
   },
 ];
 
 const strengthCards = [
   {
-    title: '更重视真实感',
+    title: '真实导向',
     description:
-      '比起只做一个“看起来很会技术”的页面，我更希望每张卡片都能对应真实经历、真实项目或者真实兴趣。',
+      '我更重视“是否真的有用”，而不是表面复杂。每一段内容都尽量对应真实项目或真实场景。',
     icon: Globe,
   },
   {
-    title: '把想法落成页面',
+    title: '表达清晰',
     description:
-      '我喜欢把零散的需求、现场经验和新工具尝试，整理成别人一眼就能理解的网页展示和原型入口。',
+      '把复杂经历翻译成易读页面，让第一次访问的人也能快速理解你在做什么、为什么值得看。',
     icon: MonitorSmartphone,
   },
   {
-    title: '关注长期可迭代',
+    title: '长期迭代',
     description:
-      '页面效果重要，但结构也要能继续扩展。后面无论加项目、截图还是联系方式，都能自然接进来。',
+      '从结构上保证可持续升级，后续新增项目、截图、联系方式都能自然接入，不会破坏整体节奏。',
     icon: Workflow,
   },
 ];
 
-const currentCards = [
+const nowCards = [
   {
-    title: '正在打磨主页',
-    text: '继续把这套页面做得更像成品，减少说明感，增强展示感。',
+    title: '继续打磨展示力',
+    text: '目标是让页面一屏就有记忆点，三屏就建立信任感。',
   },
   {
-    title: '补真实作品',
-    text: '优先补能直接点开的作品、截图和简洁说明，而不是堆很多占位内容。',
+    title: '补齐真实项目素材',
+    text: '下一步优先补截图、上线链接和成果数据，强化说服力。',
   },
   {
-    title: '保持统一入口',
-    text: '之后公开分享时，就只保留这一套主页和这一条公开网址。',
+    title: '统一个人品牌入口',
+    text: '公开分享时只给这一个主页地址，形成稳定一致的个人名片。',
   },
 ];
 
@@ -122,165 +128,16 @@ export default function Home() {
   return (
     <Layout>
       <div id="top" className="mx-auto flex w-full max-w-6xl flex-col gap-8 md:gap-10">
-        <motion.section
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          className={`relative overflow-hidden rounded-[2rem] p-8 md:p-12 ${
-            mode === 'zen'
-              ? 'border border-black/5 bg-white/95 shadow-[0_24px_80px_rgba(15,23,42,0.08)]'
-              : 'border border-white/10 bg-card/90 shadow-[0_24px_80px_rgba(5,10,20,0.45)]'
-          }`}
-        >
-          <div className="absolute inset-0 opacity-90">
-            <div
-              className={`absolute -right-20 top-0 h-64 w-64 rounded-full blur-3xl ${
-                mode === 'zen' ? 'bg-stone-100' : 'bg-cyan-500/10'
-              }`}
-            />
-            <div
-              className={`absolute -left-8 bottom-0 h-56 w-56 rounded-full blur-3xl ${
-                mode === 'zen' ? 'bg-amber-50' : 'bg-fuchsia-500/10'
-              }`}
-            />
-          </div>
-
-          <div className="relative z-10 grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
-            <div className="max-w-3xl">
-              <div
-                className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm ${
-                  mode === 'zen'
-                    ? 'bg-black/[0.04] text-foreground/80'
-                    : 'border border-primary/20 bg-primary/10 text-primary'
-                }`}
-              >
-                <Sparkles className="h-4 w-4" />
-                OPC 的探索之路
-              </div>
-
-              <p
-                className={`mt-6 text-sm tracking-[0.35em] ${
-                  mode === 'zen' ? 'text-foreground/55' : 'text-primary/85'
-                }`}
-              >
-                {ownerName}
-              </p>
-
-              <h1 className="mt-5 max-w-4xl text-4xl font-semibold leading-tight tracking-tight md:text-6xl">
-                把想法做成作品，
-                <span className={mode === 'zen' ? 'text-foreground/55' : 'text-primary'}>
-                  {' '}
-                  把经历写成答案。
-                </span>
-              </h1>
-
-              <p className="mt-6 max-w-2xl text-base leading-8 text-muted-foreground md:text-lg">
-                这里展示的不是思路，而是真正值得被看见的结果：正在推进的项目、可以直接体验的原型，以及一条还在持续向前的探索路径。
-              </p>
-
-              <div className="mt-8 flex flex-wrap gap-3">
-                {heroFacts.map((item) => (
-                  <span
-                    key={item}
-                    className={`rounded-full px-4 py-2 text-sm ${
-                      mode === 'zen'
-                        ? 'border border-black/8 bg-black/[0.03] text-foreground/75'
-                        : 'border border-white/10 bg-white/[0.04] text-foreground/80'
-                    }`}
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
-
-              <div className="mt-8 flex flex-wrap gap-4">
-                <a
-                  href="#works"
-                  className={`inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all ${
-                    mode === 'zen'
-                      ? 'bg-foreground text-background hover:opacity-90'
-                      : 'bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/20'
-                  }`}
-                >
-                  查看作品卡片
-                  <ArrowRight className="h-4 w-4" />
-                </a>
-                <a
-                  href="https://silencezx007.github.io/"
-                  className={`inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all ${
-                    mode === 'zen'
-                      ? 'border border-black/10 bg-white hover:bg-black/[0.03]'
-                      : 'border border-white/10 bg-white/5 hover:bg-white/10'
-                  }`}
-                >
-                  打开公开网址
-                  <ArrowUpRight className="h-4 w-4" />
-                </a>
-              </div>
-            </div>
-
-            <div className="grid gap-4">
-              <div
-                className={`rounded-[1.75rem] p-6 ${
-                  mode === 'zen'
-                    ? 'border border-black/5 bg-black/[0.02]'
-                    : 'border border-white/10 bg-white/[0.03]'
-                }`}
-              >
-                <p className="text-sm uppercase tracking-[0.25em] text-muted-foreground">
-                  快速认识
-                </p>
-                <div className="mt-5 space-y-4">
-                  <div>
-                    <div className="text-sm text-muted-foreground">当前定位</div>
-                    <div className="mt-1 text-lg font-semibold">项目经验 + AI 工具实践</div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-muted-foreground">主页风格</div>
-                    <div className="mt-1 text-lg font-semibold">简洁、现代、偏展示型</div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-muted-foreground">这页的作用</div>
-                    <div className="mt-1 text-lg font-semibold">一个可以直接分享的个人入口</div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-1">
-                {contactCards.map((item) => (
-                  <a
-                    key={item.title}
-                    href={item.href}
-                    className={`rounded-[1.5rem] p-5 transition-all ${
-                      mode === 'zen'
-                        ? 'border border-black/5 bg-white/80 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(15,23,42,0.08)]'
-                        : 'border border-white/10 bg-card/70 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,0,0,0.28)]'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-sm text-muted-foreground">{item.title}</span>
-                      <Link2 className="h-4 w-4 text-primary" />
-                    </div>
-                    <div className="mt-3 text-base font-semibold">{item.value}</div>
-                  </a>
-                ))}
-              </div>
-            </div>
-          </div>
-        </motion.section>
-
         <section id="works" className="grid gap-6">
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground">
-                作品卡片
-              </p>
+              <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground">作品卡片</p>
               <h2 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
-                先看内容，再决定要不要继续往下点开
+                先看作品，再认识我
               </h2>
             </div>
             <p className="max-w-2xl text-sm leading-7 text-muted-foreground">
-              这一页现在更像一个展示首页。每张卡片都尽量对应一个真实方向、真实能力或真实入口，不再用大段篇幅解释页面是怎么做出来的。
+              这里先放可感知的结果。能点开的原型、能理解的经历、能延展的方向，比任何长篇自述都更有说服力。
             </p>
           </div>
 
@@ -290,10 +147,10 @@ export default function Home() {
                 key={card.title}
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.08 * index, duration: 0.45 }}
+                transition={{ delay: 0.06 * index, duration: 0.45 }}
                 className={`group relative overflow-hidden rounded-[1.9rem] p-7 ${
                   mode === 'zen'
-                    ? 'border border-black/5 bg-white/90 shadow-[0_16px_56px_rgba(15,23,42,0.06)]'
+                    ? 'border border-black/5 bg-white/92 shadow-[0_16px_56px_rgba(15,23,42,0.06)]'
                     : 'border border-white/10 bg-card/85 shadow-[0_16px_56px_rgba(0,0,0,0.35)]'
                 }`}
               >
@@ -349,6 +206,137 @@ export default function Home() {
           </div>
         </section>
 
+        <motion.section
+          id="manifesto"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          className={`relative overflow-hidden rounded-[2rem] p-8 md:p-12 ${
+            mode === 'zen'
+              ? 'border border-black/5 bg-white/95 shadow-[0_24px_80px_rgba(15,23,42,0.08)]'
+              : 'border border-white/10 bg-card/90 shadow-[0_24px_80px_rgba(5,10,20,0.45)]'
+          }`}
+        >
+          <div className="absolute inset-0 opacity-90">
+            <div
+              className={`absolute -right-20 top-0 h-64 w-64 rounded-full blur-3xl ${
+                mode === 'zen' ? 'bg-stone-100' : 'bg-cyan-500/10'
+              }`}
+            />
+            <div
+              className={`absolute -left-8 bottom-0 h-56 w-56 rounded-full blur-3xl ${
+                mode === 'zen' ? 'bg-amber-50' : 'bg-fuchsia-500/10'
+              }`}
+            />
+          </div>
+
+          <div className="relative z-10 grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
+            <div className="max-w-3xl">
+              <div
+                className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm ${
+                  mode === 'zen'
+                    ? 'bg-black/[0.04] text-foreground/80'
+                    : 'border border-primary/20 bg-primary/10 text-primary'
+                }`}
+              >
+                <Sparkles className="h-4 w-4" />
+                {manifesto.badge}
+              </div>
+
+              <p
+                className={`mt-6 text-sm tracking-[0.35em] ${
+                  mode === 'zen' ? 'text-foreground/55' : 'text-primary/85'
+                }`}
+              >
+                {ownerName}
+              </p>
+
+              <h1 className="mt-5 max-w-4xl text-4xl font-semibold leading-tight tracking-tight md:text-6xl">
+                {manifesto.lead}
+                <span className={mode === 'zen' ? 'text-foreground/55' : 'text-primary'}>
+                  {' '}
+                  {manifesto.emphasis}
+                </span>
+              </h1>
+
+              <p className="mt-6 max-w-2xl text-base leading-8 text-muted-foreground md:text-lg">
+                {manifesto.description}
+              </p>
+
+              <div className="mt-8 flex flex-wrap gap-4">
+                <a
+                  href="#works"
+                  className={`inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all ${
+                    mode === 'zen'
+                      ? 'bg-foreground text-background hover:opacity-90'
+                      : 'bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/20'
+                  }`}
+                >
+                  返回作品卡片
+                  <ArrowRight className="h-4 w-4" />
+                </a>
+                <a
+                  href="https://silencezx007.github.io/"
+                  className={`inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all ${
+                    mode === 'zen'
+                      ? 'border border-black/10 bg-white hover:bg-black/[0.03]'
+                      : 'border border-white/10 bg-white/5 hover:bg-white/10'
+                  }`}
+                >
+                  打开公开网址
+                  <ArrowUpRight className="h-4 w-4" />
+                </a>
+              </div>
+            </div>
+
+            <div className="grid gap-4">
+              <div
+                className={`rounded-[1.75rem] p-6 ${
+                  mode === 'zen'
+                    ? 'border border-black/5 bg-black/[0.02]'
+                    : 'border border-white/10 bg-white/[0.03]'
+                }`}
+              >
+                <p className="text-sm uppercase tracking-[0.25em] text-muted-foreground">快速认识</p>
+                <div className="mt-5 space-y-4">
+                  <div>
+                    <div className="text-sm text-muted-foreground">当前定位</div>
+                    <div className="mt-1 text-lg font-semibold">项目经验 + AI 工具实践</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">主页风格</div>
+                    <div className="mt-1 text-lg font-semibold">卡片式、现代、可分享</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">核心宣言</div>
+                    <div className="mt-1 text-lg font-semibold">把想法做成作品，把经历写成答案。</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-1">
+                {contactCards.map((item) => (
+                  <a
+                    key={item.title}
+                    href={item.href}
+                    className={`rounded-[1.5rem] p-5 transition-all ${
+                      mode === 'zen'
+                        ? 'border border-black/5 bg-white/80 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(15,23,42,0.08)]'
+                        : 'border border-white/10 bg-card/70 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,0,0,0.28)]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-sm text-muted-foreground">{item.title}</span>
+                      <Link2 className="h-4 w-4 text-primary" />
+                    </div>
+                    <div className="mt-3 text-base font-semibold">{item.value}</div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.section>
+
         <section id="strengths" className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
           <div
             className={`rounded-[1.9rem] p-7 ${
@@ -357,14 +345,10 @@ export default function Home() {
                 : 'border border-white/10 bg-card/85 shadow-[0_12px_48px_rgba(0,0,0,0.3)]'
             }`}
           >
-            <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground">
-              我更看重什么
-            </p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight">
-              不是把页面做复杂，而是把展示做清楚
-            </h2>
+            <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground">核心特点</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight">把复杂经验，变成清晰表达</h2>
             <p className="mt-5 text-sm leading-8 text-muted-foreground">
-              如果这是朋友第一次打开我的主页，我希望他能在很短时间里看到三个关键信息：我在做什么、我做过什么、以及我接下来会继续往哪里打磨。
+              当朋友第一次打开这页，我希望他不用滚太久，就能明白你的方向、你的能力和你已经交付过的结果。
             </p>
           </div>
 
@@ -398,7 +382,7 @@ export default function Home() {
         </section>
 
         <section id="now" className="grid gap-5 md:grid-cols-3">
-          {currentCards.map((item, index) => (
+          {nowCards.map((item, index) => (
             <motion.div
               key={item.title}
               initial={{ opacity: 0, y: 20 }}
@@ -428,14 +412,12 @@ export default function Home() {
           <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-primary/10 blur-3xl" />
           <div className="relative z-10 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
             <div className="max-w-2xl">
-              <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground">
-                继续浏览
-              </p>
+              <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground">继续浏览</p>
               <h2 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
-                如果你想继续看，可以从这里继续点开
+                从这里继续点开你的真实世界
               </h2>
               <p className="mt-4 text-sm leading-8 text-muted-foreground">
-                这版主页已经切到成品展示逻辑。接下来适合继续补的是项目截图、更多真实作品，以及更完整的联系方式。
+                下一步建议补充项目截图、上线链接和联系方式入口，让“看起来不错”升级成“值得联系”。
               </p>
             </div>
 
