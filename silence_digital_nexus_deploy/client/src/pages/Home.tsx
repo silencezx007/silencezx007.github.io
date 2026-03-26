@@ -17,7 +17,7 @@ import {
 
 const ownerName = '张旭';
 
-const heroFacts = ['个人主页', '卡片式展示', '持续更新'];
+const heroFacts = ['OPC 探索', 'AI 实践', '真实项目'];
 
 const featuredCards = [
   {
@@ -155,7 +155,7 @@ export default function Home() {
                 }`}
               >
                 <Sparkles className="h-4 w-4" />
-                现在这就是唯一保留的个人主页版本
+                OPC 的探索之路
               </div>
 
               <p
@@ -167,15 +167,15 @@ export default function Home() {
               </p>
 
               <h1 className="mt-5 max-w-4xl text-4xl font-semibold leading-tight tracking-tight md:text-6xl">
-                把项目、经历和正在做的事，
+                把想法做成作品，
                 <span className={mode === 'zen' ? 'text-foreground/55' : 'text-primary'}>
                   {' '}
-                  收进一组可以直接发给朋友看的卡片里。
+                  把经历写成答案。
                 </span>
               </h1>
 
               <p className="mt-6 max-w-2xl text-base leading-8 text-muted-foreground md:text-lg">
-                这里不再展开讲建站过程，而是直接展示值得看的内容：能打开的作品、我在做的方向，以及几个能快速认识我的切面。
+                这里展示的不是思路，而是真正值得被看见的结果：正在推进的项目、可以直接体验的原型，以及一条还在持续向前的探索路径。
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
