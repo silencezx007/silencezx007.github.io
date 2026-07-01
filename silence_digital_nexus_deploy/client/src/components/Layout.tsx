@@ -9,9 +9,9 @@ interface LayoutProps {
 }
 
 const navigationItems = [
-  { href: '#works', label: '作品' },
-  { href: '#manifesto', label: '宣言' },
-  { href: '#strengths', label: '特点' },
+  { href: '#systems', label: '系统' },
+  { href: '#method', label: '方法' },
+  { href: '#notes', label: '笔记' },
   { href: '#contact', label: '链接' },
 ];
 
@@ -57,14 +57,14 @@ export function Layout({ children }: LayoutProps) {
               className={`flex h-10 w-10 items-center justify-center rounded-2xl border transition-colors ${
                 mode === 'zen'
                   ? 'border-black/5 bg-white text-foreground'
-                  : 'border-primary/30 bg-background/70 text-primary'
+                  : 'border-emerald-300/30 bg-background/70 text-emerald-200'
               }`}
             >
               <Sparkles className="h-4 w-4" />
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-semibold tracking-[0.2em] text-foreground/80">张旭</span>
-              <span className="text-xs text-muted-foreground">个人主页</span>
+              <span className="text-xs text-muted-foreground">AI 操作系统建设中</span>
             </div>
           </a>
 
@@ -86,14 +86,14 @@ export function Layout({ children }: LayoutProps) {
 
           <div className="flex items-center gap-3">
             <a
-              href="#works"
+              href="#systems"
               className={`hidden items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all md:inline-flex ${
                 mode === 'zen'
                   ? 'bg-foreground text-background hover:opacity-90'
                   : 'bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/20'
               }`}
             >
-              查看作品
+              查看系统
               <ArrowUpRight className="h-4 w-4" />
             </a>
             <ModeSwitcher />
@@ -105,13 +105,6 @@ export function Layout({ children }: LayoutProps) {
         {children}
       </main>
 
-      <a
-        href="#contact"
-        className="fixed bottom-6 right-6 z-50 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-transform hover:scale-105 md:hidden"
-      >
-        查看链接
-        <ArrowUpRight className="h-4 w-4" />
-      </a>
     </div>
   );
 }
