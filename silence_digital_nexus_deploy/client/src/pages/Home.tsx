@@ -2,311 +2,483 @@ import { Layout } from '@/components/Layout';
 import { useMode } from '@/contexts/ModeContext';
 import { motion } from 'framer-motion';
 import {
-  ArrowRight,
   ArrowUpRight,
   BookOpenText,
   BriefcaseBusiness,
-  Cpu,
+  DatabaseZap,
   Link2,
   Mail,
   Network,
-  Radar,
+  Play,
   Workflow,
 } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 
-const buildSignals = [
+type Particle = {
+  x: number;
+  y: number;
+  size: number;
+  drift: number;
+  tone: 'ink' | 'red' | 'green';
+};
+
+const signals = [
+  { label: 'WORKHUB', value: 'Live', detail: '事件队列 / 拟稿 / 采购单' },
+  { label: 'MEMORY', value: 'Live', detail: 'Obsidian 三库 / AI 对话沉淀' },
+  { label: 'MAIL AGENT', value: 'Building', detail: '审批判断 / 草稿箱 / 附件归档' },
+  { label: 'AGENT STACK', value: 'Lab', detail: 'Codex / Hermes / OpenClaw 边界实验' },
+];
+
+const profileRows = [
+  ['ID', 'ZHANG XU / 张旭'],
+  ['FOCUS', 'AI one-person company OS'],
+  ['METHOD', 'Workflows before demos'],
+  ['BASE', 'Engineering + operations'],
+  ['VALUE', 'Systems that leave evidence'],
+];
+
+const notes = [
   {
-    label: 'Current thesis',
-    value: 'AI one-person company OS',
-    detail: '把采购、审批、邮件、知识库和自动化收敛成一个可接管的工作系统。',
+    title: '把邮件草稿真正放进工作邮箱',
+    tag: 'WORKFLOW',
+    meta: '采购自动化 · 2026',
+    body: 'AI 不是写一段建议，而是把结果落到草稿箱、附件目录和可追踪状态里。',
   },
   {
-    label: 'Home base',
-    value: 'Engineering + operations',
-    detail: '从工程项目、供应链协同和真实业务流程里长出 AI 应用。',
+    title: '记忆不是收藏夹',
+    tag: 'MEMORY',
+    meta: 'LLM + Wiki · Obsidian',
+    body: '每次网页、对话和判断都要沉淀成下次能接上的上下文。',
   },
   {
-    label: 'Public stance',
-    value: 'Build in public',
-    detail: '个人网站不做简历墙，做一个持续更新的信号台。',
+    title: '三套 Agent，三条边界',
+    tag: 'AGENT OPS',
+    meta: 'Codex / Hermes / OpenClaw',
+    body: '系统独立、目录独立、记忆独立。先核验真相源，再让 Agent 接管。',
   },
 ];
 
 const systems = [
   {
-    title: 'Workhub',
-    tag: 'automation',
-    description: '工作事件队列、采购单、邮件草稿、跟进动作的中枢。',
     icon: Workflow,
+    title: 'Workhub',
+    tag: 'AUTOMATION',
+    description: '工作事件队列、采购单、邮件草稿、跟进动作的中枢。',
   },
   {
-    title: 'LLM + Wiki',
-    tag: 'memory',
-    description: '把网页、AI 对话、工作记录沉淀进 Obsidian，形成长期知识层。',
     icon: BookOpenText,
+    title: 'LLM + Wiki',
+    tag: 'MEMORY',
+    description: '把网页、AI 对话、工作记录沉淀进 Obsidian，形成长期知识层。',
   },
   {
-    title: 'Procurement Agent',
-    tag: 'workflow',
-    description: '采购申请、审批判断、供应商询价、附件归档的半自动流程。',
     icon: BriefcaseBusiness,
+    title: 'Procurement Agent',
+    tag: 'WORKFLOW',
+    description: '采购申请、审批判断、供应商询价、附件归档的半自动流程。',
   },
   {
-    title: 'Codex / Hermes / OpenClaw',
-    tag: 'agent stack',
-    description: '三套本机 Agent 独立运行，用真实任务检验边界、记忆和接管能力。',
     icon: Network,
+    title: 'Agent Stack',
+    tag: 'BOUNDARY',
+    description: 'Codex、Hermes、OpenClaw 分工清晰，用真实任务验证接管能力。',
   },
 ];
 
-const proofItems = [
-  '把邮件草稿真正落到工作邮箱草稿箱，而不是停留在文本建议。',
-  '把文章、网页和工具评估沉淀成可复用知识卡，而不是一次性摘要。',
-  '用最小补丁修系统，不为了“理论最佳”重构已有工作流。',
-  '先核验进程、日志、配置、端口和文件，再判断问题在哪。',
+const buildLines = [
+  'boot archive workspace',
+  'load workhub events',
+  'sync obsidian memory',
+  'draft procurement mail',
+  'verify agent boundary',
+  'publish signal station',
 ];
 
-const publicLinks = [
-  {
-    title: 'GitHub',
-    value: 'github.com/silencezx007',
-    href: 'https://github.com/silencezx007',
-  },
-  {
-    title: 'AI translator prototype',
-    value: '在线预览',
-    href: '/translator/',
-  },
-  {
-    title: 'Email',
-    value: 'silencezx009@gmail.com',
-    href: 'mailto:silencezx009@gmail.com',
-  },
+const links = [
+  { label: 'GitHub', value: 'github.com/silencezx007', href: 'https://github.com/silencezx007' },
+  { label: 'Prototype', value: 'AI translator', href: '/translator/' },
+  { label: 'Email', value: 'silencezx009@gmail.com', href: 'mailto:silencezx009@gmail.com' },
 ];
 
-const fieldNotes = [
-  {
-    title: 'AI is not a chat box',
-    body: '我的重点不是多试几个模型，而是让模型进入真实流程，留下文件、草稿、记录和可追踪结果。',
-  },
-  {
-    title: 'Memory is infrastructure',
-    body: '知识库不是收藏夹。它要能解释我为什么做过这个判断，下次如何更快接上。',
-  },
-  {
-    title: 'Small systems beat big demos',
-    body: '先让一个小流程稳定工作，再把它接到更大的操作系统里。',
-  },
-];
+function ParticleField() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const burstRef = useRef<HTMLSpanElement>(null);
+  const frameRef = useRef<number | null>(null);
+  const pointerRef = useRef({ x: 50, y: 50, active: false });
+  const particlesRef = useRef<Particle[]>(
+    Array.from({ length: 3600 }, (_, index) => ({
+      x: (index * 37 + (index % 9) * 3) % 100,
+      y: (index * 61 + (index % 13) * 2) % 100,
+      size: 0.4 + ((index * 7) % 5) * 0.2,
+      drift: 20 + ((index * 13) % 36),
+      tone: index % 10 === 0 ? 'red' : index % 6 === 0 ? 'green' : 'ink',
+    })),
+  );
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const context = canvas.getContext('2d');
+    if (!context) return;
+
+    const colors = {
+      ink: [23, 19, 15],
+      red: [185, 84, 58],
+      green: [84, 115, 91],
+    } satisfies Record<Particle['tone'], [number, number, number]>;
+
+    const draw = () => {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      const width = rect.width;
+      const height = rect.height;
+
+      if (canvas.width !== Math.round(width * dpr) || canvas.height !== Math.round(height * dpr)) {
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+      }
+
+      context.setTransform(dpr, 0, 0, dpr, 0, 0);
+      context.clearRect(0, 0, width, height);
+
+      const pointer = pointerRef.current;
+      for (const particle of particlesRef.current) {
+        const dx = particle.x - pointer.x;
+        const dy = particle.y - pointer.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const force = pointer.active ? Math.max(0, 1 - distance / 42) : 0;
+        const angle = Math.atan2(dy, dx);
+        const moveX = Math.cos(angle) * particle.drift * force * 1.35;
+        const moveY = Math.sin(angle) * particle.drift * force * 1.35;
+        const x = (particle.x / 100) * width + moveX;
+        const y = (particle.y / 100) * height + moveY;
+        const [r, g, b] = colors[particle.tone];
+
+        context.beginPath();
+        context.fillStyle = `rgba(${r}, ${g}, ${b}, ${0.32 + force * 0.6})`;
+        context.arc(x, y, particle.size * (1 + force * 1.9), 0, Math.PI * 2);
+        context.fill();
+      }
+    };
+
+    const scheduleDraw = () => {
+      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+      frameRef.current = requestAnimationFrame(draw);
+    };
+
+    const resizeObserver = new ResizeObserver(scheduleDraw);
+    resizeObserver.observe(canvas);
+    scheduleDraw();
+
+    return () => {
+      resizeObserver.disconnect();
+      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+    };
+  }, []);
+
+  const scheduleDraw = () => {
+    if (frameRef.current) cancelAnimationFrame(frameRef.current);
+    frameRef.current = requestAnimationFrame(() => {
+      const canvas = canvasRef.current;
+      const context = canvas?.getContext('2d');
+      if (!canvas || !context) return;
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      const width = rect.width;
+      const height = rect.height;
+      const colors = {
+        ink: [23, 19, 15],
+        red: [185, 84, 58],
+        green: [84, 115, 91],
+      } satisfies Record<Particle['tone'], [number, number, number]>;
+
+      context.setTransform(dpr, 0, 0, dpr, 0, 0);
+      context.clearRect(0, 0, width, height);
+      for (const particle of particlesRef.current) {
+        const pointer = pointerRef.current;
+        const dx = particle.x - pointer.x;
+        const dy = particle.y - pointer.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const force = pointer.active ? Math.max(0, 1 - distance / 42) : 0;
+        const angle = Math.atan2(dy, dx);
+        const x = (particle.x / 100) * width + Math.cos(angle) * particle.drift * force * 1.35;
+        const y = (particle.y / 100) * height + Math.sin(angle) * particle.drift * force * 1.35;
+        const [r, g, b] = colors[particle.tone];
+        context.beginPath();
+        context.fillStyle = `rgba(${r}, ${g}, ${b}, ${0.32 + force * 0.6})`;
+        context.arc(x, y, particle.size * (1 + force * 1.9), 0, Math.PI * 2);
+        context.fill();
+      }
+    });
+  };
+
+  return (
+    <div
+      className="particle-field"
+      data-particle-count="3600"
+      onPointerMove={(event) => {
+        const rect = event.currentTarget.getBoundingClientRect();
+        pointerRef.current = {
+          x: ((event.clientX - rect.left) / rect.width) * 100,
+          y: ((event.clientY - rect.top) / rect.height) * 100,
+          active: true,
+        };
+        if (burstRef.current) {
+          burstRef.current.style.left = `${pointerRef.current.x}%`;
+          burstRef.current.style.top = `${pointerRef.current.y}%`;
+          burstRef.current.style.opacity = '1';
+        }
+        scheduleDraw();
+      }}
+      onPointerLeave={() => {
+        pointerRef.current = { ...pointerRef.current, active: false };
+        if (burstRef.current) burstRef.current.style.opacity = '0';
+        scheduleDraw();
+      }}
+    >
+      <canvas ref={canvasRef} className="particle-canvas" aria-hidden="true" />
+      <span ref={burstRef} className="particle-burst" />
+    </div>
+  );
+}
+
+function BuildConsole() {
+  return (
+    <div className="build-console">
+      <div className="console-bar">
+        <span />
+        <span />
+        <span />
+      </div>
+      <div className="console-body">
+        <p className="console-command">$ zx build --in-public</p>
+        {buildLines.map((line, index) => (
+          <p key={line} className="console-line" style={{ animationDelay: `${index * 0.45}s` }}>
+            <span>{`10:12:0${index + 1}`}</span>
+            {line}
+          </p>
+        ))}
+      </div>
+      <div className="console-footer">
+        <span>v0.2.0 · compiling...</span>
+        <div className="progress-track">
+          <div className="progress-fill" />
+        </div>
+        <span>68%</span>
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
   const { mode } = useMode();
-
-  const panelClass =
-    mode === 'zen'
-      ? 'border-stone-200/80 bg-white/78 shadow-[0_24px_80px_rgba(39,35,27,0.09)]'
-      : 'border-white/12 bg-zinc-950/68 shadow-[0_26px_90px_rgba(0,0,0,0.5)]';
-
-  const quietPanelClass =
-    mode === 'zen'
-      ? 'border-stone-200/75 bg-white/68 shadow-[0_14px_45px_rgba(39,35,27,0.07)]'
-      : 'border-white/10 bg-white/[0.045] shadow-[0_16px_48px_rgba(0,0,0,0.32)]';
-
-  const signalClass =
-    mode === 'zen'
-      ? 'border-stone-900/10 bg-stone-950 text-stone-50'
-      : 'border-emerald-300/25 bg-emerald-300 text-zinc-950';
+  const dark = mode !== 'zen';
 
   return (
     <Layout>
-      <div id="top" className="mx-auto flex w-full max-w-7xl flex-col gap-6 md:gap-8">
-        <section className={`relative overflow-hidden rounded-[1.6rem] border backdrop-blur-2xl ${panelClass}`}>
-          <div className="grid min-h-[calc(100vh-9rem)] gap-0 lg:grid-cols-[1.08fr_0.92fr]">
-            <div className="flex flex-col justify-between p-6 md:p-10 lg:p-12">
-              <div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-current/10 px-3 py-2 text-xs font-medium uppercase tracking-[0.22em] text-muted-foreground">
-                  <Radar className="h-4 w-4" />
-                  Personal signal station
+      <div id="top" className="archive-page mx-auto flex w-full max-w-[1520px] flex-col">
+        <section className="archive-hero">
+          <div className="hero-copy">
+            <p className="archive-kicker">AI OPERATOR / ONE-PERSON COMPANY OS</p>
+            <h1 className="display-title">Zhang Xu</h1>
+            <p className="hero-subtitle">
+              我正在把邮件、采购、审批、知识库和本机 Agent 织成一套能持续复利的工作系统。
+            </p>
+            <div className="hero-actions">
+              <a href="#build" className="archive-button primary">
+                查看 Build
+                <ArrowUpRight className="h-4 w-4" />
+              </a>
+              <a href="#writing" className="archive-button">
+                阅读笔记
+                <ArrowUpRight className="h-4 w-4" />
+              </a>
+            </div>
+          </div>
+
+          <div className="hero-visual" aria-label="Zhang Xu AI operator archive hero illustration">
+            <img src="/images/ai-operator-archive-hero.png" alt="" />
+            <ParticleField />
+            <div className="hero-label top">ARCHIVE 2026</div>
+            <div className="hero-label bottom">BUILD IN PUBLIC</div>
+          </div>
+        </section>
+
+        <section id="about" className="archive-section about-grid">
+          <motion.div
+            initial={{ opacity: 0, y: 32 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-120px' }}
+            className="dossier-card"
+          >
+            <p className="archive-kicker">ABOUT / 档案</p>
+            <h2 className="section-title">AI Operator Archive</h2>
+            <p className="section-copy">
+              我不把个人网站当简历墙，而是当一个公开建设现场。这里展示我如何把 AI 放进真实业务流程，留下可复盘、可接管、可复利的工作资产。
+            </p>
+            <div className="profile-table">
+              {profileRows.map(([label, value]) => (
+                <div key={label}>
+                  <span>{label}</span>
+                  <strong>{value}</strong>
                 </div>
+              ))}
+            </div>
+          </motion.div>
 
-                <p className="mt-10 font-mono text-sm uppercase tracking-[0.35em] text-muted-foreground">
-                  Zhang Xu / 张旭
-                </p>
-
-                <h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-[0.98] tracking-tight md:text-7xl lg:text-8xl">
-                  Building the operating system for a one-person company.
-                </h1>
-
-                <p className="mt-7 max-w-2xl text-base leading-8 text-muted-foreground md:text-lg">
-                  我正在把 AI、邮件、采购、审批、知识库和本机 Agent 织成一套能持续复利的工作系统。
-                  这里不是简历，是我公开的建设现场。
-                </p>
+          <motion.div
+            initial={{ opacity: 0, y: 32 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-120px' }}
+            transition={{ delay: 0.12 }}
+            className="signal-board"
+          >
+            <div className="board-header">
+              <p>全系统信号台</p>
+              <span>LIVE / SOON</span>
+            </div>
+            {signals.map((signal) => (
+              <div key={signal.label} className="signal-row">
+                <span className="signal-name">{signal.label}</span>
+                <span className="signal-detail">{signal.detail}</span>
+                <span className={`signal-state ${signal.value.toLowerCase()}`}>{signal.value}</span>
               </div>
+            ))}
+          </motion.div>
+        </section>
 
-              <div className="mt-10 flex flex-wrap gap-3">
-                <a
-                  href="#systems"
-                  className={`inline-flex items-center gap-2 rounded-full border px-5 py-3 text-sm font-semibold transition-transform hover:-translate-y-0.5 ${signalClass}`}
-                >
-                  看我在建什么
-                  <ArrowRight className="h-4 w-4" />
-                </a>
-                <a
-                  href="#contact"
-                  className="inline-flex items-center gap-2 rounded-full border border-current/10 bg-white/10 px-5 py-3 text-sm font-semibold backdrop-blur-xl transition-transform hover:-translate-y-0.5"
-                >
-                  联系 / 入口
+        <section id="writing" className="archive-section writing-section">
+          <div className="section-heading">
+            <p className="archive-kicker">WRITING / 沉淀</p>
+            <h2 className="section-title">Not just notes. Working memory.</h2>
+          </div>
+
+          <div className="writing-grid">
+            <motion.article
+              initial={{ opacity: 0, y: 28 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-120px' }}
+              className="featured-note"
+            >
+              <div className="note-art">
+                <DatabaseZap className="h-12 w-12" />
+              </div>
+              <div className="note-copy">
+                <span className="note-tag">FEATURED</span>
+                <h3>当系统能留下证据，AI 才真正进入工作。</h3>
+                <p>
+                  邮件草稿、审批状态、采购附件、知识卡片、Agent 日志，都不是边角料。它们是一个人公司未来自动化的地基。
+                </p>
+                <a href="#build">
+                  看建设方式
                   <ArrowUpRight className="h-4 w-4" />
                 </a>
               </div>
-            </div>
+            </motion.article>
 
-            <div
-              className={`relative border-t p-6 md:p-10 lg:border-l lg:border-t-0 ${
-                mode === 'zen' ? 'border-stone-200/80 bg-stone-100/45' : 'border-white/10 bg-black/18'
-              }`}
-            >
-              <div className="absolute inset-x-6 top-6 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
-              <div className="flex h-full flex-col justify-end gap-4 pt-10">
-                {buildSignals.map((item, index) => (
-                  <motion.article
-                    key={item.label}
-                    initial={{ opacity: 0, x: 18 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.08, duration: 0.45 }}
-                    className={`rounded-[1.1rem] border p-5 backdrop-blur-xl ${quietPanelClass}`}
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <p className="font-mono text-xs uppercase tracking-[0.24em] text-muted-foreground">
-                        {item.label}
-                      </p>
-                      <span className="font-mono text-xs text-muted-foreground">
-                        {String(index + 1).padStart(2, '0')}
-                      </span>
-                    </div>
-                    <h2 className="mt-4 text-2xl font-semibold tracking-tight">{item.value}</h2>
-                    <p className="mt-3 text-sm leading-7 text-muted-foreground">{item.detail}</p>
-                  </motion.article>
-                ))}
-              </div>
+            <div className="ranked-notes">
+              {notes.map((note, index) => (
+                <motion.article
+                  key={note.title}
+                  initial={{ opacity: 0, x: 28 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: '-120px' }}
+                  transition={{ delay: index * 0.08 }}
+                >
+                  <span className="rank-number">{String(index + 2).padStart(2, '0')}</span>
+                  <div>
+                    <span className="note-tag">{note.tag}</span>
+                    <h3>{note.title}</h3>
+                    <p>{note.body}</p>
+                    <small>{note.meta}</small>
+                  </div>
+                </motion.article>
+              ))}
             </div>
           </div>
         </section>
 
-        <section id="systems" className="grid gap-5">
-          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="font-mono text-xs uppercase tracking-[0.28em] text-muted-foreground">
-                Current build
-              </p>
-              <h2 className="mt-2 text-3xl font-semibold tracking-tight md:text-5xl">正在成形的系统</h2>
+        <section className="impact-section">
+          <div className="impact-frame">
+            <div className="rec-line">
+              <span>REC · 00:00:00</span>
+              <span>EP.01 · 拍摄中</span>
             </div>
-            <p className="max-w-2xl text-sm leading-7 text-muted-foreground">
-              参考 Sac 的“个人网站是 AI 时代简历”思路，这里把静态介绍换成可验证的建设轨迹。
+            <div className="impact-center">
+              <Play className="h-7 w-7" />
+              <h2>AI 时代，最重要的是系统化表达能力。</h2>
+              <p>把你做过的事，变成别人能看懂、能信任、能联系你的公开资产。</p>
+            </div>
+            <div className="impact-progress">
+              <span>00:00</span>
+              <div />
+              <span>68%</span>
+            </div>
+          </div>
+        </section>
+
+        <section id="build" className="archive-section build-section">
+          <div className="build-copy">
+            <p className="archive-kicker">BUILD / 造</p>
+            <h2 className="section-title">Systems under construction.</h2>
+            <p className="section-copy">
+              我的网站不只展示结果，也展示系统如何被建出来。这里保留进度、日志、边界和下一步。
             </p>
+            <a href="https://github.com/silencezx007" className="archive-link">
+              关注 GitHub
+              <ArrowUpRight className="h-4 w-4" />
+            </a>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            {systems.map((system, index) => (
-              <motion.article
-                key={system.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                whileHover={{ y: -4 }}
-                transition={{ delay: index * 0.05, duration: 0.4 }}
-                className={`group rounded-[1.2rem] border p-6 backdrop-blur-2xl ${quietPanelClass}`}
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div
-                    className={`flex h-11 w-11 items-center justify-center rounded-xl border ${
-                      mode === 'zen'
-                        ? 'border-stone-900/10 bg-stone-950 text-stone-50'
-                        : 'border-emerald-300/25 bg-emerald-300/12 text-emerald-200'
-                    }`}
-                  >
-                    <system.icon className="h-5 w-5" />
-                  </div>
-                  <span className="rounded-full border border-current/10 px-3 py-1 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                    {system.tag}
-                  </span>
-                </div>
-                <h3 className="mt-7 text-2xl font-semibold tracking-tight">{system.title}</h3>
-                <p className="mt-3 text-sm leading-7 text-muted-foreground">{system.description}</p>
-              </motion.article>
+          <div className="build-stage">
+            <div className="commit-line">
+              <span>a1b2c3d</span>
+              <span>feat: init core</span>
+              <span>d4e5f6a</span>
+              <span>feat: graph engine</span>
+              <strong>HEAD - build: in public</strong>
+            </div>
+            <BuildConsole />
+          </div>
+        </section>
+
+        <section id="systems" className="system-grid">
+          {systems.map((system, index) => (
+            <motion.article
+              key={system.title}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-120px' }}
+              transition={{ delay: index * 0.05 }}
+              className="system-card"
+            >
+              <span className="note-tag">{system.tag}</span>
+              <system.icon className="h-6 w-6" />
+              <h3>{system.title}</h3>
+              <p>{system.description}</p>
+            </motion.article>
+          ))}
+        </section>
+
+        <section id="contact" className="contact-section">
+          <p className="archive-kicker">GET IN TOUCH / 联系</p>
+          <h2 className="display-title">Let's build.</h2>
+          <p>聊聊 AI、自动化、采购工作流、知识库，或者一起搞点能落地的事情。</p>
+          <div className="contact-links">
+            {links.map((link) => (
+              <a key={link.href} href={link.href}>
+                <span>
+                  <small>{link.label}</small>
+                  <strong>{link.value}</strong>
+                </span>
+                {link.href.startsWith('mailto:') ? <Mail className="h-4 w-4" /> : <Link2 className="h-4 w-4" />}
+              </a>
             ))}
           </div>
         </section>
 
-        <section id="method" className={`rounded-[1.4rem] border p-6 backdrop-blur-2xl md:p-10 ${panelClass}`}>
-          <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
-            <div>
-              <p className="font-mono text-xs uppercase tracking-[0.28em] text-muted-foreground">
-                Operating principles
-              </p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">做事方式</h2>
-              <p className="mt-5 text-sm leading-8 text-muted-foreground">
-                我不追求炫技 Demo。我的判断标准是：能不能进入真实流程、减少人工消耗、留下可复盘证据。
-              </p>
-            </div>
-
-            <div className="grid gap-3">
-              {proofItems.map((item, index) => (
-                <div
-                  key={item}
-                  className={`flex gap-4 rounded-[1rem] border p-4 ${quietPanelClass}`}
-                >
-                  <span className="font-mono text-sm text-primary">{String(index + 1).padStart(2, '0')}</span>
-                  <p className="text-sm leading-7 text-muted-foreground">{item}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="notes" className="grid gap-4 md:grid-cols-3">
-          {fieldNotes.map((note) => (
-            <article key={note.title} className={`rounded-[1.2rem] border p-6 backdrop-blur-2xl ${quietPanelClass}`}>
-              <Cpu className="h-5 w-5 text-primary" />
-              <h3 className="mt-5 text-xl font-semibold tracking-tight">{note.title}</h3>
-              <p className="mt-3 text-sm leading-7 text-muted-foreground">{note.body}</p>
-            </article>
-          ))}
-        </section>
-
-        <section
-          id="contact"
-          className={`mb-4 rounded-[1.4rem] border p-6 backdrop-blur-2xl md:p-10 ${panelClass}`}
-        >
-          <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
-            <div>
-              <p className="font-mono text-xs uppercase tracking-[0.28em] text-muted-foreground">Open channels</p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">入口和链接</h2>
-              <p className="mt-5 max-w-2xl text-sm leading-8 text-muted-foreground">
-                如果你想看我正在试什么、做什么、如何把 AI 放进真实工作流，可以从这些入口开始。
-              </p>
-            </div>
-
-            <div className="grid min-w-[min(100%,24rem)] gap-3">
-              {publicLinks.map((item) => (
-                <a
-                  key={item.title}
-                  href={item.href}
-                  className={`inline-flex items-center justify-between gap-4 rounded-[1rem] border px-4 py-3 text-sm font-medium backdrop-blur-xl transition-transform hover:-translate-y-0.5 ${quietPanelClass}`}
-                >
-                  <span className="flex flex-col items-start">
-                    <span className="text-xs text-muted-foreground">{item.title}</span>
-                    <span>{item.value}</span>
-                  </span>
-                  {item.href.startsWith('mailto:') ? (
-                    <Mail className="h-4 w-4 text-primary" />
-                  ) : (
-                    <Link2 className="h-4 w-4 text-primary" />
-                  )}
-                </a>
-              ))}
-            </div>
-          </div>
-        </section>
+        {dark && <div className="dark-mode-note">Archive dark mode active</div>}
       </div>
     </Layout>
   );

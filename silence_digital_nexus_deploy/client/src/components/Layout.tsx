@@ -9,10 +9,10 @@ interface LayoutProps {
 }
 
 const navigationItems = [
-  { href: '#systems', label: '系统' },
-  { href: '#method', label: '方法' },
-  { href: '#notes', label: '笔记' },
-  { href: '#contact', label: '链接' },
+  { href: '#about', label: 'ABOUT' },
+  { href: '#writing', label: 'WRITING' },
+  { href: '#build', label: 'BUILD' },
+  { href: '#contact', label: 'CONTACT' },
 ];
 
 export function Layout({ children }: LayoutProps) {
@@ -29,10 +29,9 @@ export function Layout({ children }: LayoutProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 1.5 }}
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: 'url(/images/zen-bg.jpg)' }}
+              className="absolute inset-0 archive-backdrop"
             >
-              <div className="absolute inset-0 bg-white/90" />
+              <div className="absolute inset-0 bg-[rgba(244,239,230,0.92)]" />
             </motion.div>
           ) : (
             <motion.div
@@ -41,17 +40,16 @@ export function Layout({ children }: LayoutProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 1.5 }}
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: 'url(/images/cyberpunk-bg.jpg)' }}
+              className="absolute inset-0 bg-[radial-gradient(circle_at_70%_10%,rgba(185,84,58,0.12),transparent_28%),#080807]"
             >
-              <div className="absolute inset-0 bg-background/95 backdrop-blur-xl" />
+              <div className="absolute inset-0 bg-background/88 backdrop-blur-sm" />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
       <header className="fixed left-0 right-0 top-0 z-50 mx-4 mt-4 md:mx-8">
-        <div className="glass-panel flex h-16 items-center justify-between rounded-2xl px-4 md:px-6">
+        <div className="glass-panel flex h-16 items-center justify-between rounded-xl px-4 md:px-6">
           <a href="#top" className="flex items-center gap-3">
             <div
               className={`flex h-10 w-10 items-center justify-center rounded-2xl border transition-colors ${
@@ -63,8 +61,8 @@ export function Layout({ children }: LayoutProps) {
               <Sparkles className="h-4 w-4" />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-semibold tracking-[0.2em] text-foreground/80">张旭</span>
-              <span className="text-xs text-muted-foreground">AI 操作系统建设中</span>
+              <span className="font-serif text-lg font-semibold text-foreground/90">ZX</span>
+              <span className="text-xs uppercase tracking-[0.16em] text-muted-foreground">AI Operator</span>
             </div>
           </a>
 
@@ -86,14 +84,14 @@ export function Layout({ children }: LayoutProps) {
 
           <div className="flex items-center gap-3">
             <a
-              href="#systems"
+              href="#build"
               className={`hidden items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all md:inline-flex ${
                 mode === 'zen'
                   ? 'bg-foreground text-background hover:opacity-90'
                   : 'bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/20'
               }`}
             >
-              查看系统
+              查看 Build
               <ArrowUpRight className="h-4 w-4" />
             </a>
             <ModeSwitcher />
@@ -101,7 +99,7 @@ export function Layout({ children }: LayoutProps) {
         </div>
       </header>
 
-      <main className="container relative z-10 mx-auto flex min-h-screen flex-col px-4 pb-12 pt-28 md:px-8">
+      <main className="relative z-10 mx-auto flex min-h-screen w-full flex-col px-4 pb-12 pt-28 md:px-8">
         {children}
       </main>
 
