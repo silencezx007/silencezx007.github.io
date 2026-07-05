@@ -9,8 +9,8 @@ interface LayoutProps {
 }
 
 const navigationItems = [
-  { href: '#about', label: 'ABOUT' },
-  { href: '#writing', label: 'WRITING' },
+  { href: '#proof', label: 'PROOF' },
+  { href: '#cases', label: 'CASES' },
   { href: '#build', label: 'BUILD' },
   { href: '#contact', label: 'CONTACT' },
 ];
@@ -91,7 +91,7 @@ export function Layout({ children }: LayoutProps) {
                   : 'bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/20'
               }`}
             >
-              查看 Build
+              看证据链
               <ArrowUpRight className="h-4 w-4" />
             </a>
             <ModeSwitcher />

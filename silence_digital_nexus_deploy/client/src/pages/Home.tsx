@@ -86,18 +86,100 @@ const systems = [
 ];
 
 const buildLines = [
-  'boot archive workspace',
-  'load workhub events',
-  'sync obsidian memory',
-  'draft procurement mail',
-  'verify agent boundary',
-  'publish signal station',
+  'ingest video transcript',
+  'extract reusable workflow',
+  'write obsidian knowledge card',
+  'generate site implementation brief',
+  'run browser screenshot qa',
+  'publish reviewed artifact',
 ];
 
 const links = [
   { label: 'GitHub', value: 'github.com/silencezx007', href: 'https://github.com/silencezx007' },
   { label: 'Prototype', value: 'AI translator', href: '/translator/' },
   { label: 'Email', value: 'silencezx009@gmail.com', href: 'mailto:silencezx009@gmail.com' },
+];
+
+const proofStages = [
+  {
+    title: '输入证据',
+    body: '视频、邮件、网页、截图、采购单先进入材料池，不从空白 prompt 开始。',
+  },
+  {
+    title: 'AI 处理',
+    body: '模型负责拆解、生成、改版、归档，但每一步都保留上下文。',
+  },
+  {
+    title: '人工闸门',
+    body: '事实、排版、合规、邮件发送必须过人工确认，不让模型直接越权。',
+  },
+  {
+    title: '公开产物',
+    body: '最后落成网页、草稿箱、知识卡、脚本、截图验证，让能力可复盘。',
+  },
+];
+
+const proofCases = [
+  {
+    title: '视频知识沉淀系统',
+    input: 'X 视频 / 字幕 / 关键帧',
+    ai: '提炼方法卡、行动项、反证边界',
+    human: '检查字幕来源和工具名误识别',
+    output: 'Obsidian 知识卡 + 网站改版 brief',
+  },
+  {
+    title: '采购邮件自动化',
+    input: '采购申请 / 审批回复 / 供应商资料',
+    ai: '识别状态、拟询价、匹配供应商',
+    human: '审批语义和发送前确认',
+    output: '工作邮箱草稿箱 + 采购批次归档',
+  },
+  {
+    title: '电影感网站生成',
+    input: '参考视频 / 人像素材 / 交互截图',
+    ai: '生成主视觉、动效、页面结构',
+    human: '浏览器截图验收，移动端检查',
+    output: '可访问站点 + 构建记录',
+  },
+];
+
+const evidenceReceipts = [
+  {
+    source: 'Claude AI 一小时自动化课程',
+    takeaway: '自动化核心不是神提示词，而是项目上下文、模板、外部工具和验收标准。',
+    action: '把网站从个人介绍改成工作流证明，让能力能被检查。',
+  },
+  {
+    source: 'AI 生成电影感互动网站教程',
+    takeaway: '高质量页面先锁定视觉资产和第一屏，再扩展其他 section。',
+    action: '保留艺术化主视觉和粒子互动，把页面叙事收敛到证据链。',
+  },
+  {
+    source: 'Claude Code + Sonnet 生成滚动互动网站',
+    takeaway: '滚动交互本质是状态映射，不能只为炫技，要服务叙事。',
+    action: '把动效定位为吸引注意，把 proof/cases 定位为建立信任。',
+  },
+];
+
+const productTracks = [
+  {
+    title: '视频知识流水线',
+    now: '字幕、关键帧、方法卡已能沉淀。',
+    next: '补视觉 brief 抽取和案例页生成。',
+    outcome: '变成内容资产服务。',
+  },
+  {
+    title: '电影感网站模板',
+    now: '参考图、主视觉、粒子互动已跑通。',
+    next: '沉淀成 cinematic-site 模板。',
+    outcome: '变成展示页交付服务。',
+  },
+  {
+    title: '工作流自动化系统',
+    now: '采购邮件和知识库已有真实场景。',
+    next: '把人工闸门、草稿箱、归档做稳定。',
+    outcome: '变成一人公司操作系统。',
+  },
 ];
 
 function ParticleField() {
@@ -261,11 +343,11 @@ function BuildConsole() {
         ))}
       </div>
       <div className="console-footer">
-        <span>v0.2.0 · compiling...</span>
+        <span>reviewed artifact</span>
         <div className="progress-track">
           <div className="progress-fill" />
         </div>
-        <span>68%</span>
+        <span>ready</span>
       </div>
     </div>
   );
@@ -280,18 +362,18 @@ export default function Home() {
       <div id="top" className="archive-page mx-auto flex w-full max-w-[1520px] flex-col">
         <section className="archive-hero">
           <div className="hero-copy">
-            <p className="archive-kicker">AI OPERATOR / ONE-PERSON COMPANY OS</p>
+            <p className="archive-kicker">AI OPERATOR / PROOF MACHINE</p>
             <h1 className="display-title">Zhang Xu</h1>
             <p className="hero-subtitle">
-              我正在把邮件、采购、审批、知识库和本机 Agent 织成一套能持续复利的工作系统。
+              把视频、邮件、采购、知识库变成可验证的 AI 工作流。
             </p>
             <div className="hero-actions">
-              <a href="#build" className="archive-button primary">
-                查看 Build
+              <a href="#proof" className="archive-button primary">
+                看证据链
                 <ArrowUpRight className="h-4 w-4" />
               </a>
-              <a href="#writing" className="archive-button">
-                阅读笔记
+              <a href="#cases" className="archive-button">
+                看案例
                 <ArrowUpRight className="h-4 w-4" />
               </a>
             </div>
@@ -300,22 +382,142 @@ export default function Home() {
           <div className="hero-visual" aria-label="Zhang Xu AI operator archive hero illustration">
             <img src="/images/ai-operator-archive-hero.png" alt="" />
             <ParticleField />
-            <div className="hero-label top">ARCHIVE 2026</div>
-            <div className="hero-label bottom">BUILD IN PUBLIC</div>
+          </div>
+        </section>
+
+        <section id="proof" className="proof-machine">
+          <div className="proof-intro">
+            <span>能力证明机</span>
+            <h2>能力不是声明，是一条能被检查的证据链。</h2>
+            <p>
+              网站从展示个人，升级为展示工作方式。每个 AI 能力都要说明输入、处理、人工闸门和最终产物。
+            </p>
+          </div>
+
+          <div className="proof-flow">
+            {proofStages.map((stage, index) => (
+              <motion.article
+                key={stage.title}
+                  initial={{ opacity: 0.72, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-120px' }}
+                transition={{ delay: index * 0.08 }}
+              >
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <h3>{stage.title}</h3>
+                <p>{stage.body}</p>
+              </motion.article>
+            ))}
+          </div>
+        </section>
+
+        <section id="cases" className="case-ledger">
+          <div className="case-ledger-head">
+            <h2>真实工作流，直接变成案例。</h2>
+            <p>不放空泛技能词，只放能追到材料和产物的链路。</p>
+          </div>
+
+          <div className="case-rows">
+            {proofCases.map((item) => (
+              <motion.article
+                key={item.title}
+                initial={{ opacity: 0.72, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-120px' }}
+              >
+                <h3>{item.title}</h3>
+                <dl>
+                  <div>
+                    <dt>输入</dt>
+                    <dd>{item.input}</dd>
+                  </div>
+                  <div>
+                    <dt>AI 做什么</dt>
+                    <dd>{item.ai}</dd>
+                  </div>
+                  <div>
+                    <dt>人工验什么</dt>
+                    <dd>{item.human}</dd>
+                  </div>
+                  <div>
+                    <dt>产物</dt>
+                    <dd>{item.output}</dd>
+                  </div>
+                </dl>
+              </motion.article>
+            ))}
+          </div>
+        </section>
+
+        <section className="evidence-receipts">
+          <div className="receipt-feature">
+            <h2>新知识，不进收藏夹，进生产线。</h2>
+            <p>
+              三篇新文章没有停在摘要层，而是直接改写了这个网站的结构：从作品展示，转向能力证明。
+            </p>
+          </div>
+
+          <div className="receipt-stack">
+            {evidenceReceipts.map((item) => (
+              <motion.article
+                key={item.source}
+                initial={{ opacity: 0.72, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-120px' }}
+              >
+                <small>{item.source}</small>
+                <h3>{item.takeaway}</h3>
+                <p>{item.action}</p>
+              </motion.article>
+            ))}
+          </div>
+        </section>
+
+        <section className="product-tracks">
+          <div className="track-head">
+            <h2>下一步，变成能卖的服务。</h2>
+            <p>网站继续承担一个任务：把学习、实验和工作流，压成可以交付的产品化能力。</p>
+          </div>
+
+          <div className="track-grid">
+            {productTracks.map((track) => (
+              <motion.article
+                key={track.title}
+                initial={{ opacity: 0.72, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-120px' }}
+              >
+                <h3>{track.title}</h3>
+                <dl>
+                  <div>
+                    <dt>现在</dt>
+                    <dd>{track.now}</dd>
+                  </div>
+                  <div>
+                    <dt>下一步</dt>
+                    <dd>{track.next}</dd>
+                  </div>
+                  <div>
+                    <dt>可卖形态</dt>
+                    <dd>{track.outcome}</dd>
+                  </div>
+                </dl>
+              </motion.article>
+            ))}
           </div>
         </section>
 
         <section id="about" className="archive-section about-grid">
           <motion.div
-            initial={{ opacity: 0, y: 32 }}
+                  initial={{ opacity: 0.72, y: 32 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-120px' }}
             className="dossier-card"
           >
             <p className="archive-kicker">ABOUT / 档案</p>
-            <h2 className="section-title">AI Operator Archive</h2>
+            <h2 className="section-title">不是简历墙，是公开控制台。</h2>
             <p className="section-copy">
-              我不把个人网站当简历墙，而是当一个公开建设现场。这里展示我如何把 AI 放进真实业务流程，留下可复盘、可接管、可复利的工作资产。
+              这里记录我如何把 AI 放进真实业务流程，留下可复盘、可接管、可复利的工作资产。
             </p>
             <div className="profile-table">
               {profileRows.map(([label, value]) => (
@@ -328,7 +530,7 @@ export default function Home() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 32 }}
+                  initial={{ opacity: 0.72, y: 32 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-120px' }}
             transition={{ delay: 0.12 }}
@@ -356,7 +558,7 @@ export default function Home() {
 
           <div className="writing-grid">
             <motion.article
-              initial={{ opacity: 0, y: 28 }}
+                initial={{ opacity: 0.72, y: 28 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-120px' }}
               className="featured-note"
@@ -381,7 +583,7 @@ export default function Home() {
               {notes.map((note, index) => (
                 <motion.article
                   key={note.title}
-                  initial={{ opacity: 0, x: 28 }}
+              initial={{ opacity: 0.72, x: 28 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true, margin: '-120px' }}
                   transition={{ delay: index * 0.08 }}
@@ -402,13 +604,13 @@ export default function Home() {
         <section className="impact-section">
           <div className="impact-frame">
             <div className="rec-line">
-              <span>REC · 00:00:00</span>
-              <span>EP.01 · 拍摄中</span>
+              <span>REC 00:00:00</span>
+              <span>EP.01 拍摄中</span>
             </div>
             <div className="impact-center">
               <Play className="h-7 w-7" />
-              <h2>AI 时代，最重要的是系统化表达能力。</h2>
-              <p>把你做过的事，变成别人能看懂、能信任、能联系你的公开资产。</p>
+              <h2>把做过的事，变成别人能信的资产。</h2>
+              <p>视觉负责吸引注意，证据链负责建立信任。</p>
             </div>
             <div className="impact-progress">
               <span>00:00</span>
@@ -433,11 +635,11 @@ export default function Home() {
 
           <div className="build-stage">
             <div className="commit-line">
-              <span>a1b2c3d</span>
-              <span>feat: init core</span>
-              <span>d4e5f6a</span>
-              <span>feat: graph engine</span>
-              <strong>HEAD - build: in public</strong>
+              <span>input</span>
+              <span>video / mail / screenshot</span>
+              <span>gate</span>
+              <span>human review before action</span>
+              <strong>output - public proof</strong>
             </div>
             <BuildConsole />
           </div>
@@ -447,7 +649,7 @@ export default function Home() {
           {systems.map((system, index) => (
             <motion.article
               key={system.title}
-              initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0.72, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-120px' }}
               transition={{ delay: index * 0.05 }}
