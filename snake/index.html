@@ -3,21 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
-  <title>小兵贪吃蛇·柯基版</title>
+  <title>小兵贪吃蛇·柯基长条版</title>
   <style>
     :root {
       --bg1: #22112f;
       --bg2: #3b1f53;
-      --panel: rgba(28, 16, 41, 0.88);
+      --panel: rgba(28, 16, 41, 0.9);
       --text: #fff7ed;
       --accent: #fb923c;
       --accent2: #fbbf24;
       --danger: #fb7185;
       --grid: rgba(255,255,255,0.07);
-      --corgi-main: #d97706;
-      --corgi-light: #fde7c6;
-      --corgi-dark: #7c2d12;
-      --corgi-cheek: #fca5a5;
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
@@ -28,18 +24,18 @@
       background: radial-gradient(circle at top, #7c3aed 0%, var(--bg2) 32%, var(--bg1) 100%);
       display: flex;
       justify-content: center;
-      padding: 14px;
+      padding: 10px;
     }
     .wrap {
-      width: min(100%, 780px);
+      width: min(100%, 920px);
       background: var(--panel);
       border: 1px solid rgba(255,255,255,0.12);
       backdrop-filter: blur(14px);
       border-radius: 26px;
       box-shadow: 0 24px 60px rgba(0,0,0,0.38);
-      padding: 16px;
+      padding: 14px;
     }
-    h1 { margin: 0; font-size: clamp(28px, 6vw, 42px); }
+    h1 { margin: 0; font-size: clamp(28px, 6vw, 44px); }
     .subtitle {
       margin-top: 8px;
       color: #f5e9ff;
@@ -62,7 +58,7 @@
     }
     .card small { display: block; color: #f8e8d8; margin-bottom: 6px; font-size: 12px; }
     .card strong { font-size: 22px; }
-    .canvas-wrap { margin-top: 16px; position: relative; }
+    .canvas-wrap { margin-top: 14px; position: relative; }
     canvas {
       width: 100%;
       aspect-ratio: 1 / 1;
@@ -70,12 +66,12 @@
       background:
         linear-gradient(var(--grid) 1px, transparent 1px),
         linear-gradient(90deg, var(--grid) 1px, transparent 1px),
-        radial-gradient(circle at 50% 20%, #1f1632 0%, #120d1f 80%);
-      background-size: 24px 24px, 24px 24px, 100% 100%;
-      border-radius: 22px;
+        radial-gradient(circle at 50% 20%, #24173c 0%, #120d1f 80%);
+      background-size: 30px 30px, 30px 30px, 100% 100%;
+      border-radius: 24px;
       border: 1px solid rgba(255,255,255,0.08);
       touch-action: none;
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.35);
+      box-shadow: inset 0 0 24px rgba(0,0,0,0.35);
     }
     .panel {
       margin-top: 14px;
@@ -128,7 +124,8 @@
     .hint { margin-top: 10px; color: #fff1dd; font-size: 14px; line-height: 1.6; }
     .footer { text-align: center; color: #f7dfcf; font-size: 13px; margin-top: 16px; }
     @media (max-width: 460px) {
-      .wrap { padding: 12px; border-radius: 18px; }
+      body { padding: 6px; }
+      .wrap { padding: 10px; border-radius: 18px; }
       .stats { gap: 8px; }
       .card strong { font-size: 20px; }
       .ctrl-grid { grid-template-columns: repeat(3, 68px); grid-template-rows: repeat(3, 58px); }
@@ -137,8 +134,8 @@
 </head>
 <body>
   <div class="wrap">
-    <h1>🐶 小兵贪吃蛇·柯基版</h1>
-    <div class="subtitle">这次不是方块蛇了，是柯基风格建模版～头更像小狗，身体更顺，移动也更丝滑。你可以点方向按钮，也可以直接在棋盘上滑动。</div>
+    <h1>🐶 小兵贪吃蛇·柯基长条版</h1>
+    <div class="subtitle">我按你的意思改了：画面更大，蛇身不再是一节一节的小块，而是一整条连起来的柯基长条身体，跑起来也会更顺。</div>
 
     <div class="stats">
       <div class="card"><small>分数</small><strong id="score">0</strong></div>
@@ -147,7 +144,7 @@
     </div>
 
     <div class="canvas-wrap">
-      <canvas id="game" width="540" height="540" aria-label="小兵贪吃蛇柯基版"></canvas>
+      <canvas id="game" width="660" height="660" aria-label="小兵贪吃蛇柯基长条版"></canvas>
     </div>
 
     <div class="panel">
@@ -170,8 +167,8 @@
         <div></div>
       </div>
 
-      <div class="hint" id="message">准备好了就开始吧～柯基已经摇着小尾巴等你了。</div>
-      <div class="hint">吃到骨头饼干会加分；撞墙或撞到自己就结束。后面会一点点加速，但动画会保持顺滑。</div>
+      <div class="hint" id="message">准备好了就开始吧～这次是长条柯基身子。</div>
+      <div class="hint">吃到骨头饼干会加分；撞墙或撞到自己就结束。你也可以直接在棋盘上滑动控制方向。</div>
     </div>
 
     <div class="footer">做给 Summer 的小游戏 by 小兵 ✨</div>
@@ -189,9 +186,9 @@
     const restartBtn = document.getElementById('restartBtn');
     const dirButtons = [...document.querySelectorAll('[data-dir]')];
 
-    const gridSize = 27;
+    const gridSize = 30;
     const tileCount = canvas.width / gridSize;
-    const bestKey = 'summer-snake-best-score-corgi';
+    const bestKey = 'summer-snake-best-score-corgi-ribbon';
 
     let snake = [];
     let direction = { x: 1, y: 0 };
@@ -205,7 +202,6 @@
     let gameOverState = false;
     let accumulator = 0;
     let lastFrameTime = 0;
-    let animationProgress = 0;
     let previousSnake = [];
     let touchStartX = null;
     let touchStartY = null;
@@ -225,6 +221,10 @@
       ctx.closePath();
     }
 
+    function cloneSnake(source) {
+      return source.map(part => ({ x: part.x, y: part.y }));
+    }
+
     function loadBest() {
       const best = Number(localStorage.getItem(bestKey) || 0);
       bestEl.textContent = String(best);
@@ -238,20 +238,18 @@
       }
     }
 
-    function cloneSnake(source) {
-      return source.map(part => ({ x: part.x, y: part.y }));
-    }
-
     function resetGame() {
       snake = [
         { x: 10, y: 10 },
         { x: 9, y: 10 },
         { x: 8, y: 10 },
-        { x: 7, y: 10 }
+        { x: 7, y: 10 },
+        { x: 6, y: 10 }
       ];
       previousSnake = cloneSnake(snake);
       direction = { x: 1, y: 0 };
       nextDirection = { x: 1, y: 0 };
+      food = { x: 14, y: 10 };
       score = 0;
       moveInterval = 180;
       running = false;
@@ -259,10 +257,9 @@
       started = false;
       gameOverState = false;
       accumulator = 0;
-      animationProgress = 0;
       scoreEl.textContent = '0';
       statusEl.textContent = '待开始';
-      messageEl.textContent = '准备好了就开始吧～柯基已经摇着小尾巴等你了。';
+      messageEl.textContent = '准备好了就开始吧～这次是长条柯基身子。';
       placeFood();
       draw(0);
     }
@@ -283,7 +280,7 @@
       paused = false;
       gameOverState = false;
       statusEl.textContent = '进行中';
-      messageEl.textContent = '冲呀～这只柯基跑起来了。';
+      messageEl.textContent = '冲呀～整条柯基跑起来了。';
     }
 
     function togglePause() {
@@ -291,7 +288,7 @@
       paused = !paused;
       running = !paused;
       statusEl.textContent = paused ? '已暂停' : '进行中';
-      messageEl.textContent = paused ? '柯基蹲下来歇一下。' : '继续冲！';
+      messageEl.textContent = paused ? '柯基趴下歇一下。' : '继续冲！';
     }
 
     function setDirection(x, y) {
@@ -329,12 +326,11 @@
         scoreEl.textContent = String(score);
         saveBest();
         placeFood();
-        messageEl.textContent = score < 5 ? '吃到骨头饼干啦！' : '哇，柯基越跑越顺了！';
-        if (moveInterval > 92) moveInterval -= 6;
+        messageEl.textContent = score < 5 ? '吃到骨头饼干啦！' : '长条柯基越来越顺了！';
+        if (moveInterval > 95) moveInterval -= 6;
       } else {
         snake.pop();
       }
-      animationProgress = 0;
     }
 
     function gameOver() {
@@ -360,50 +356,70 @@
       });
     }
 
+    function toPixel(part) {
+      return {
+        x: part.x * gridSize + gridSize / 2,
+        y: part.y * gridSize + gridSize / 2
+      };
+    }
+
+    function drawSmoothLine(points, width, color) {
+      if (points.length < 2) return;
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+      for (let i = 1; i < points.length - 1; i++) {
+        const midX = (points[i].x + points[i + 1].x) / 2;
+        const midY = (points[i].y + points[i + 1].y) / 2;
+        ctx.quadraticCurveTo(points[i].x, points[i].y, midX, midY);
+      }
+      const last = points[points.length - 1];
+      ctx.lineTo(last.x, last.y);
+      ctx.stroke();
+      ctx.restore();
+    }
+
     function drawFood() {
       const x = food.x * gridSize + gridSize / 2;
       const y = food.y * gridSize + gridSize / 2;
       ctx.save();
       ctx.translate(x, y);
       ctx.fillStyle = '#fff7ed';
-      roundRect(-9, -5, 18, 10, 5);
+      roundRect(-11, -6, 22, 12, 6);
       ctx.fill();
       ctx.beginPath();
-      ctx.arc(-10, 0, 4, 0, Math.PI * 2);
-      ctx.arc(10, 0, 4, 0, Math.PI * 2);
+      ctx.arc(-12, 0, 4.5, 0, Math.PI * 2);
+      ctx.arc(12, 0, 4.5, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = '#f59e0b';
       ctx.beginPath();
-      ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
+      ctx.arc(0, 0, 2.8, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
     }
 
-    function drawBodyPart(part, index, total) {
-      const px = part.x * gridSize + 2.5;
-      const py = part.y * gridSize + 2.5;
-      const size = gridSize - 5;
-      const shade = 0.16 + (index / Math.max(total, 1)) * 0.18;
-      ctx.fillStyle = `rgba(217, 119, 6, ${0.92 - shade})`;
-      roundRect(px, py, size, size, 11);
-      ctx.fill();
-      ctx.fillStyle = index % 2 === 0 ? '#fde7c6' : '#f8d6ab';
-      roundRect(px + 4, py + size * 0.45, size - 8, size * 0.34, 9);
-      ctx.fill();
-    }
+    function drawBody(points) {
+      if (points.length < 2) return;
+      drawSmoothLine(points, gridSize * 0.92, '#9a4f16');
+      drawSmoothLine(points, gridSize * 0.72, '#d97706');
+      drawSmoothLine(points, gridSize * 0.36, '#fde7c6');
 
-    function drawTail(part, prevPart, wag) {
-      const cx = part.x * gridSize + gridSize / 2;
-      const cy = part.y * gridSize + gridSize / 2;
-      const angle = Math.atan2(part.y - prevPart.y, part.x - prevPart.x) + Math.PI;
+      const tail = points[points.length - 1];
+      const beforeTail = points[points.length - 2];
+      const angle = Math.atan2(tail.y - beforeTail.y, tail.x - beforeTail.x) + Math.PI;
+      const wag = Math.sin(performance.now() / 120) * 0.22;
       ctx.save();
-      ctx.translate(cx, cy);
+      ctx.translate(tail.x, tail.y);
       ctx.rotate(angle + wag);
-      ctx.fillStyle = '#b45309';
+      ctx.fillStyle = '#9a4f16';
       ctx.beginPath();
-      ctx.moveTo(-3, 0);
-      ctx.quadraticCurveTo(-10, -4, -15, -1);
-      ctx.quadraticCurveTo(-10, 1, -3, 3);
+      ctx.moveTo(-2, 0);
+      ctx.quadraticCurveTo(-10, -6, -18, -2);
+      ctx.quadraticCurveTo(-10, 4, -2, 2);
       ctx.closePath();
       ctx.fill();
       ctx.restore();
@@ -419,59 +435,59 @@
 
       ctx.fillStyle = '#d97706';
       ctx.beginPath();
-      ctx.ellipse(0, 0, 13, 11.5, 0, 0, Math.PI * 2);
+      ctx.ellipse(0, 0, 15, 13, 0, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.fillStyle = '#7c2d12';
       ctx.beginPath();
-      ctx.moveTo(-7, -5);
-      ctx.lineTo(-12, -15);
-      ctx.lineTo(-2, -10);
+      ctx.moveTo(-8, -6);
+      ctx.lineTo(-14, -17);
+      ctx.lineTo(-2, -11);
       ctx.closePath();
       ctx.fill();
       ctx.beginPath();
-      ctx.moveTo(-7, 5);
-      ctx.lineTo(-12, 15);
-      ctx.lineTo(-2, 10);
+      ctx.moveTo(-8, 6);
+      ctx.lineTo(-14, 17);
+      ctx.lineTo(-2, 11);
       ctx.closePath();
       ctx.fill();
 
       ctx.fillStyle = '#fde7c6';
       ctx.beginPath();
-      ctx.ellipse(4, 0, 8.5, 7.5, 0, 0, Math.PI * 2);
+      ctx.ellipse(5, 0, 10, 8.6, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = '#fff';
       ctx.beginPath();
-      ctx.arc(3.5, -4, 2.4, 0, Math.PI * 2);
-      ctx.arc(3.5, 4, 2.4, 0, Math.PI * 2);
+      ctx.arc(3.5, -4.2, 2.7, 0, Math.PI * 2);
+      ctx.arc(3.5, 4.2, 2.7, 0, Math.PI * 2);
       ctx.fill();
+
       ctx.fillStyle = '#1f2937';
       ctx.beginPath();
-      ctx.arc(4.2, -4, 1.15, 0, Math.PI * 2);
-      ctx.arc(4.2, 4, 1.15, 0, Math.PI * 2);
+      ctx.arc(4.3, -4.2, 1.2, 0, Math.PI * 2);
+      ctx.arc(4.3, 4.2, 1.2, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.fillStyle = '#111827';
       ctx.beginPath();
-      ctx.arc(10, 0, 1.7, 0, Math.PI * 2);
+      ctx.arc(11.5, 0, 1.9, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.strokeStyle = '#7c2d12';
-      ctx.lineWidth = 1.1;
+      ctx.lineWidth = 1.2;
       ctx.beginPath();
-      ctx.moveTo(10, 0);
-      ctx.quadraticCurveTo(7, 1.6, 5, 1.9);
-      ctx.moveTo(10, 0);
-      ctx.quadraticCurveTo(7, -1.6, 5, -1.9);
+      ctx.moveTo(11.5, 0);
+      ctx.quadraticCurveTo(8, 2, 5.5, 2.1);
+      ctx.moveTo(11.5, 0);
+      ctx.quadraticCurveTo(8, -2, 5.5, -2.1);
       ctx.stroke();
 
       ctx.fillStyle = '#fca5a5';
       ctx.beginPath();
-      ctx.arc(6, -7, 1.6, 0, Math.PI * 2);
-      ctx.arc(6, 7, 1.6, 0, Math.PI * 2);
+      ctx.arc(6.6, -7.2, 1.8, 0, Math.PI * 2);
+      ctx.arc(6.6, 7.2, 1.8, 0, Math.PI * 2);
       ctx.fill();
-
       ctx.restore();
     }
 
@@ -480,24 +496,19 @@
       drawFood();
 
       const smoothSnake = getInterpolatedSnake(progress);
-      smoothSnake.forEach((part, index) => drawBodyPart(part, index, smoothSnake.length));
-      if (smoothSnake.length > 1) {
-        const tail = smoothSnake[smoothSnake.length - 1];
-        const beforeTail = smoothSnake[smoothSnake.length - 2];
-        const wag = Math.sin(performance.now() / 120) * 0.28;
-        drawTail(tail, beforeTail, wag);
-      }
+      const points = smoothSnake.map(toPixel);
+      drawBody(points);
       if (smoothSnake[0]) drawHead(smoothSnake[0]);
 
       if (!started || gameOverState) {
-        ctx.fillStyle = 'rgba(10, 6, 20, 0.55)';
+        ctx.fillStyle = 'rgba(10, 6, 20, 0.54)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#fff7ed';
         ctx.textAlign = 'center';
-        ctx.font = 'bold 34px sans-serif';
-        ctx.fillText(gameOverState ? '游戏结束' : '点开始或滑动开局', canvas.width / 2, canvas.height / 2 - 8);
-        ctx.font = '18px sans-serif';
-        ctx.fillText(gameOverState ? '点重开再来一局' : '方向按钮也能控制', canvas.width / 2, canvas.height / 2 + 28);
+        ctx.font = 'bold 38px sans-serif';
+        ctx.fillText(gameOverState ? '游戏结束' : '点开始或滑动开局', canvas.width / 2, canvas.height / 2 - 12);
+        ctx.font = '20px sans-serif';
+        ctx.fillText(gameOverState ? '点重开再来一局' : '方向按钮也能控制', canvas.width / 2, canvas.height / 2 + 24);
       }
     }
 
@@ -506,6 +517,7 @@
       const delta = timestamp - lastFrameTime;
       lastFrameTime = timestamp;
 
+      let progress = 0;
       if (running && !paused && !gameOverState) {
         accumulator += delta;
         while (accumulator >= moveInterval) {
@@ -513,12 +525,10 @@
           updateGameStep();
           if (gameOverState) break;
         }
-        animationProgress = Math.min(accumulator / moveInterval, 1);
-      } else {
-        animationProgress = gameOverState ? 1 : 0;
+        progress = Math.min(accumulator / moveInterval, 1);
       }
 
-      draw(animationProgress);
+      draw(progress);
       requestAnimationFrame(gameFrame);
     }
 
