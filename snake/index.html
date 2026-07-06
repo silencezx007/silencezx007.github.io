@@ -199,6 +199,7 @@
     let running = false;
     let paused = false;
     let started = false;
+    let waitingForFirstMove = false;
     let gameOverState = false;
     let accumulator = 0;
     let lastFrameTime = 0;
@@ -251,15 +252,16 @@
       nextDirection = { x: 1, y: 0 };
       food = { x: 14, y: 10 };
       score = 0;
-      moveInterval = 180;
+      moveInterval = 300;
       running = false;
       paused = false;
       started = false;
+      waitingForFirstMove = false;
       gameOverState = false;
       accumulator = 0;
       scoreEl.textContent = '0';
       statusEl.textContent = '待开始';
-      messageEl.textContent = '准备好了就开始吧～这次是长条柯基身子。';
+      messageEl.textContent = '先点开始，再点一个方向，柯基才会跑出去。';
       placeFood();
       draw(0);
     }
@@ -274,13 +276,15 @@
     }
 
     function startGame() {
-      if (running && !paused) return;
+      if ((running && !paused) || waitingForFirstMove) return;
       started = true;
-      running = true;
+      running = false;
       paused = false;
+      waitingForFirstMove = true;
       gameOverState = false;
-      statusEl.textContent = '进行中';
-      messageEl.textContent = '冲呀～整条柯基跑起来了。';
+      accumulator = 0;
+      statusEl.textContent = '选方向';
+      messageEl.textContent = '现在点一下方向键，或者在棋盘上滑一下，柯基就会开始跑。';
     }
 
     function togglePause() {
@@ -294,9 +298,18 @@
     function setDirection(x, y) {
       if (!started) startGame();
       if (gameOverState) return;
-      const goingBack = x === -direction.x && y === -direction.y;
+      const baseDirection = waitingForFirstMove ? nextDirection : direction;
+      const goingBack = x === -baseDirection.x && y === -baseDirection.y;
       if (goingBack) return;
       nextDirection = { x, y };
+      if (waitingForFirstMove) {
+        waitingForFirstMove = false;
+        running = true;
+        paused = false;
+        accumulator = 0;
+        statusEl.textContent = '进行中';
+        messageEl.textContent = '冲呀～整条柯基跑起来了。';
+      }
     }
 
     function handleDir(name) {
@@ -327,7 +340,7 @@
         saveBest();
         placeFood();
         messageEl.textContent = score < 5 ? '吃到骨头饼干啦！' : '长条柯基越来越顺了！';
-        if (moveInterval > 95) moveInterval -= 6;
+        // Summer 要求不加难度、不加速，保持匀速
       } else {
         snake.pop();
       }
@@ -500,15 +513,15 @@
       drawBody(points);
       if (smoothSnake[0]) drawHead(smoothSnake[0]);
 
-      if (!started || gameOverState) {
+      if (!started || waitingForFirstMove || gameOverState) {
         ctx.fillStyle = 'rgba(10, 6, 20, 0.54)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#fff7ed';
         ctx.textAlign = 'center';
         ctx.font = 'bold 38px sans-serif';
-        ctx.fillText(gameOverState ? '游戏结束' : '点开始或滑动开局', canvas.width / 2, canvas.height / 2 - 12);
+        ctx.fillText(gameOverState ? '游戏结束' : (waitingForFirstMove ? '选一个方向开始' : '点开始或滑动开局'), canvas.width / 2, canvas.height / 2 - 12);
         ctx.font = '20px sans-serif';
-        ctx.fillText(gameOverState ? '点重开再来一局' : '方向按钮也能控制', canvas.width / 2, canvas.height / 2 + 24);
+        ctx.fillText(gameOverState ? '点重开再来一局' : (waitingForFirstMove ? '点方向键或滑一下' : '方向按钮也能控制'), canvas.width / 2, canvas.height / 2 + 24);
       }
     }
 
