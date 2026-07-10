@@ -372,35 +372,60 @@
       return copy;
     }
 
-    function buildPool(count) {
+    function getLevelConfig(targetLevel) {
+      return {
+        count: Math.min(24 + (targetLevel - 1) * 6, 54),
+        variety: Math.min(4 + targetLevel, ICONS.length),
+        jitterX: 8 + targetLevel * 2.4,
+        jitterY: 6 + targetLevel * 2,
+        extraStacks: Math.min(Math.max(targetLevel - 1, 0), 4),
+        overlapBoost: Math.min(targetLevel * 2, 12)
+      };
+    }
+
+    function buildPool(count, targetLevel) {
       const tripleCount = Math.ceil(count / 3);
+      const variety = getLevelConfig(targetLevel).variety;
       const pool = [];
       for (let i = 0; i < tripleCount; i++) {
-        const typeIndex = i % ICONS.length;
+        const typeIndex = i % variety;
         pool.push(typeIndex, typeIndex, typeIndex);
       }
       return shuffle(pool).slice(0, count);
     }
 
-    function createLayout(count) {
+    function createLayout(count, targetLevel) {
       const { w, h } = tileSize();
+      const config = getLevelConfig(targetLevel);
       const layouts = [
-        { x: 0.18, y: 0.16, cols: 4, rows: 3, stepX: 0.15, stepY: 0.16 },
-        { x: 0.12, y: 0.34, cols: 5, rows: 3, stepX: 0.14, stepY: 0.15 },
-        { x: 0.26, y: 0.52, cols: 4, rows: 2, stepX: 0.16, stepY: 0.16 },
-        { x: 0.35, y: 0.12, cols: 3, rows: 2, stepX: 0.16, stepY: 0.17 }
+        { x: 0.16, y: 0.15, cols: 4, rows: 3, stepX: 0.15, stepY: 0.16 },
+        { x: 0.10, y: 0.33, cols: 5, rows: 3, stepX: 0.14, stepY: 0.15 },
+        { x: 0.24, y: 0.50, cols: 4, rows: 2, stepX: 0.15, stepY: 0.16 },
+        { x: 0.34, y: 0.12, cols: 3, rows: 2, stepX: 0.14, stepY: 0.16 }
       ];
+
+      for (let i = 0; i < config.extraStacks; i++) {
+        layouts.push({
+          x: 0.23 + (i % 2) * 0.08,
+          y: 0.20 + i * 0.07,
+          cols: 3,
+          rows: 2,
+          stepX: 0.12,
+          stepY: 0.12
+        });
+      }
+
       const points = [];
       const boardW = meadow.clientWidth;
       const boardH = meadow.clientHeight;
       for (let layer = 0; layer < layouts.length && points.length < count; layer++) {
-        const config = layouts[layer];
-        for (let row = 0; row < config.rows && points.length < count; row++) {
-          for (let col = 0; col < config.cols && points.length < count; col++) {
-            const jitterX = (Math.random() * 10 - 5) + level * 1.2 * (Math.random() - 0.5);
-            const jitterY = (Math.random() * 8 - 4) + level * 0.8 * (Math.random() - 0.5);
-            const x = Math.round(boardW * (config.x + col * config.stepX) + jitterX);
-            const y = Math.round(boardH * (config.y + row * config.stepY) + jitterY);
+        const layerConfig = layouts[layer];
+        for (let row = 0; row < layerConfig.rows && points.length < count; row++) {
+          for (let col = 0; col < layerConfig.cols && points.length < count; col++) {
+            const jitterX = (Math.random() * config.jitterX - config.jitterX / 2);
+            const jitterY = (Math.random() * config.jitterY - config.jitterY / 2);
+            const x = Math.round(boardW * (layerConfig.x + col * layerConfig.stepX) + jitterX);
+            const y = Math.round(boardH * (layerConfig.y + row * layerConfig.stepY) + jitterY);
             points.push({
               x: Math.max(8, Math.min(boardW - w - 8, x)),
               y: Math.max(12, Math.min(boardH - h - 16, y)),
@@ -418,13 +443,14 @@
           z: zSeed++
         });
       }
-      return shuffle(points).slice(0, count).map((p, index) => ({ ...p, id: index + 1 }));
+      return shuffle(points).slice(0, count).map((p, index) => ({ ...p, id: index + 1, overlapBoost: config.overlapBoost }));
     }
 
     function overlaps(a, b) {
+      const boost = Math.max(a.overlapBoost || 0, b.overlapBoost || 0);
       const dx = Math.abs(a.x - b.x);
       const dy = Math.abs(a.y - b.y);
-      return dx < 48 && dy < 58;
+      return dx < 48 + boost && dy < 58 + Math.floor(boost * 0.8);
     }
 
     function recomputeBlocked() {
@@ -516,7 +542,7 @@
         const leftCount = tiles.filter(tile => !tile.removed).length;
         if (leftCount === 0 && tray.length === 0) {
           gameOver = true;
-          showMessage('通关啦！🎉', `你把第 ${level} 关清空啦，真的很稳！要不要试试下一关？`, '下一关', () => { level += 1; startLevel(level); });
+          showMessage('通关啦！🎉', `你把第 ${level} 关清空啦！下一关会更难：卡片更多、遮挡更密、图案也会更多。`, '下一关', () => { level += 1; startLevel(level); });
         }
       }, 120);
     }
@@ -545,9 +571,9 @@
       gameOver = false;
       tray = [];
       removedGroups = 0;
-      const count = Math.min(24 + (targetLevel - 1) * 3, 42);
-      const pool = buildPool(count);
-      const layout = createLayout(count);
+      const config = getLevelConfig(targetLevel);
+      const pool = buildPool(config.count, targetLevel);
+      const layout = createLayout(config.count, targetLevel);
       tiles = layout.map((pos, index) => ({
         id: pos.id,
         type: pool[index],
@@ -555,6 +581,7 @@
         y: pos.y,
         z: pos.z + pos.layer * 20,
         layer: pos.layer,
+        overlapBoost: pos.overlapBoost,
         removed: false,
         blocked: false
       }));
