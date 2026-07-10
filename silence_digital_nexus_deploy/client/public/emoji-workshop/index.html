@@ -54,6 +54,12 @@
   }
   .base-grid .cell:active { transform: scale(.95); }
   .base-grid canvas { width: 100%; height: auto; display: block; }
+  .cell-upload {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px; aspect-ratio: 1 / 1; background: #fff8fc !important;
+    border: 3px dashed #e3b8d9 !important; font-size: 12px; font-weight: 700; color: #c586b0;
+  }
+  .cell-upload .icon { font-size: 26px; }
 
   /* ---------- 编辑页 ---------- */
   .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
@@ -151,6 +157,7 @@
   </div>
   <div class="grid-title">— 挑一个底图开始 —</div>
   <div class="base-grid" id="baseGrid"></div>
+  <input type="file" id="photoInput" accept="image/*" style="display:none">
 </section>
 
 <!-- 编辑页 -->
@@ -177,6 +184,11 @@
   <div class="panel">
     <label class="plabel" for="sizeRange">字号</label>
     <input id="sizeRange" type="range" min="24" max="80" value="44">
+  </div>
+
+  <div class="panel">
+    <label class="plabel" for="markInput">落款（写你的名字，选填，右下角小字）</label>
+    <input id="markInput" type="text" maxlength="12" placeholder="比如：Summer 出品">
   </div>
 
   <button class="btn-done" id="btnDone">做好了，出图！</button>
@@ -211,11 +223,8 @@ const MEME_TEXTS = [
   '作业写完了吗',
 ];
 
-// 分享短链接：上线后填入，为空则水印不显示链接部分
-const SHARE_URL = 'silencezx007.github.io/emoji-workshop';
-
-// 水印文字
-const WATERMARK = '表情包工坊';
+// 首页示例图的落款演示文字（编辑页里用户可自己改成自己的名字）
+const DEMO_WATERMARK = '你的名字';
 
 // 画布逻辑尺寸（正方形）
 const SIZE = 480;
@@ -648,12 +657,14 @@ function paintBase(ctx, i) {
  * ========================================================== */
 
 const state = {
-  baseIndex: 0,
+  baseIndex: 0,          // -1 表示用自定义照片/手绘底图（见 customImage）
+  customImage: null,     // 上传的照片/手绘图（Image 对象）
   text: '就这？',
   colorIndex: 0,        // TEXT_COLORS 下标
   fontSize: 44,
   textX: SIZE / 2,
   textY: SIZE - 70,
+  watermarkText: '',    // 落款，右下角小字，用户自己填名字
 };
 
 // 创建一个 DPR 高清 canvas，返回 { canvas, ctx }（ctx 已按逻辑坐标 480 缩放）
@@ -683,31 +694,48 @@ function paintText(ctx, opts) {
   ctx.restore();
 }
 
-// 水印：右下角小字
-function paintWatermark(ctx) {
+// 水印：右下角小字，为空不画（用户可在编辑页自己填落款）
+function paintWatermark(ctx, text) {
+  if (!text) return;
   ctx.save();
-  const label = SHARE_URL ? WATERMARK + ' · ' + SHARE_URL : WATERMARK;
   ctx.font = '600 15px -apple-system, "PingFang SC", sans-serif';
   ctx.textAlign = 'right';
   ctx.textBaseline = 'bottom';
   ctx.lineJoin = 'round';
   ctx.strokeStyle = 'rgba(255,255,255,.9)';
   ctx.lineWidth = 4;
-  ctx.strokeText(label, SIZE - 12, SIZE - 10);
+  ctx.strokeText(text, SIZE - 12, SIZE - 10);
   ctx.fillStyle = 'rgba(90,74,106,.75)';
-  ctx.fillText(label, SIZE - 12, SIZE - 10);
+  ctx.fillText(text, SIZE - 12, SIZE - 10);
   ctx.restore();
+}
+
+// 把图片按"填满裁剪"方式画满整个正方形画布（不拉伸变形）
+function drawImageCover(ctx, img) {
+  const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
+  const scale = Math.max(SIZE / iw, SIZE / ih);
+  const dw = iw * scale, dh = ih * scale;
+  ctx.drawImage(img, (SIZE - dw) / 2, (SIZE - dh) / 2, dw, dh);
+}
+
+// 画当前底图：自定义照片优先，否则走内置底图
+function paintCurrentBase(ctx) {
+  if (state.baseIndex === -1 && state.customImage) {
+    drawImageCover(ctx, state.customImage);
+  } else {
+    paintBase(ctx, state.baseIndex);
+  }
 }
 
 // 完整合成一帧（底图 + 文字 + 水印）
 function compose(ctx) {
   ctx.clearRect(0, 0, SIZE, SIZE);
-  paintBase(ctx, state.baseIndex);
+  paintCurrentBase(ctx);
   paintText(ctx, {
     text: state.text, x: state.textX, y: state.textY,
     size: state.fontSize, color: TEXT_COLORS[state.colorIndex],
   });
-  paintWatermark(ctx);
+  paintWatermark(ctx, state.watermarkText);
 }
 
 /* ==========================================================
@@ -739,7 +767,7 @@ function renderSamples() {
       text: s.text, x: SIZE / 2, y: SIZE - 70,
       size: s.text.length > 4 ? 52 : 64, color: TEXT_COLORS[0],
     });
-    paintWatermark(ctx);
+    paintWatermark(ctx, DEMO_WATERMARK);
     wrap.appendChild(c);
   });
 }
@@ -762,6 +790,12 @@ function renderGrid() {
     grid.appendChild(btn);
     gridCtxs.push({ ctx, i });
   });
+  // 最后一格：上传照片 / 手绘底图（拍照或从相册选，选完直接进编辑页）
+  const uploadBtn = document.createElement('button');
+  uploadBtn.className = 'cell cell-upload';
+  uploadBtn.innerHTML = '<span class="icon">📷</span><span>传照片/手绘</span>';
+  uploadBtn.addEventListener('click', () => $('photoInput').click());
+  grid.appendChild(uploadBtn);
 }
 
 // 图片异步加载完成后刷新所有已画内容
@@ -778,6 +812,7 @@ const editCtx = makeCanvas(editCanvasEl);
 function enterEdit() {
   state.textX = SIZE / 2;
   state.textY = SIZE - 70;
+  $('markInput').value = state.watermarkText;
   compose(editCtx);
   show('edit');
 }
@@ -821,6 +856,30 @@ TEXT_COLORS.forEach((c, i) => {
 $('sizeRange').addEventListener('input', (e) => {
   state.fontSize = +e.target.value;
   compose(editCtx);
+});
+
+// 落款输入
+$('markInput').addEventListener('input', (e) => {
+  state.watermarkText = e.target.value;
+  compose(editCtx);
+});
+
+// 上传照片/手绘底图：读成 dataURL -> Image -> 设为当前底图，直接进编辑页
+$('photoInput').addEventListener('change', (e) => {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      state.customImage = img;
+      state.baseIndex = -1;
+      enterEdit();
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+  e.target.value = ''; // 允许连续选同一张图也能触发 change
 });
 
 // --- 文字拖动（touch + mouse 都支持）---
