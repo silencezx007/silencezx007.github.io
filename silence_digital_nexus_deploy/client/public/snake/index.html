@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+  <title>小兵贪吃蛇·柯基长条版</title>
+  <style>
+    :root {
+      --bg1: #22112f;
+      --bg2: #3b1f53;
+      --panel: rgba(28, 16, 41, 0.9);
+      --text: #fff7ed;
+      --accent: #fb923c;
+      --accent2: #fbbf24;
+      --danger: #fb7185;
+      --grid: rgba(255,255,255,0.07);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at top, #7c3aed 0%, var(--bg2) 32%, var(--bg1) 100%);
+      display: flex;
+      justify-content: center;
+      padding: 10px;
+    }
+    .wrap {
+      width: min(100%, 920px);
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(14px);
+      border-radius: 26px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.38);
+      padding: 14px;
+    }
+    h1 { margin: 0; font-size: clamp(28px, 6vw, 44px); }
+    .subtitle {
+      margin-top: 8px;
+      color: #f5e9ff;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .stats {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 18px;
+      padding: 10px 12px;
+      text-align: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+    .card small { display: block; color: #f8e8d8; margin-bottom: 6px; font-size: 12px; }
+    .card strong { font-size: 22px; }
+    .sub-owner {
+      margin-top: 6px;
+      min-height: 18px;
+      font-size: 12px;
+      color: #ffe3c1;
+      opacity: 0.95;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .canvas-wrap { margin-top: 14px; position: relative; }
+    .leaderboard-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 3;
+      min-height: 40px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(24, 14, 39, 0.86);
+      color: #fff7ed;
+      border: 1px solid rgba(255,255,255,0.16);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.22);
+      font-size: 14px;
+    }
+    canvas {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      display: block;
+      background:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+        radial-gradient(circle at 50% 20%, #24173c 0%, #120d1f 80%);
+      background-size: 30px 30px, 30px 30px, 100% 100%;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.08);
+      touch-action: none;
+      box-shadow: inset 0 0 24px rgba(0,0,0,0.35);
+    }
+    .panel {
+      margin-top: 14px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 14px;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .speed-btn {
+      margin-top: 12px;
+      width: 100%;
+      background: linear-gradient(180deg, #93c5fd, #3b82f6);
+      color: white;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.25);
+    }
+    .speed-btn.active {
+      background: linear-gradient(180deg, #60a5fa, #2563eb);
+      transform: scale(0.985);
+      filter: brightness(1.02);
+    }
+    button {
+      border: 0;
+      border-radius: 18px;
+      padding: 14px 12px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      min-height: 52px;
+      transition: transform .08s ease, filter .08s ease;
+    }
+    button:active { transform: scale(0.97); filter: brightness(.95); }
+    .primary { background: linear-gradient(180deg, #fdba74, #fb923c); color: #4a1900; }
+    .secondary { background: linear-gradient(180deg, #fde68a, #fbbf24); color: #4b3300; }
+    .danger { background: linear-gradient(180deg, #fda4af, #fb7185); color: #4c1020; }
+    .ctrl-grid {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: repeat(3, 78px);
+      grid-template-rows: repeat(3, 64px);
+      justify-content: center;
+      gap: 8px;
+    }
+    .ctrl {
+      background: rgba(255,255,255,0.1);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      font-size: 26px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+    .ctrl.dead { opacity: .42; font-size: 14px; line-height: 1.15; }
+    .hint { margin-top: 10px; color: #fff1dd; font-size: 14px; line-height: 1.6; }
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(12, 7, 20, 0.66);
+      backdrop-filter: blur(6px);
+      z-index: 20;
+    }
+    .modal.open { display: flex; }
+    .modal-card {
+      width: min(100%, 420px);
+      background: rgba(40, 22, 58, 0.98);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      padding: 18px;
+    }
+    .modal-card h2 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+    .modal-card p {
+      margin: 8px 0;
+      color: #fcebd7;
+      line-height: 1.6;
+    }
+    .modal-card input {
+      width: 100%;
+      margin-top: 10px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.08);
+      color: #fff7ed;
+      font-size: 17px;
+      outline: none;
+    }
+    .modal-card input::placeholder { color: rgba(255,247,237,0.55); }
+    .modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .leaderboard-list {
+      margin-top: 14px;
+      display: grid;
+      gap: 8px;
+      max-height: 320px;
+      overflow: auto;
+    }
+    .leaderboard-row {
+      display: grid;
+      grid-template-columns: 50px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+    }
+    .leaderboard-row .rank {
+      font-weight: 900;
+      color: #fde68a;
+    }
+    .leaderboard-row .name {
+      font-weight: 700;
+    }
+    .leaderboard-row .score {
+      font-weight: 900;
+      color: #fdba74;
+    }
+    .leaderboard-status {
+      margin: 8px 0 0;
+      color: #c7d2fe;
+      font-size: 13px;
+    }
+    .leaderboard-status[data-error="true"] { color: #fecdd3; }
+    .leaderboard-empty {
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.06);
+      color: #fcebd7;
+      text-align: center;
+    }
+    .footer { text-align: center; color: #f7dfcf; font-size: 13px; margin-top: 16px; }
+    @media (max-width: 460px) {
+      body { padding: 6px; }
+      .wrap { padding: 10px; border-radius: 18px; }
+      .stats { gap: 8px; }
+      .card strong { font-size: 20px; }
+      .ctrl-grid { grid-template-columns: repeat(3, 68px); grid-template-rows: repeat(3, 58px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🐶 小兵贪吃蛇·柯基长条版</h1>
+    <div class="subtitle">我按你的意思改了：画面更大，蛇身不再是一节一节的小块，而是一整条连起来的柯基长条身体，跑起来也会更顺。</div>
+
+    <div class="stats">
+      <div class="card"><small>分数</small><strong id="score">0</strong></div>
+      <div class="card">
+        <small>最高分</small>
+        <strong id="best">0</strong>
+        <div class="sub-owner" id="bestOwner">还没有记录</div>
+      </div>
+      <div class="card"><small>状态</small><strong id="status">待开始</strong></div>
+    </div>
+
+    <div class="canvas-wrap">
+      <button class="leaderboard-btn" id="leaderboardBtn">🏆 排行榜</button>
+      <canvas id="game" width="660" height="660" aria-label="小兵贪吃蛇柯基长条版"></canvas>
+    </div>
+
+    <div class="panel">
+      <strong>操作区</strong>
+      <div class="buttons">
+        <button class="primary" id="startBtn">开始</button>
+        <button class="secondary" id="pauseBtn">暂停/继续</button>
+        <button class="danger" id="restartBtn">重开</button>
+      </div>
+      <button class="speed-btn" id="speedBtn" aria-label="按住加速">🐾 按住加速</button>
+
+      <div class="ctrl-grid">
+        <div></div>
+        <button class="ctrl" data-dir="up" aria-label="向上">↑</button>
+        <div></div>
+        <button class="ctrl" data-dir="left" aria-label="向左">←</button>
+        <div class="ctrl dead">柯基<br>鼻尖</div>
+        <button class="ctrl" data-dir="right" aria-label="向右">→</button>
+        <div></div>
+        <button class="ctrl" data-dir="down" aria-label="向下">↓</button>
+        <div></div>
+      </div>
+
+      <div class="hint" id="message">准备好了就开始吧～这次是长条柯基身子。</div>
+      <div class="hint">吃到骨头饼干会加分；撞墙或撞到自己就结束。你也可以直接在棋盘上滑动控制方向。</div>
+    </div>
+
+    <div class="footer">做给 Summer 的小游戏 by 小兵 ✨</div>
+  </div>
+
+  <div class="modal" id="nameModal" aria-hidden="true">
+    <div class="modal-card">
+      <h2>英雄请留名</h2>
+      <p id="nameModalText">这局很厉害，留下名字吧～</p>
+      <input id="nameInput" maxlength="12" placeholder="输入你的名字" />
+      <div class="modal-actions">
+        <button class="secondary" id="skipSaveBtn">先不写</button>
+        <button class="primary" id="saveScoreBtn">保存成绩</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="leaderboardModal" aria-hidden="true">
+    <div class="modal-card">
+      <h2>🏆 排行榜</h2>
+      <p>分数越高，名次越靠前。</p>
+      <p class="leaderboard-status" id="leaderboardStatus">当前显示本机记录</p>
+      <div class="leaderboard-list" id="leaderboardList"></div>
+      <div class="leaderboard-empty" id="leaderboardEmpty">还没有人上榜，快来当第一个！</div>
+      <div class="modal-actions">
+        <button class="secondary" id="closeLeaderboardBtn">关闭</button>
+        <button class="primary" id="leaderboardRestartBtn">重开一局</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 这里只放 Supabase 的公开配置：anon key 可以出现在网页里，千万不要放 service_role key。
+    // 配好后，把下面两个空字符串替换成自己的项目 URL 和 anon public key。
+    window.SNAKE_SUPABASE = {
+      url: '',
+      anonKey: ''
+    };
+  </script>
+
+  <script>
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score');
+    const bestEl = document.getElementById('best');
+    const bestOwnerEl = document.getElementById('bestOwner');
+    const statusEl = document.getElementById('status');
+    const messageEl = document.getElementById('message');
+    const startBtn = document.getElementById('startBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const speedBtn = document.getElementById('speedBtn');
+    const leaderboardBtn = document.getElementById('leaderboardBtn');
+    const nameModal = document.getElementById('nameModal');
+    const nameModalText = document.getElementById('nameModalText');
+    const nameInput = document.getElementById('nameInput');
+    const saveScoreBtn = document.getElementById('saveScoreBtn');
+    const skipSaveBtn = document.getElementById('skipSaveBtn');
+    const leaderboardModal = document.getElementById('leaderboardModal');
+    const leaderboardList = document.getElementById('leaderboardList');
+    const leaderboardEmpty = document.getElementById('leaderboardEmpty');
+    const leaderboardStatus = document.getElementById('leaderboardStatus');
+    const closeLeaderboardBtn = document.getElementById('closeLeaderboardBtn');
+    const leaderboardRestartBtn = document.getElementById('leaderboardRestartBtn');
+    const dirButtons = [...document.querySelectorAll('[data-dir]')];
+
+    const gridSize = 30;
+    const tileCount = canvas.width / gridSize;
+    const leaderboardKey = 'summer-snake-corgi-ribbon-leaderboard-v1';
+    const playerNameKey = 'summer-snake-corgi-player-name-v1';
+    const maxLeaderboardSize = 12;
+    const supabaseConfig = window.SNAKE_SUPABASE || {};
+    const supabaseTable = 'snake_scores';
+    const supabaseEnabled = Boolean(supabaseConfig.url && supabaseConfig.anonKey);
+
+    let snake = [];
+    let direction = { x: 1, y: 0 };
+    let nextDirection = { x: 1, y: 0 };
+    let food = { x: 0, y: 0 };
+    let score = 0;
+    let moveInterval = 180;
+    const normalMoveInterval = 300;
+    const fastMoveInterval = 150;
+    let running = false;
+    let paused = false;
+    let started = false;
+    let waitingForFirstMove = false;
+    let gameOverState = false;
+    let accumulator = 0;
+    let lastFrameTime = 0;
+    let previousSnake = [];
+    let touchStartX = null;
+    let touchStartY = null;
+    let speedBoost = false;
+    let audioContext = null;
+    let leaderboard = [];
+    let playerName = '';
+    let pendingScore = null;
+
+    function ensureAudio() {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return null;
+      if (!audioContext) audioContext = new AudioCtx();
+      if (audioContext.state === 'suspended') audioContext.resume();
+      return audioContext;
+    }
+
+    function playChewSound() {
+      const audio = ensureAudio();
+      if (!audio) return;
+      const now = audio.currentTime;
+
+      const master = audio.createGain();
+      master.gain.setValueAtTime(0.0001, now);
+      master.gain.exponentialRampToValueAtTime(0.22, now + 0.02);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + 0.24);
+      master.connect(audio.destination);
+
+      [0, 0.05, 0.1].forEach((offset, index) => {
+        const osc = audio.createOscillator();
+        const gain = audio.createGain();
+        osc.type = index % 2 === 0 ? 'triangle' : 'sine';
+        osc.frequency.setValueAtTime(520 - index * 110, now + offset);
+        osc.frequency.exponentialRampToValueAtTime(240 - index * 30, now + offset + 0.08);
+        gain.gain.setValueAtTime(0.0001, now + offset);
+        gain.gain.exponentialRampToValueAtTime(0.18, now + offset + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.09);
+        osc.connect(gain);
+        gain.connect(master);
+        osc.start(now + offset);
+        osc.stop(now + offset + 0.1);
+      });
+
+      const crunch = audio.createBufferSource();
+      const length = Math.floor(audio.sampleRate * 0.08);
+      const buffer = audio.createBuffer(1, length, audio.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < length; i++) {
+        data[i] = (Math.random() * 2 - 1) * (1 - i / length);
+      }
+      const filter = audio.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(900, now);
+      const crunchGain = audio.createGain();
+      crunchGain.gain.setValueAtTime(0.08, now);
+      crunchGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+      crunch.buffer = buffer;
+      crunch.connect(filter);
+      filter.connect(crunchGain);
+      crunchGain.connect(master);
+      crunch.start(now + 0.015);
+    }
+
+    function roundRect(x, y, w, h, r) {
+      if (ctx.roundRect) {
+        ctx.beginPath();
+        ctx.roundRect(x, y, w, h, r);
+        return;
+      }
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+
+    function cloneSnake(source) {
+      return source.map(part => ({ x: part.x, y: part.y }));
+    }
+
+    function sanitizeName(name) {
+      return String(name || '').trim().replace(/\s+/g, ' ').slice(0, 12);
+    }
+
+    function sortLeaderboard(entries) {
+      return [...entries].sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return (a.createdAt || 0) - (b.createdAt || 0);
+      }).slice(0, maxLeaderboardSize);
+    }
+
+    function loadLeaderboard() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(leaderboardKey) || '[]');
+        if (!Array.isArray(raw)) throw new Error('bad leaderboard');
+        leaderboard = sortLeaderboard(raw
+          .filter(item => item && typeof item.score === 'number')
+          .map(item => ({
+            name: sanitizeName(item.name) || '无名英雄',
+            score: Number(item.score) || 0,
+            createdAt: Number(item.createdAt) || Date.now()
+          }))
+          .filter(item => item.score > 0));
+      } catch {
+        leaderboard = [];
+      }
+      renderLeaderboard();
+      renderBest();
+    }
+
+    function saveLeaderboard() {
+      localStorage.setItem(leaderboardKey, JSON.stringify(leaderboard));
+      renderLeaderboard();
+      renderBest();
+    }
+
+    function setLeaderboardStatus(text, isError = false) {
+      leaderboardStatus.textContent = text;
+      leaderboardStatus.dataset.error = isError ? 'true' : 'false';
+    }
+
+    function supabaseEndpoint(query = '') {
+      return `${String(supabaseConfig.url).replace(/\/$/, '')}/rest/v1/${supabaseTable}${query}`;
+    }
+
+    function supabaseHeaders(withJson = false) {
+      const headers = {
+        apikey: supabaseConfig.anonKey,
+        Authorization: `Bearer ${supabaseConfig.anonKey}`
+      };
+      if (withJson) headers['Content-Type'] = 'application/json';
+      return headers;
+    }
+
+    function remoteRowsToLeaderboard(rows) {
+      return sortLeaderboard((Array.isArray(rows) ? rows : [])
+        .filter(item => item && typeof item.score === 'number')
+        .map(item => ({
+          name: sanitizeName(item.name) || '无名英雄',
+          score: Number(item.score) || 0,
+          createdAt: Date.parse(item.created_at) || Date.now()
+        }))
+        .filter(item => item.score > 0));
+    }
+
+    async function loadRemoteLeaderboard() {
+      if (!supabaseEnabled) {
+        setLeaderboardStatus('当前显示本机记录');
+        return false;
+      }
+      setLeaderboardStatus('正在读取共享排行榜…');
+      const response = await fetch(supabaseEndpoint(
+        '?select=name,score,created_at&order=score.desc,created_at.asc&limit=12'
+      ), { headers: supabaseHeaders() });
+      if (!response.ok) throw new Error(`Supabase 读取失败（${response.status}）`);
+      leaderboard = remoteRowsToLeaderboard(await response.json());
+      localStorage.setItem(leaderboardKey, JSON.stringify(leaderboard));
+      renderLeaderboard();
+      renderBest();
+      setLeaderboardStatus('已连接共享排行榜');
+      return true;
+    }
+
+    async function saveScoreToSupabase(name, finalScore) {
+      if (!supabaseEnabled) return false;
+      const cleanName = sanitizeName(name) || '无名英雄';
+      const nameKey = cleanName.toLocaleLowerCase();
+      const existingResponse = await fetch(supabaseEndpoint(
+        `?select=score&name_key=eq.${encodeURIComponent(nameKey)}&limit=1`
+      ), { headers: supabaseHeaders() });
+      if (!existingResponse.ok) throw new Error(`Supabase 查询失败（${existingResponse.status}）`);
+      const existingRows = await existingResponse.json();
+      if (existingRows[0] && Number(existingRows[0].score) >= finalScore) return true;
+
+      const response = await fetch(supabaseEndpoint('?on_conflict=name_key'), {
+        method: 'POST',
+        headers: { ...supabaseHeaders(true), Prefer: 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify({
+          name_key: nameKey,
+          name: cleanName,
+          score: finalScore,
+          created_at: new Date().toISOString()
+        })
+      });
+      if (!response.ok) throw new Error(`Supabase 保存失败（${response.status}）`);
+      return true;
+    }
+
+    async function syncRemoteLeaderboard() {
+      if (!supabaseEnabled) return;
+      try {
+        await loadRemoteLeaderboard();
+      } catch (error) {
+        console.warn(error);
+        setLeaderboardStatus('共享榜暂时连不上，当前显示本机记录', true);
+      }
+    }
+
+    function renderBest() {
+      const top = leaderboard[0];
+      bestEl.textContent = top ? String(top.score) : '0';
+      bestOwnerEl.textContent = top ? top.name : '还没有记录';
+    }
+
+    function renderLeaderboard() {
+      leaderboardList.innerHTML = '';
+      leaderboardEmpty.style.display = leaderboard.length ? 'none' : 'block';
+      leaderboard.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = 'leaderboard-row';
+        row.innerHTML = `<div class="rank">#${index + 1}</div><div class="name">${item.name}</div><div class="score">${item.score}分</div>`;
+        leaderboardList.appendChild(row);
+      });
+    }
+
+    function openModal(modal) {
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeModal(modal) {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    async function openLeaderboard() {
+      renderLeaderboard();
+      openModal(leaderboardModal);
+      await syncRemoteLeaderboard();
+    }
+
+    function closeLeaderboard() {
+      closeModal(leaderboardModal);
+    }
+
+    function loadPlayerName() {
+      playerName = sanitizeName(localStorage.getItem(playerNameKey) || '');
+    }
+
+    function savePlayerName(name) {
+      playerName = sanitizeName(name);
+      if (playerName) localStorage.setItem(playerNameKey, playerName);
+    }
+
+    function samePlayer(a, b) {
+      return sanitizeName(a).toLocaleLowerCase() === sanitizeName(b).toLocaleLowerCase();
+    }
+
+    async function saveScoreForPlayer(name, finalScore) {
+      const cleanName = sanitizeName(name) || '无名英雄';
+      const existingIndex = leaderboard.findIndex(item => samePlayer(item.name, cleanName));
+
+      if (existingIndex >= 0) {
+        if (finalScore > leaderboard[existingIndex].score) {
+          leaderboard[existingIndex] = {
+            ...leaderboard[existingIndex],
+            name: cleanName,
+            score: finalScore,
+            createdAt: Date.now()
+          };
+        }
+      } else {
+        leaderboard.push({ name: cleanName, score: finalScore, createdAt: Date.now() });
+      }
+
+      leaderboard = sortLeaderboard(leaderboard);
+      saveLeaderboard();
+      const rank = leaderboard.findIndex(item => samePlayer(item.name, cleanName)) + 1;
+      const savedScore = leaderboard.find(item => samePlayer(item.name, cleanName))?.score || finalScore;
+      messageEl.textContent = rank === 1
+        ? `${cleanName} 登顶第一名啦！`
+        : `${cleanName} 现在排第 ${rank} 名，最高记录 ${savedScore} 分。`;
+
+      if (supabaseEnabled) {
+        try {
+          setLeaderboardStatus('正在同步这次成绩…');
+          await saveScoreToSupabase(cleanName, finalScore);
+          await loadRemoteLeaderboard();
+          messageEl.textContent += ' 已同步到共享榜！';
+        } catch (error) {
+          console.warn(error);
+          setLeaderboardStatus('同步失败，已保留本机记录', true);
+          messageEl.textContent += '（联网同步失败，但本机记录还在）';
+        }
+      }
+    }
+
+    function openNamePrompt(finalScore) {
+      if (playerName) {
+        saveScoreForPlayer(playerName, finalScore);
+        return;
+      }
+      pendingScore = finalScore;
+      const currentBest = leaderboard[0]?.score || 0;
+      nameModalText.textContent = finalScore > currentBest
+        ? `你拿了 ${finalScore} 分，刷新最高分啦！快留下英雄名字～`
+        : `你拿了 ${finalScore} 分，也能进排行榜喔，留下名字吧～`;
+      nameInput.value = '';
+      openModal(nameModal);
+      setTimeout(() => nameInput.focus(), 30);
+    }
+
+    function closeNamePrompt() {
+      closeModal(nameModal);
+    }
+
+    function saveCurrentScore() {
+      if (!pendingScore || pendingScore <= 0) {
+        closeNamePrompt();
+        return;
+      }
+      savePlayerName(nameInput.value || '无名英雄');
+      saveScoreForPlayer(playerName, pendingScore);
+      pendingScore = null;
+      closeNamePrompt();
+    }
+
+    function skipCurrentScore() {
+      pendingScore = null;
+      closeNamePrompt();
+      messageEl.textContent = `这局拿了 ${score} 分。点“重开”再来！`;
+    }
+
+    async function loadBest() {
+      loadPlayerName();
+      loadLeaderboard();
+      await syncRemoteLeaderboard();
+    }
+
+    function saveBest() {
+      renderBest();
+    }
+
+    function resetGame() {
+      snake = [
+        { x: 10, y: 10 },
+        { x: 9, y: 10 },
+        { x: 8, y: 10 },
+        { x: 7, y: 10 },
+        { x: 6, y: 10 }
+      ];
+      previousSnake = cloneSnake(snake);
+      direction = { x: 1, y: 0 };
+      nextDirection = { x: 1, y: 0 };
+      food = { x: 14, y: 10 };
+      score = 0;
+      moveInterval = normalMoveInterval;
+      running = false;
+      paused = false;
+      started = false;
+      waitingForFirstMove = false;
+      gameOverState = false;
+      speedBoost = false;
+      pendingScore = null;
+      speedBtn.classList.remove('active');
+      speedBtn.textContent = '🐾 按住加速';
+      accumulator = 0;
+      scoreEl.textContent = '0';
+      statusEl.textContent = '待开始';
+      messageEl.textContent = '先点开始，再点一个方向，柯基才会跑出去。';
+      closeNamePrompt();
+      closeLeaderboard();
+      placeFood();
+      draw(0);
+    }
+
+    function placeFood() {
+      do {
+        food = {
+          x: Math.floor(Math.random() * tileCount),
+          y: Math.floor(Math.random() * tileCount)
+        };
+      } while (snake.some(part => part.x === food.x && part.y === food.y));
+    }
+
+    function startGame() {
+      if ((running && !paused) || waitingForFirstMove) return;
+      started = true;
+      running = false;
+      paused = false;
+      waitingForFirstMove = true;
+      gameOverState = false;
+      accumulator = 0;
+      statusEl.textContent = '选方向';
+      messageEl.textContent = '现在点一下方向键，或者在棋盘上滑一下，柯基就会开始跑。';
+    }
+
+    function setSpeedBoost(active) {
+      speedBoost = active;
+      moveInterval = active ? fastMoveInterval : normalMoveInterval;
+      speedBtn.classList.toggle('active', active);
+      speedBtn.textContent = active ? '💨 正在加速' : '🐾 按住加速';
+      if (active && running && !paused && !gameOverState) {
+        messageEl.textContent = '柯基加速冲刺中！';
+      } else if (!active && running && !paused && !gameOverState) {
+        messageEl.textContent = '恢复正常速度啦。';
+      }
+    }
+
+    function drawFlame(x, y, scale = 1, alpha = 1) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scale, scale);
+      ctx.globalAlpha = alpha;
+
+      const outer = ctx.createRadialGradient(0, 0, 2, 0, 0, 18);
+      outer.addColorStop(0, 'rgba(255,244,180,0.95)');
+      outer.addColorStop(0.45, 'rgba(255,166,48,0.95)');
+      outer.addColorStop(1, 'rgba(255,84,24,0)');
+      ctx.fillStyle = outer;
+      ctx.beginPath();
+      ctx.moveTo(14, 0);
+      ctx.quadraticCurveTo(-2, -15, -18, 0);
+      ctx.quadraticCurveTo(-2, 15, 14, 0);
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(255,247,214,0.92)';
+      ctx.beginPath();
+      ctx.moveTo(8, 0);
+      ctx.quadraticCurveTo(-1, -8, -10, 0);
+      ctx.quadraticCurveTo(-1, 8, 8, 0);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function togglePause() {
+      if (!started || gameOverState) return;
+      paused = !paused;
+      running = !paused;
+      statusEl.textContent = paused ? '已暂停' : '进行中';
+      messageEl.textContent = paused ? '柯基趴下歇一下。' : '继续冲！';
+    }
+
+    function setDirection(x, y) {
+      if (!started) startGame();
+      if (gameOverState) return;
+      const baseDirection = waitingForFirstMove ? nextDirection : direction;
+      const goingBack = x === -baseDirection.x && y === -baseDirection.y;
+      if (goingBack) return;
+      nextDirection = { x, y };
+      if (waitingForFirstMove) {
+        waitingForFirstMove = false;
+        running = true;
+        paused = false;
+        accumulator = 0;
+        statusEl.textContent = '进行中';
+        messageEl.textContent = '冲呀～整条柯基跑起来了。';
+      }
+    }
+
+    function handleDir(name) {
+      if (name === 'up') setDirection(0, -1);
+      if (name === 'down') setDirection(0, 1);
+      if (name === 'left') setDirection(-1, 0);
+      if (name === 'right') setDirection(1, 0);
+    }
+
+    function updateGameStep() {
+      previousSnake = cloneSnake(snake);
+      direction = { ...nextDirection };
+      const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+
+      if (
+        head.x < 0 || head.x >= tileCount ||
+        head.y < 0 || head.y >= tileCount ||
+        snake.some(part => part.x === head.x && part.y === head.y)
+      ) {
+        gameOver();
+        return;
+      }
+
+      snake.unshift(head);
+      if (head.x === food.x && head.y === food.y) {
+        score += 1;
+        scoreEl.textContent = String(score);
+        saveBest();
+        playChewSound();
+        placeFood();
+        messageEl.textContent = score < 5 ? '咔嚓咔嚓，吃到果糖啦！' : '咔嚓！长条柯基越跑越顺了！';
+        // Summer 要求不加难度、不加速，保持匀速
+      } else {
+        snake.pop();
+      }
+    }
+
+    function gameOver() {
+      running = false;
+      paused = false;
+      gameOverState = true;
+      setSpeedBoost(false);
+      statusEl.textContent = '结束';
+      messageEl.textContent = `这局拿了 ${score} 分。点“重开”再来！`;
+      if (score > 0) {
+        openNamePrompt(score);
+      }
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function getInterpolatedSnake(progress) {
+      return snake.map((part, index) => {
+        const prev = previousSnake[index] || snake[index + 1] || part;
+        return {
+          x: lerp(prev.x, part.x, progress),
+          y: lerp(prev.y, part.y, progress)
+        };
+      });
+    }
+
+    function toPixel(part) {
+      return {
+        x: part.x * gridSize + gridSize / 2,
+        y: part.y * gridSize + gridSize / 2
+      };
+    }
+
+    function drawSmoothLine(points, width, color) {
+      if (points.length < 2) return;
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+      for (let i = 1; i < points.length - 1; i++) {
+        const midX = (points[i].x + points[i + 1].x) / 2;
+        const midY = (points[i].y + points[i + 1].y) / 2;
+        ctx.quadraticCurveTo(points[i].x, points[i].y, midX, midY);
+      }
+      const last = points[points.length - 1];
+      ctx.lineTo(last.x, last.y);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawFood() {
+      const x = food.x * gridSize + gridSize / 2;
+      const y = food.y * gridSize + gridSize / 2;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.fillStyle = '#fff7ed';
+      roundRect(-11, -6, 22, 12, 6);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(-12, 0, 4.5, 0, Math.PI * 2);
+      ctx.arc(12, 0, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#f59e0b';
+      ctx.beginPath();
+      ctx.arc(0, 0, 2.8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawBody(points) {
+      if (points.length < 2) return;
+
+      if (speedBoost && running && !paused && !gameOverState) {
+        for (let i = Math.min(points.length - 1, 6); i >= 1; i--) {
+          const point = points[i];
+          const before = points[i - 1] || point;
+          const angle = Math.atan2(point.y - before.y, point.x - before.x) + Math.PI;
+          ctx.save();
+          ctx.translate(point.x, point.y);
+          ctx.rotate(angle);
+          drawFlame(-gridSize * 0.22 - i * 2.2, Math.sin(performance.now() / 70 + i) * 3, 0.9 - i * 0.08, 0.36 - i * 0.04);
+          ctx.restore();
+        }
+      }
+
+      drawSmoothLine(points, gridSize * 0.92, '#9a4f16');
+      drawSmoothLine(points, gridSize * 0.72, '#d97706');
+      drawSmoothLine(points, gridSize * 0.36, '#fde7c6');
+
+      const tail = points[points.length - 1];
+      const beforeTail = points[points.length - 2];
+      const angle = Math.atan2(tail.y - beforeTail.y, tail.x - beforeTail.x) + Math.PI;
+      const wag = Math.sin(performance.now() / 120) * 0.22;
+      ctx.save();
+      ctx.translate(tail.x, tail.y);
+      ctx.rotate(angle + wag);
+      ctx.fillStyle = '#9a4f16';
+      ctx.beginPath();
+      ctx.moveTo(-2, 0);
+      ctx.quadraticCurveTo(-10, -6, -18, -2);
+      ctx.quadraticCurveTo(-10, 4, -2, 2);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawHead(head) {
+      const cx = head.x * gridSize + gridSize / 2;
+      const cy = head.y * gridSize + gridSize / 2;
+      const angle = Math.atan2(direction.y, direction.x);
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(angle);
+
+      ctx.fillStyle = '#d97706';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 15, 13, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#7c2d12';
+      ctx.beginPath();
+      ctx.moveTo(-8, -6);
+      ctx.lineTo(-14, -17);
+      ctx.lineTo(-2, -11);
+      ctx.closePath();
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(-8, 6);
+      ctx.lineTo(-14, 17);
+      ctx.lineTo(-2, 11);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#fde7c6';
+      ctx.beginPath();
+      ctx.ellipse(5, 0, 10, 8.6, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(3.5, -4.2, 2.7, 0, Math.PI * 2);
+      ctx.arc(3.5, 4.2, 2.7, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#1f2937';
+      ctx.beginPath();
+      ctx.arc(4.3, -4.2, 1.2, 0, Math.PI * 2);
+      ctx.arc(4.3, 4.2, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#111827';
+      ctx.beginPath();
+      ctx.arc(11.5, 0, 1.9, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#7c2d12';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(11.5, 0);
+      ctx.quadraticCurveTo(8, 2, 5.5, 2.1);
+      ctx.moveTo(11.5, 0);
+      ctx.quadraticCurveTo(8, -2, 5.5, -2.1);
+      ctx.stroke();
+
+      ctx.fillStyle = '#fca5a5';
+      ctx.beginPath();
+      ctx.arc(6.6, -7.2, 1.8, 0, Math.PI * 2);
+      ctx.arc(6.6, 7.2, 1.8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function draw(progress = 0) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawFood();
+
+      const smoothSnake = getInterpolatedSnake(progress);
+      const points = smoothSnake.map(toPixel);
+      drawBody(points);
+      if (smoothSnake[0]) drawHead(smoothSnake[0]);
+
+      if (!started || waitingForFirstMove || gameOverState) {
+        ctx.fillStyle = 'rgba(10, 6, 20, 0.54)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#fff7ed';
+        ctx.textAlign = 'center';
+        ctx.font = 'bold 38px sans-serif';
+        ctx.fillText(gameOverState ? '游戏结束' : (waitingForFirstMove ? '选一个方向开始' : '点开始或滑动开局'), canvas.width / 2, canvas.height / 2 - 12);
+        ctx.font = '20px sans-serif';
+        ctx.fillText(gameOverState ? '点重开再来一局' : (waitingForFirstMove ? '点方向键或滑一下' : '方向按钮也能控制'), canvas.width / 2, canvas.height / 2 + 24);
+      }
+    }
+
+    function gameFrame(timestamp) {
+      if (!lastFrameTime) lastFrameTime = timestamp;
+      const delta = timestamp - lastFrameTime;
+      lastFrameTime = timestamp;
+
+      let progress = 0;
+      if (running && !paused && !gameOverState) {
+        accumulator += delta;
+        while (accumulator >= moveInterval) {
+          accumulator -= moveInterval;
+          updateGameStep();
+          if (gameOverState) break;
+        }
+        progress = Math.min(accumulator / moveInterval, 1);
+      }
+
+      draw(progress);
+      requestAnimationFrame(gameFrame);
+    }
+
+    dirButtons.forEach(btn => btn.addEventListener('click', () => handleDir(btn.dataset.dir)));
+    startBtn.addEventListener('click', startGame);
+    pauseBtn.addEventListener('click', togglePause);
+    restartBtn.addEventListener('click', resetGame);
+    leaderboardBtn.addEventListener('click', openLeaderboard);
+    closeLeaderboardBtn.addEventListener('click', closeLeaderboard);
+    leaderboardRestartBtn.addEventListener('click', () => {
+      closeLeaderboard();
+      resetGame();
+    });
+    saveScoreBtn.addEventListener('click', saveCurrentScore);
+    skipSaveBtn.addEventListener('click', skipCurrentScore);
+    nameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') saveCurrentScore();
+    });
+    [nameModal, leaderboardModal].forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal(modal);
+      });
+    });
+    [startBtn, pauseBtn, restartBtn, speedBtn, leaderboardBtn, saveScoreBtn, skipSaveBtn, closeLeaderboardBtn, leaderboardRestartBtn, canvas, ...dirButtons].forEach(el => {
+      ['pointerdown', 'touchstart', 'click'].forEach(eventName => {
+        el.addEventListener(eventName, ensureAudio, { passive: true });
+      });
+    });
+
+    ['pointerdown', 'touchstart', 'mousedown'].forEach(eventName => {
+      speedBtn.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        setSpeedBoost(true);
+      });
+    });
+    ['pointerup', 'pointercancel', 'pointerleave', 'touchend', 'touchcancel', 'mouseup'].forEach(eventName => {
+      speedBtn.addEventListener(eventName, () => setSpeedBoost(false));
+    });
+
+    canvas.addEventListener('touchstart', (e) => {
+      const touch = e.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+    }, { passive: true });
+
+    canvas.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const dx = touch.clientX - touchStartX;
+      const dy = touch.clientY - touchStartY;
+      if (Math.abs(dx) < 16 && Math.abs(dy) < 16) return;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        handleDir(dx > 0 ? 'right' : 'left');
+      } else {
+        handleDir(dy > 0 ? 'down' : 'up');
+      }
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+    }, { passive: false });
+
+    document.addEventListener('keydown', (e) => {
+      const k = e.key.toLowerCase();
+      if (k === 'arrowup' || k === 'w') handleDir('up');
+      if (k === 'arrowdown' || k === 's') handleDir('down');
+      if (k === 'arrowleft' || k === 'a') handleDir('left');
+      if (k === 'arrowright' || k === 'd') handleDir('right');
+      if (k === 'shift') setSpeedBoost(true);
+      if (k === ' ') { e.preventDefault(); togglePause(); }
+      if (k === 'r') resetGame();
+      if (k === 'escape') {
+        closeNamePrompt();
+        closeLeaderboard();
+      }
+    });
+
+    document.addEventListener('keyup', (e) => {
+      if (e.key.toLowerCase() === 'shift') setSpeedBoost(false);
+    });
+
+    loadBest();
+    resetGame();
+    requestAnimationFrame(gameFrame);
+  </script>
+</body>
+</html>
