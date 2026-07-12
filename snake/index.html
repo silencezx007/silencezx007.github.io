@@ -234,6 +234,12 @@
       font-weight: 900;
       color: #fdba74;
     }
+    .leaderboard-status {
+      margin: 8px 0 0;
+      color: #c7d2fe;
+      font-size: 13px;
+    }
+    .leaderboard-status[data-error="true"] { color: #fecdd3; }
     .leaderboard-empty {
       margin-top: 14px;
       padding: 16px;
@@ -316,6 +322,7 @@
     <div class="modal-card">
       <h2>🏆 排行榜</h2>
       <p>分数越高，名次越靠前。</p>
+      <p class="leaderboard-status" id="leaderboardStatus">当前显示本机记录</p>
       <div class="leaderboard-list" id="leaderboardList"></div>
       <div class="leaderboard-empty" id="leaderboardEmpty">还没有人上榜，快来当第一个！</div>
       <div class="modal-actions">
@@ -324,6 +331,15 @@
       </div>
     </div>
   </div>
+
+  <script>
+    // 这里只放 Supabase 的公开配置：anon key 可以出现在网页里，千万不要放 service_role key。
+    // 配好后，把下面两个空字符串替换成自己的项目 URL 和 anon public key。
+    window.SNAKE_SUPABASE = {
+      url: '',
+      anonKey: ''
+    };
+  </script>
 
   <script>
     const canvas = document.getElementById('game');
@@ -346,6 +362,7 @@
     const leaderboardModal = document.getElementById('leaderboardModal');
     const leaderboardList = document.getElementById('leaderboardList');
     const leaderboardEmpty = document.getElementById('leaderboardEmpty');
+    const leaderboardStatus = document.getElementById('leaderboardStatus');
     const closeLeaderboardBtn = document.getElementById('closeLeaderboardBtn');
     const leaderboardRestartBtn = document.getElementById('leaderboardRestartBtn');
     const dirButtons = [...document.querySelectorAll('[data-dir]')];
@@ -353,7 +370,11 @@
     const gridSize = 30;
     const tileCount = canvas.width / gridSize;
     const leaderboardKey = 'summer-snake-corgi-ribbon-leaderboard-v1';
+    const playerNameKey = 'summer-snake-corgi-player-name-v1';
     const maxLeaderboardSize = 12;
+    const supabaseConfig = window.SNAKE_SUPABASE || {};
+    const supabaseTable = 'snake_scores';
+    const supabaseEnabled = Boolean(supabaseConfig.url && supabaseConfig.anonKey);
 
     let snake = [];
     let direction = { x: 1, y: 0 };
@@ -376,6 +397,7 @@
     let speedBoost = false;
     let audioContext = null;
     let leaderboard = [];
+    let playerName = '';
     let pendingScore = null;
 
     function ensureAudio() {
@@ -487,6 +509,88 @@
       renderBest();
     }
 
+    function setLeaderboardStatus(text, isError = false) {
+      leaderboardStatus.textContent = text;
+      leaderboardStatus.dataset.error = isError ? 'true' : 'false';
+    }
+
+    function supabaseEndpoint(query = '') {
+      return `${String(supabaseConfig.url).replace(/\/$/, '')}/rest/v1/${supabaseTable}${query}`;
+    }
+
+    function supabaseHeaders(withJson = false) {
+      const headers = {
+        apikey: supabaseConfig.anonKey,
+        Authorization: `Bearer ${supabaseConfig.anonKey}`
+      };
+      if (withJson) headers['Content-Type'] = 'application/json';
+      return headers;
+    }
+
+    function remoteRowsToLeaderboard(rows) {
+      return sortLeaderboard((Array.isArray(rows) ? rows : [])
+        .filter(item => item && typeof item.score === 'number')
+        .map(item => ({
+          name: sanitizeName(item.name) || '无名英雄',
+          score: Number(item.score) || 0,
+          createdAt: Date.parse(item.created_at) || Date.now()
+        }))
+        .filter(item => item.score > 0));
+    }
+
+    async function loadRemoteLeaderboard() {
+      if (!supabaseEnabled) {
+        setLeaderboardStatus('当前显示本机记录');
+        return false;
+      }
+      setLeaderboardStatus('正在读取共享排行榜…');
+      const response = await fetch(supabaseEndpoint(
+        '?select=name,score,created_at&order=score.desc,created_at.asc&limit=12'
+      ), { headers: supabaseHeaders() });
+      if (!response.ok) throw new Error(`Supabase 读取失败（${response.status}）`);
+      leaderboard = remoteRowsToLeaderboard(await response.json());
+      localStorage.setItem(leaderboardKey, JSON.stringify(leaderboard));
+      renderLeaderboard();
+      renderBest();
+      setLeaderboardStatus('已连接共享排行榜');
+      return true;
+    }
+
+    async function saveScoreToSupabase(name, finalScore) {
+      if (!supabaseEnabled) return false;
+      const cleanName = sanitizeName(name) || '无名英雄';
+      const nameKey = cleanName.toLocaleLowerCase();
+      const existingResponse = await fetch(supabaseEndpoint(
+        `?select=score&name_key=eq.${encodeURIComponent(nameKey)}&limit=1`
+      ), { headers: supabaseHeaders() });
+      if (!existingResponse.ok) throw new Error(`Supabase 查询失败（${existingResponse.status}）`);
+      const existingRows = await existingResponse.json();
+      if (existingRows[0] && Number(existingRows[0].score) >= finalScore) return true;
+
+      const response = await fetch(supabaseEndpoint('?on_conflict=name_key'), {
+        method: 'POST',
+        headers: { ...supabaseHeaders(true), Prefer: 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify({
+          name_key: nameKey,
+          name: cleanName,
+          score: finalScore,
+          created_at: new Date().toISOString()
+        })
+      });
+      if (!response.ok) throw new Error(`Supabase 保存失败（${response.status}）`);
+      return true;
+    }
+
+    async function syncRemoteLeaderboard() {
+      if (!supabaseEnabled) return;
+      try {
+        await loadRemoteLeaderboard();
+      } catch (error) {
+        console.warn(error);
+        setLeaderboardStatus('共享榜暂时连不上，当前显示本机记录', true);
+      }
+    }
+
     function renderBest() {
       const top = leaderboard[0];
       bestEl.textContent = top ? String(top.score) : '0';
@@ -514,16 +618,73 @@
       modal.setAttribute('aria-hidden', 'true');
     }
 
-    function openLeaderboard() {
+    async function openLeaderboard() {
       renderLeaderboard();
       openModal(leaderboardModal);
+      await syncRemoteLeaderboard();
     }
 
     function closeLeaderboard() {
       closeModal(leaderboardModal);
     }
 
+    function loadPlayerName() {
+      playerName = sanitizeName(localStorage.getItem(playerNameKey) || '');
+    }
+
+    function savePlayerName(name) {
+      playerName = sanitizeName(name);
+      if (playerName) localStorage.setItem(playerNameKey, playerName);
+    }
+
+    function samePlayer(a, b) {
+      return sanitizeName(a).toLocaleLowerCase() === sanitizeName(b).toLocaleLowerCase();
+    }
+
+    async function saveScoreForPlayer(name, finalScore) {
+      const cleanName = sanitizeName(name) || '无名英雄';
+      const existingIndex = leaderboard.findIndex(item => samePlayer(item.name, cleanName));
+
+      if (existingIndex >= 0) {
+        if (finalScore > leaderboard[existingIndex].score) {
+          leaderboard[existingIndex] = {
+            ...leaderboard[existingIndex],
+            name: cleanName,
+            score: finalScore,
+            createdAt: Date.now()
+          };
+        }
+      } else {
+        leaderboard.push({ name: cleanName, score: finalScore, createdAt: Date.now() });
+      }
+
+      leaderboard = sortLeaderboard(leaderboard);
+      saveLeaderboard();
+      const rank = leaderboard.findIndex(item => samePlayer(item.name, cleanName)) + 1;
+      const savedScore = leaderboard.find(item => samePlayer(item.name, cleanName))?.score || finalScore;
+      messageEl.textContent = rank === 1
+        ? `${cleanName} 登顶第一名啦！`
+        : `${cleanName} 现在排第 ${rank} 名，最高记录 ${savedScore} 分。`;
+
+      if (supabaseEnabled) {
+        try {
+          setLeaderboardStatus('正在同步这次成绩…');
+          await saveScoreToSupabase(cleanName, finalScore);
+          await loadRemoteLeaderboard();
+          messageEl.textContent += ' 已同步到共享榜！';
+        } catch (error) {
+          console.warn(error);
+          setLeaderboardStatus('同步失败，已保留本机记录', true);
+          messageEl.textContent += '（联网同步失败，但本机记录还在）';
+        }
+      }
+    }
+
     function openNamePrompt(finalScore) {
+      if (playerName) {
+        saveScoreForPlayer(playerName, finalScore);
+        return;
+      }
       pendingScore = finalScore;
       const currentBest = leaderboard[0]?.score || 0;
       nameModalText.textContent = finalScore > currentBest
@@ -543,14 +704,8 @@
         closeNamePrompt();
         return;
       }
-      const name = sanitizeName(nameInput.value) || '无名英雄';
-      leaderboard = sortLeaderboard([
-        ...leaderboard,
-        { name, score: pendingScore, createdAt: Date.now() }
-      ]);
-      saveLeaderboard();
-      const rank = leaderboard.findIndex(item => item.name === name && item.score === pendingScore) + 1;
-      messageEl.textContent = rank === 1 ? `${name} 登顶第一名啦！` : `${name} 现在排第 ${rank} 名。`;
+      savePlayerName(nameInput.value || '无名英雄');
+      saveScoreForPlayer(playerName, pendingScore);
       pendingScore = null;
       closeNamePrompt();
     }
@@ -561,8 +716,10 @@
       messageEl.textContent = `这局拿了 ${score} 分。点“重开”再来！`;
     }
 
-    function loadBest() {
+    async function loadBest() {
+      loadPlayerName();
       loadLeaderboard();
+      await syncRemoteLeaderboard();
     }
 
     function saveBest() {
