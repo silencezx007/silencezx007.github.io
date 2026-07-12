@@ -223,6 +223,61 @@
     let touchStartX = null;
     let touchStartY = null;
     let speedBoost = false;
+    let audioContext = null;
+
+    function ensureAudio() {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return null;
+      if (!audioContext) audioContext = new AudioCtx();
+      if (audioContext.state === 'suspended') audioContext.resume();
+      return audioContext;
+    }
+
+    function playChewSound() {
+      const audio = ensureAudio();
+      if (!audio) return;
+      const now = audio.currentTime;
+
+      const master = audio.createGain();
+      master.gain.setValueAtTime(0.0001, now);
+      master.gain.exponentialRampToValueAtTime(0.22, now + 0.02);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + 0.24);
+      master.connect(audio.destination);
+
+      [0, 0.05, 0.1].forEach((offset, index) => {
+        const osc = audio.createOscillator();
+        const gain = audio.createGain();
+        osc.type = index % 2 === 0 ? 'triangle' : 'sine';
+        osc.frequency.setValueAtTime(520 - index * 110, now + offset);
+        osc.frequency.exponentialRampToValueAtTime(240 - index * 30, now + offset + 0.08);
+        gain.gain.setValueAtTime(0.0001, now + offset);
+        gain.gain.exponentialRampToValueAtTime(0.18, now + offset + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.09);
+        osc.connect(gain);
+        gain.connect(master);
+        osc.start(now + offset);
+        osc.stop(now + offset + 0.1);
+      });
+
+      const crunch = audio.createBufferSource();
+      const length = Math.floor(audio.sampleRate * 0.08);
+      const buffer = audio.createBuffer(1, length, audio.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < length; i++) {
+        data[i] = (Math.random() * 2 - 1) * (1 - i / length);
+      }
+      const filter = audio.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(900, now);
+      const crunchGain = audio.createGain();
+      crunchGain.gain.setValueAtTime(0.08, now);
+      crunchGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+      crunch.buffer = buffer;
+      crunch.connect(filter);
+      filter.connect(crunchGain);
+      crunchGain.connect(master);
+      crunch.start(now + 0.015);
+    }
 
     function roundRect(x, y, w, h, r) {
       if (ctx.roundRect) {
@@ -319,6 +374,32 @@
       }
     }
 
+    function drawFlame(x, y, scale = 1, alpha = 1) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scale, scale);
+      ctx.globalAlpha = alpha;
+
+      const outer = ctx.createRadialGradient(0, 0, 2, 0, 0, 18);
+      outer.addColorStop(0, 'rgba(255,244,180,0.95)');
+      outer.addColorStop(0.45, 'rgba(255,166,48,0.95)');
+      outer.addColorStop(1, 'rgba(255,84,24,0)');
+      ctx.fillStyle = outer;
+      ctx.beginPath();
+      ctx.moveTo(14, 0);
+      ctx.quadraticCurveTo(-2, -15, -18, 0);
+      ctx.quadraticCurveTo(-2, 15, 14, 0);
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(255,247,214,0.92)';
+      ctx.beginPath();
+      ctx.moveTo(8, 0);
+      ctx.quadraticCurveTo(-1, -8, -10, 0);
+      ctx.quadraticCurveTo(-1, 8, 8, 0);
+      ctx.fill();
+      ctx.restore();
+    }
+
     function togglePause() {
       if (!started || gameOverState) return;
       paused = !paused;
@@ -370,8 +451,9 @@
         score += 1;
         scoreEl.textContent = String(score);
         saveBest();
+        playChewSound();
         placeFood();
-        messageEl.textContent = score < 5 ? '吃到骨头饼干啦！' : '长条柯基越来越顺了！';
+        messageEl.textContent = score < 5 ? '咔嚓咔嚓，吃到果糖啦！' : '咔嚓！长条柯基越跑越顺了！';
         // Summer 要求不加难度、不加速，保持匀速
       } else {
         snake.pop();
@@ -450,6 +532,20 @@
 
     function drawBody(points) {
       if (points.length < 2) return;
+
+      if (speedBoost && running && !paused && !gameOverState) {
+        for (let i = Math.min(points.length - 1, 6); i >= 1; i--) {
+          const point = points[i];
+          const before = points[i - 1] || point;
+          const angle = Math.atan2(point.y - before.y, point.x - before.x) + Math.PI;
+          ctx.save();
+          ctx.translate(point.x, point.y);
+          ctx.rotate(angle);
+          drawFlame(-gridSize * 0.22 - i * 2.2, Math.sin(performance.now() / 70 + i) * 3, 0.9 - i * 0.08, 0.36 - i * 0.04);
+          ctx.restore();
+        }
+      }
+
       drawSmoothLine(points, gridSize * 0.92, '#9a4f16');
       drawSmoothLine(points, gridSize * 0.72, '#d97706');
       drawSmoothLine(points, gridSize * 0.36, '#fde7c6');
@@ -582,6 +678,11 @@
     startBtn.addEventListener('click', startGame);
     pauseBtn.addEventListener('click', togglePause);
     restartBtn.addEventListener('click', resetGame);
+    [startBtn, pauseBtn, restartBtn, speedBtn, canvas, ...dirButtons].forEach(el => {
+      ['pointerdown', 'touchstart', 'click'].forEach(eventName => {
+        el.addEventListener(eventName, ensureAudio, { passive: true });
+      });
+    });
 
     ['pointerdown', 'touchstart', 'mousedown'].forEach(eventName => {
       speedBtn.addEventListener(eventName, (e) => {
