@@ -374,29 +374,71 @@
       }
     }
 
-    function drawFlame(x, y, scale = 1, alpha = 1) {
+    function drawFlame(length, width, alpha = 1, wiggle = 0) {
       ctx.save();
-      ctx.translate(x, y);
-      ctx.scale(scale, scale);
       ctx.globalAlpha = alpha;
+      ctx.shadowColor = 'rgba(255,80,30,0.5)';
+      ctx.shadowBlur = 12;
 
-      const outer = ctx.createRadialGradient(0, 0, 2, 0, 0, 18);
-      outer.addColorStop(0, 'rgba(255,244,180,0.95)');
-      outer.addColorStop(0.45, 'rgba(255,166,48,0.95)');
-      outer.addColorStop(1, 'rgba(255,84,24,0)');
-      ctx.fillStyle = outer;
+      const outerGrad = ctx.createLinearGradient(12, 0, -length, 0);
+      outerGrad.addColorStop(0, 'rgba(255,210,90,1)');
+      outerGrad.addColorStop(0.2, 'rgba(255,132,24,1)');
+      outerGrad.addColorStop(0.72, 'rgba(239,68,68,0.95)');
+      outerGrad.addColorStop(1, 'rgba(239,68,68,0.12)');
+      ctx.fillStyle = outerGrad;
       ctx.beginPath();
       ctx.moveTo(14, 0);
-      ctx.quadraticCurveTo(-2, -15, -18, 0);
-      ctx.quadraticCurveTo(-2, 15, 14, 0);
+      ctx.bezierCurveTo(-length * 0.1, -width * 1.15, -length * 0.58, -width * 1.35 - wiggle, -length, 0);
+      ctx.bezierCurveTo(-length * 0.58, width * 1.35 + wiggle, -length * 0.1, width * 1.15, 14, 0);
+      ctx.closePath();
       ctx.fill();
 
-      ctx.fillStyle = 'rgba(255,247,214,0.92)';
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = 'rgba(220,38,38,0.98)';
+      ctx.lineWidth = 5;
       ctx.beginPath();
-      ctx.moveTo(8, 0);
-      ctx.quadraticCurveTo(-1, -8, -10, 0);
-      ctx.quadraticCurveTo(-1, 8, 8, 0);
+      ctx.moveTo(10, 0);
+      ctx.quadraticCurveTo(-length * 0.25, -width * 1.02, -length * 0.95, 0);
+      ctx.quadraticCurveTo(-length * 0.25, width * 1.02, 10, 0);
+      ctx.stroke();
+
+      const innerGrad = ctx.createLinearGradient(10, 0, -length * 0.92, 0);
+      innerGrad.addColorStop(0, 'rgba(255,245,180,1)');
+      innerGrad.addColorStop(0.18, 'rgba(255,174,34,1)');
+      innerGrad.addColorStop(0.7, 'rgba(249,115,22,0.96)');
+      innerGrad.addColorStop(1, 'rgba(249,115,22,0.1)');
+      ctx.fillStyle = innerGrad;
+      ctx.beginPath();
+      ctx.moveTo(10, 0);
+      ctx.bezierCurveTo(-length * 0.06, -width * 0.6, -length * 0.48, -width * 0.7 - wiggle * 0.5, -length * 0.92, 0);
+      ctx.bezierCurveTo(-length * 0.48, width * 0.7 + wiggle * 0.5, -length * 0.06, width * 0.6, 10, 0);
+      ctx.closePath();
       ctx.fill();
+
+      ctx.fillStyle = 'rgba(255,248,220,0.92)';
+      ctx.beginPath();
+      ctx.moveTo(6, 0);
+      ctx.quadraticCurveTo(-length * 0.18, -width * 0.2, -length * 0.42, 0);
+      ctx.quadraticCurveTo(-length * 0.18, width * 0.2, 6, 0);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawBoostTrail(points) {
+      const tail = points[points.length - 1];
+      const beforeTail = points[points.length - 2] || tail;
+      const angle = Math.atan2(tail.y - beforeTail.y, tail.x - beforeTail.x) + Math.PI;
+      const baseLength = gridSize * 5.2;
+      const pulse = Math.sin(performance.now() / 80) * 12;
+      const length = baseLength + pulse;
+      const wiggle = Math.sin(performance.now() / 55) * 5;
+
+      ctx.save();
+      ctx.translate(tail.x, tail.y);
+      ctx.rotate(angle);
+      drawFlame(length, gridSize * 0.92, 1, wiggle);
+      drawFlame(length * 0.8, gridSize * 0.56, 0.88, -wiggle * 0.6);
+      drawFlame(length * 0.54, gridSize * 0.28, 0.72, wiggle * 0.35);
       ctx.restore();
     }
 
@@ -534,16 +576,7 @@
       if (points.length < 2) return;
 
       if (speedBoost && running && !paused && !gameOverState) {
-        for (let i = Math.min(points.length - 1, 6); i >= 1; i--) {
-          const point = points[i];
-          const before = points[i - 1] || point;
-          const angle = Math.atan2(point.y - before.y, point.x - before.x) + Math.PI;
-          ctx.save();
-          ctx.translate(point.x, point.y);
-          ctx.rotate(angle);
-          drawFlame(-gridSize * 0.22 - i * 2.2, Math.sin(performance.now() / 70 + i) * 3, 0.9 - i * 0.08, 0.36 - i * 0.04);
-          ctx.restore();
-        }
+        drawBoostTrail(points);
       }
 
       drawSmoothLine(points, gridSize * 0.92, '#9a4f16');
