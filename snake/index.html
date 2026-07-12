@@ -58,7 +58,32 @@
     }
     .card small { display: block; color: #f8e8d8; margin-bottom: 6px; font-size: 12px; }
     .card strong { font-size: 22px; }
+    .sub-owner {
+      margin-top: 6px;
+      min-height: 18px;
+      font-size: 12px;
+      color: #ffe3c1;
+      opacity: 0.95;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     .canvas-wrap { margin-top: 14px; position: relative; }
+    .leaderboard-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 3;
+      min-height: 40px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(24, 14, 39, 0.86);
+      color: #fff7ed;
+      border: 1px solid rgba(255,255,255,0.16);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.22);
+      font-size: 14px;
+    }
     canvas {
       width: 100%;
       aspect-ratio: 1 / 1;
@@ -134,6 +159,89 @@
     }
     .ctrl.dead { opacity: .42; font-size: 14px; line-height: 1.15; }
     .hint { margin-top: 10px; color: #fff1dd; font-size: 14px; line-height: 1.6; }
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(12, 7, 20, 0.66);
+      backdrop-filter: blur(6px);
+      z-index: 20;
+    }
+    .modal.open { display: flex; }
+    .modal-card {
+      width: min(100%, 420px);
+      background: rgba(40, 22, 58, 0.98);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      padding: 18px;
+    }
+    .modal-card h2 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+    .modal-card p {
+      margin: 8px 0;
+      color: #fcebd7;
+      line-height: 1.6;
+    }
+    .modal-card input {
+      width: 100%;
+      margin-top: 10px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.08);
+      color: #fff7ed;
+      font-size: 17px;
+      outline: none;
+    }
+    .modal-card input::placeholder { color: rgba(255,247,237,0.55); }
+    .modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .leaderboard-list {
+      margin-top: 14px;
+      display: grid;
+      gap: 8px;
+      max-height: 320px;
+      overflow: auto;
+    }
+    .leaderboard-row {
+      display: grid;
+      grid-template-columns: 50px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+    }
+    .leaderboard-row .rank {
+      font-weight: 900;
+      color: #fde68a;
+    }
+    .leaderboard-row .name {
+      font-weight: 700;
+    }
+    .leaderboard-row .score {
+      font-weight: 900;
+      color: #fdba74;
+    }
+    .leaderboard-empty {
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.06);
+      color: #fcebd7;
+      text-align: center;
+    }
     .footer { text-align: center; color: #f7dfcf; font-size: 13px; margin-top: 16px; }
     @media (max-width: 460px) {
       body { padding: 6px; }
@@ -151,11 +259,16 @@
 
     <div class="stats">
       <div class="card"><small>分数</small><strong id="score">0</strong></div>
-      <div class="card"><small>最高分</small><strong id="best">0</strong></div>
+      <div class="card">
+        <small>最高分</small>
+        <strong id="best">0</strong>
+        <div class="sub-owner" id="bestOwner">还没有记录</div>
+      </div>
       <div class="card"><small>状态</small><strong id="status">待开始</strong></div>
     </div>
 
     <div class="canvas-wrap">
+      <button class="leaderboard-btn" id="leaderboardBtn">🏆 排行榜</button>
       <canvas id="game" width="660" height="660" aria-label="小兵贪吃蛇柯基长条版"></canvas>
     </div>
 
@@ -187,22 +300,60 @@
     <div class="footer">做给 Summer 的小游戏 by 小兵 ✨</div>
   </div>
 
+  <div class="modal" id="nameModal" aria-hidden="true">
+    <div class="modal-card">
+      <h2>英雄请留名</h2>
+      <p id="nameModalText">这局很厉害，留下名字吧～</p>
+      <input id="nameInput" maxlength="12" placeholder="输入你的名字" />
+      <div class="modal-actions">
+        <button class="secondary" id="skipSaveBtn">先不写</button>
+        <button class="primary" id="saveScoreBtn">保存成绩</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="leaderboardModal" aria-hidden="true">
+    <div class="modal-card">
+      <h2>🏆 排行榜</h2>
+      <p>分数越高，名次越靠前。</p>
+      <div class="leaderboard-list" id="leaderboardList"></div>
+      <div class="leaderboard-empty" id="leaderboardEmpty">还没有人上榜，快来当第一个！</div>
+      <div class="modal-actions">
+        <button class="secondary" id="closeLeaderboardBtn">关闭</button>
+        <button class="primary" id="leaderboardRestartBtn">重开一局</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const canvas = document.getElementById('game');
     const ctx = canvas.getContext('2d');
     const scoreEl = document.getElementById('score');
     const bestEl = document.getElementById('best');
+    const bestOwnerEl = document.getElementById('bestOwner');
     const statusEl = document.getElementById('status');
     const messageEl = document.getElementById('message');
     const startBtn = document.getElementById('startBtn');
     const pauseBtn = document.getElementById('pauseBtn');
     const restartBtn = document.getElementById('restartBtn');
     const speedBtn = document.getElementById('speedBtn');
+    const leaderboardBtn = document.getElementById('leaderboardBtn');
+    const nameModal = document.getElementById('nameModal');
+    const nameModalText = document.getElementById('nameModalText');
+    const nameInput = document.getElementById('nameInput');
+    const saveScoreBtn = document.getElementById('saveScoreBtn');
+    const skipSaveBtn = document.getElementById('skipSaveBtn');
+    const leaderboardModal = document.getElementById('leaderboardModal');
+    const leaderboardList = document.getElementById('leaderboardList');
+    const leaderboardEmpty = document.getElementById('leaderboardEmpty');
+    const closeLeaderboardBtn = document.getElementById('closeLeaderboardBtn');
+    const leaderboardRestartBtn = document.getElementById('leaderboardRestartBtn');
     const dirButtons = [...document.querySelectorAll('[data-dir]')];
 
     const gridSize = 30;
     const tileCount = canvas.width / gridSize;
-    const bestKey = 'summer-snake-best-score-corgi-ribbon';
+    const leaderboardKey = 'summer-snake-corgi-ribbon-leaderboard-v1';
+    const maxLeaderboardSize = 12;
 
     let snake = [];
     let direction = { x: 1, y: 0 };
@@ -224,6 +375,8 @@
     let touchStartY = null;
     let speedBoost = false;
     let audioContext = null;
+    let leaderboard = [];
+    let pendingScore = null;
 
     function ensureAudio() {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -298,17 +451,122 @@
       return source.map(part => ({ x: part.x, y: part.y }));
     }
 
+    function sanitizeName(name) {
+      return String(name || '').trim().replace(/\s+/g, ' ').slice(0, 12);
+    }
+
+    function sortLeaderboard(entries) {
+      return [...entries].sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return (a.createdAt || 0) - (b.createdAt || 0);
+      }).slice(0, maxLeaderboardSize);
+    }
+
+    function loadLeaderboard() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(leaderboardKey) || '[]');
+        if (!Array.isArray(raw)) throw new Error('bad leaderboard');
+        leaderboard = sortLeaderboard(raw
+          .filter(item => item && typeof item.score === 'number')
+          .map(item => ({
+            name: sanitizeName(item.name) || '无名英雄',
+            score: Number(item.score) || 0,
+            createdAt: Number(item.createdAt) || Date.now()
+          }))
+          .filter(item => item.score > 0));
+      } catch {
+        leaderboard = [];
+      }
+      renderLeaderboard();
+      renderBest();
+    }
+
+    function saveLeaderboard() {
+      localStorage.setItem(leaderboardKey, JSON.stringify(leaderboard));
+      renderLeaderboard();
+      renderBest();
+    }
+
+    function renderBest() {
+      const top = leaderboard[0];
+      bestEl.textContent = top ? String(top.score) : '0';
+      bestOwnerEl.textContent = top ? top.name : '还没有记录';
+    }
+
+    function renderLeaderboard() {
+      leaderboardList.innerHTML = '';
+      leaderboardEmpty.style.display = leaderboard.length ? 'none' : 'block';
+      leaderboard.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = 'leaderboard-row';
+        row.innerHTML = `<div class="rank">#${index + 1}</div><div class="name">${item.name}</div><div class="score">${item.score}分</div>`;
+        leaderboardList.appendChild(row);
+      });
+    }
+
+    function openModal(modal) {
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeModal(modal) {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    function openLeaderboard() {
+      renderLeaderboard();
+      openModal(leaderboardModal);
+    }
+
+    function closeLeaderboard() {
+      closeModal(leaderboardModal);
+    }
+
+    function openNamePrompt(finalScore) {
+      pendingScore = finalScore;
+      const currentBest = leaderboard[0]?.score || 0;
+      nameModalText.textContent = finalScore > currentBest
+        ? `你拿了 ${finalScore} 分，刷新最高分啦！快留下英雄名字～`
+        : `你拿了 ${finalScore} 分，也能进排行榜喔，留下名字吧～`;
+      nameInput.value = '';
+      openModal(nameModal);
+      setTimeout(() => nameInput.focus(), 30);
+    }
+
+    function closeNamePrompt() {
+      closeModal(nameModal);
+    }
+
+    function saveCurrentScore() {
+      if (!pendingScore || pendingScore <= 0) {
+        closeNamePrompt();
+        return;
+      }
+      const name = sanitizeName(nameInput.value) || '无名英雄';
+      leaderboard = sortLeaderboard([
+        ...leaderboard,
+        { name, score: pendingScore, createdAt: Date.now() }
+      ]);
+      saveLeaderboard();
+      const rank = leaderboard.findIndex(item => item.name === name && item.score === pendingScore) + 1;
+      messageEl.textContent = rank === 1 ? `${name} 登顶第一名啦！` : `${name} 现在排第 ${rank} 名。`;
+      pendingScore = null;
+      closeNamePrompt();
+    }
+
+    function skipCurrentScore() {
+      pendingScore = null;
+      closeNamePrompt();
+      messageEl.textContent = `这局拿了 ${score} 分。点“重开”再来！`;
+    }
+
     function loadBest() {
-      const best = Number(localStorage.getItem(bestKey) || 0);
-      bestEl.textContent = String(best);
+      loadLeaderboard();
     }
 
     function saveBest() {
-      const best = Number(localStorage.getItem(bestKey) || 0);
-      if (score > best) {
-        localStorage.setItem(bestKey, String(score));
-        bestEl.textContent = String(score);
-      }
+      renderBest();
     }
 
     function resetGame() {
@@ -331,12 +589,15 @@
       waitingForFirstMove = false;
       gameOverState = false;
       speedBoost = false;
+      pendingScore = null;
       speedBtn.classList.remove('active');
       speedBtn.textContent = '🐾 按住加速';
       accumulator = 0;
       scoreEl.textContent = '0';
       statusEl.textContent = '待开始';
       messageEl.textContent = '先点开始，再点一个方向，柯基才会跑出去。';
+      closeNamePrompt();
+      closeLeaderboard();
       placeFood();
       draw(0);
     }
@@ -537,7 +798,9 @@
       setSpeedBoost(false);
       statusEl.textContent = '结束';
       messageEl.textContent = `这局拿了 ${score} 分。点“重开”再来！`;
-      saveBest();
+      if (score > 0) {
+        openNamePrompt(score);
+      }
     }
 
     function lerp(a, b, t) {
@@ -739,7 +1002,23 @@
     startBtn.addEventListener('click', startGame);
     pauseBtn.addEventListener('click', togglePause);
     restartBtn.addEventListener('click', resetGame);
-    [startBtn, pauseBtn, restartBtn, speedBtn, canvas, ...dirButtons].forEach(el => {
+    leaderboardBtn.addEventListener('click', openLeaderboard);
+    closeLeaderboardBtn.addEventListener('click', closeLeaderboard);
+    leaderboardRestartBtn.addEventListener('click', () => {
+      closeLeaderboard();
+      resetGame();
+    });
+    saveScoreBtn.addEventListener('click', saveCurrentScore);
+    skipSaveBtn.addEventListener('click', skipCurrentScore);
+    nameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') saveCurrentScore();
+    });
+    [nameModal, leaderboardModal].forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal(modal);
+      });
+    });
+    [startBtn, pauseBtn, restartBtn, speedBtn, leaderboardBtn, saveScoreBtn, skipSaveBtn, closeLeaderboardBtn, leaderboardRestartBtn, canvas, ...dirButtons].forEach(el => {
       ['pointerdown', 'touchstart', 'click'].forEach(eventName => {
         el.addEventListener(eventName, ensureAudio, { passive: true });
       });
@@ -785,6 +1064,10 @@
       if (k === 'shift') setSpeedBoost(true);
       if (k === ' ') { e.preventDefault(); togglePause(); }
       if (k === 'r') resetGame();
+      if (k === 'escape') {
+        closeNamePrompt();
+        closeLeaderboard();
+      }
     });
 
     document.addEventListener('keyup', (e) => {
