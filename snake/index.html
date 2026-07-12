@@ -86,6 +86,18 @@
       gap: 10px;
       margin-top: 10px;
     }
+    .speed-btn {
+      margin-top: 12px;
+      width: 100%;
+      background: linear-gradient(180deg, #93c5fd, #3b82f6);
+      color: white;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.25);
+    }
+    .speed-btn.active {
+      background: linear-gradient(180deg, #60a5fa, #2563eb);
+      transform: scale(0.985);
+      filter: brightness(1.02);
+    }
     button {
       border: 0;
       border-radius: 18px;
@@ -154,6 +166,7 @@
         <button class="secondary" id="pauseBtn">暂停/继续</button>
         <button class="danger" id="restartBtn">重开</button>
       </div>
+      <button class="speed-btn" id="speedBtn" aria-label="按住加速">🐾 按住加速</button>
 
       <div class="ctrl-grid">
         <div></div>
@@ -184,6 +197,7 @@
     const startBtn = document.getElementById('startBtn');
     const pauseBtn = document.getElementById('pauseBtn');
     const restartBtn = document.getElementById('restartBtn');
+    const speedBtn = document.getElementById('speedBtn');
     const dirButtons = [...document.querySelectorAll('[data-dir]')];
 
     const gridSize = 30;
@@ -196,6 +210,8 @@
     let food = { x: 0, y: 0 };
     let score = 0;
     let moveInterval = 180;
+    const normalMoveInterval = 300;
+    const fastMoveInterval = 150;
     let running = false;
     let paused = false;
     let started = false;
@@ -206,6 +222,7 @@
     let previousSnake = [];
     let touchStartX = null;
     let touchStartY = null;
+    let speedBoost = false;
 
     function roundRect(x, y, w, h, r) {
       if (ctx.roundRect) {
@@ -252,12 +269,15 @@
       nextDirection = { x: 1, y: 0 };
       food = { x: 14, y: 10 };
       score = 0;
-      moveInterval = 300;
+      moveInterval = normalMoveInterval;
       running = false;
       paused = false;
       started = false;
       waitingForFirstMove = false;
       gameOverState = false;
+      speedBoost = false;
+      speedBtn.classList.remove('active');
+      speedBtn.textContent = '🐾 按住加速';
       accumulator = 0;
       scoreEl.textContent = '0';
       statusEl.textContent = '待开始';
@@ -285,6 +305,18 @@
       accumulator = 0;
       statusEl.textContent = '选方向';
       messageEl.textContent = '现在点一下方向键，或者在棋盘上滑一下，柯基就会开始跑。';
+    }
+
+    function setSpeedBoost(active) {
+      speedBoost = active;
+      moveInterval = active ? fastMoveInterval : normalMoveInterval;
+      speedBtn.classList.toggle('active', active);
+      speedBtn.textContent = active ? '💨 正在加速' : '🐾 按住加速';
+      if (active && running && !paused && !gameOverState) {
+        messageEl.textContent = '柯基加速冲刺中！';
+      } else if (!active && running && !paused && !gameOverState) {
+        messageEl.textContent = '恢复正常速度啦。';
+      }
     }
 
     function togglePause() {
@@ -350,6 +382,7 @@
       running = false;
       paused = false;
       gameOverState = true;
+      setSpeedBoost(false);
       statusEl.textContent = '结束';
       messageEl.textContent = `这局拿了 ${score} 分。点“重开”再来！`;
       saveBest();
@@ -550,6 +583,16 @@
     pauseBtn.addEventListener('click', togglePause);
     restartBtn.addEventListener('click', resetGame);
 
+    ['pointerdown', 'touchstart', 'mousedown'].forEach(eventName => {
+      speedBtn.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        setSpeedBoost(true);
+      });
+    });
+    ['pointerup', 'pointercancel', 'pointerleave', 'touchend', 'touchcancel', 'mouseup'].forEach(eventName => {
+      speedBtn.addEventListener(eventName, () => setSpeedBoost(false));
+    });
+
     canvas.addEventListener('touchstart', (e) => {
       const touch = e.touches[0];
       touchStartX = touch.clientX;
@@ -577,8 +620,13 @@
       if (k === 'arrowdown' || k === 's') handleDir('down');
       if (k === 'arrowleft' || k === 'a') handleDir('left');
       if (k === 'arrowright' || k === 'd') handleDir('right');
+      if (k === 'shift') setSpeedBoost(true);
       if (k === ' ') { e.preventDefault(); togglePause(); }
       if (k === 'r') resetGame();
+    });
+
+    document.addEventListener('keyup', (e) => {
+      if (e.key.toLowerCase() === 'shift') setSpeedBoost(false);
     });
 
     loadBest();
