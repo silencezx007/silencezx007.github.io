@@ -1629,10 +1629,24 @@ function loop(filterType, freq, q, gain) {
 }
 const env = (g, t, a, peak, d) => { g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + a + d); };
 
+// 苹果手机开着静音键时，网页合成的声音默认也被静掉。Safari 16.4+ 认 audioSession；微信等内嵌浏览器不认，
+// 就在点“展卷”的同一下放一段循环的无声音频，把声音通道切到“播放”模式（和听音乐一样，不受静音键管）
+let mute = null;
+function iosUnmute() {
+  if (!(SH.ui && SH.ui.isIOS) || mute) return;
+  const n = 2205, b = new ArrayBuffer(44 + n * 2), v = new DataView(b), w = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  w(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); w(8, 'WAVE'); w(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, 22050, true); v.setUint32(28, 44100, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); w(36, 'data'); v.setUint32(40, n * 2, true);   // 0.1 秒静音 WAV
+  mute = document.createElement('audio');
+  mute.src = URL.createObjectURL(new Blob([b], { type: 'audio/wav' })); mute.loop = true; mute.setAttribute('playsinline', ''); mute.setAttribute('x-webkit-airplay', 'deny');
+  mute.play().catch(() => {});
+}
 A.init = () => {
   if (A.ready) return;
   try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { /* iPhone 静音键下也能出声 */ }
+  iosUnmute();
   ctx = new (window.AudioContext || window.webkitAudioContext)();
+  if (ctx.state !== 'running') ctx.resume();                                       // 趁还在“点击”这一下里就开声，别等后面琴弦预计算
   master = ctx.createGain(); master.gain.value = S.sound ? 0.85 : 0;
   const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -16; comp.ratio.value = 3;
   analyser = ctx.createAnalyser(); analyser.fftSize = 1024; wave = new Float32Array(analyser.fftSize);
@@ -1658,7 +1672,7 @@ A.init = () => {
   A.ready = true;
   phrase(); ambientLoop();
 };
-A.resume = () => ctx && ctx.state !== 'running' && ctx.resume();
+A.resume = () => { if (mute && mute.paused && !document.hidden) mute.play().catch(() => {}); return ctx && ctx.state !== 'running' && ctx.resume(); };
 A.setSound = on => { if (!ctx) return; master.gain.setTargetAtTime(on ? 0.85 : 0, ctx.currentTime, 0.2); };
 
 // ---------- 琴 ----------
@@ -1769,7 +1783,7 @@ A.dragon = () => {
 };
 A.wave = () => { if (!A.ready) return null; analyser.getFloatTimeDomainData(wave); return wave; };
 A.now = () => ctx ? ctx.currentTime : 0;
-A.pause = hidden => { if (ctx) hidden ? ctx.suspend() : ctx.resume(); };
+A.pause = hidden => { if (ctx) hidden ? ctx.suspend() : ctx.resume(); if (mute) hidden ? mute.pause() : mute.play().catch(() => {}); };
 A.ctx = () => ctx;                                                                // 吹气起风：话筒接到同一个音频上下文里听
 
 // ---------- 画中物的声音：都是几道振荡器加滤波噪声 ----------
@@ -2796,6 +2810,20 @@ P.pick = () => {
   return best || POEMS.find(p => p.t === '静夜思') || POEMS[0];
 };
 
+// 别压在月亮上：月亮连同光晕（玉兔出场时月亮会放大），再加上它接下来二十来秒往左挪的那段，算一个框；
+// 压上了先换到另一侧，两侧都压（手机竖屏常见）就回原侧、挪到月亮下面
+function avoidMoon(p) {
+  const m = SH.sky.moon; if (!m || m[2] < 0.3) return;
+  const big = (p.p || []).includes('玉兔') || (SH.props && SH.props.has('rabbit'));
+  const k = S.k, R = (big ? 40 : 21) * 1.7 * k, cx = m[0] * k, cy = m[1] * k, drift = 0.15 * innerWidth;
+  const hit = () => { const b = el.getBoundingClientRect(); return cx + R > b.left && cx - R - drift < b.right && cy + R > b.top && cy - R < b.bottom; };
+  if (!hit()) return;
+  const onRight = !el.style.left, side = r => { el.style.left = r ? '' : '5vw'; el.style.right = r ? '6vw' : ''; };
+  side(!onRight); if (!hit()) return;
+  side(onRight);
+  el.style.top = Math.max(8, Math.min(cy + R + 12, innerHeight - el.getBoundingClientRect().height - 110)) + 'px';
+}
+
 // opt.from：从第几句起显示（念到哪句就从那一联起）；opt.hl：标红哪一句；opt.quiet：不叫画中物出场
 P.show = (p = P.pick(), opt = {}) => {
   P.cur = p; P.recent.push(p); if (P.recent.length > 12) P.recent.shift();
@@ -2809,6 +2837,7 @@ P.show = (p = P.pick(), opt = {}) => {
   p.l.slice(from, from + max).forEach((line, i) => { const c = document.createElement('div'); c.className = 'col' + (from + i === opt.hl ? ' hl' : ''); [...line].forEach(ch => { const s = document.createElement('span'); s.className = 'ch'; s.textContent = ch; c.appendChild(s); chars.push(s); }); el.appendChild(c); });
   const meta = document.createElement('div'); meta.className = 'meta'; meta.textContent = `${p.t} · ${p.a}`; el.appendChild(meta);
   const seal = document.createElement('div'); seal.className = 'pseal'; seal.textContent = S.name || '长卷'; el.appendChild(seal);
+  avoidMoon(p);
   chars.forEach((s, i) => setTimeout(() => s.classList.add('v'), 300 + i * 190));
   setTimeout(() => seal.classList.add('v'), 600 + chars.length * 190);
   clearTimeout(P.hideT); P.hideT = setTimeout(() => { el.style.opacity = '0'; setTimeout(() => { if (el.style.opacity === '0') { el.innerHTML = ''; P.cur = null; } }, 2100); }, 15000 + chars.length * 190);
@@ -3514,6 +3543,7 @@ function boot() {
   run('boot');
   $('openBtn').onclick = () => {
     SH.audio.init(); SH.audio.resume();
+    setTimeout(() => { const c = SH.audio.ctx(); if (S.sound && c && c.state !== 'running') ui.toast('轻 点 画 面 · 开 启 声 音', 4000); }, 1800);   // 个别浏览器要再点一下才出声
     const t = SH.audio.now(); [0, 1, 2, 3, 4, 5].forEach(i => SH.audio.pluck(SH.audio.step(SH.audio.tonic(3), i), t + 0.3 + i * 0.16, 0.42, { vib: i === 5 }));
     $('intro').classList.add('open');
     setTimeout(() => { body.classList.remove('pre'); S.started = true; run('opened'); }, 1400);
@@ -4686,7 +4716,7 @@ function ask(p, opts) {
 // ---------- 玩法总览：百宝箱的目录 + 画上能点的地方 + 快捷键 ----------
 SH.feat.help = () => {
   const groups = ui.catalog.map(([g, items]) => `<h3>${esc(g)}</h3>` + items.map(([, , name, desc]) => `<p><b>${esc(name)}</b>　${esc(desc)}</p>`).join('')).join('');
-  ui.modal({ title: '玩 法 总 览', wide: true, html: `<div class="help"><h3>画 上 点 一 点</h3><p>点天空：白天惊起飞鸟，夜里放一盏孔明灯</p><p>点山间：种一棵会长大的树</p><p>点水面：跃出一尾锦鲤　　点水中小洲：惊起一滩鸥鹭</p><p>按住拖动、滚轮：在长卷里穿行</p>${groups}<h3>快 捷 键</h3><p class="muted">1–4 四季 · N 晨昏 · D 召龙 · P 吟诗 · B 百宝箱 · G 赠画 · X 看见数学 · S 落款 · M 声音 · F 全屏 · H 隐藏界面 · 空格 行止</p></div>` });
+  ui.modal({ title: '玩 法 总 览', wide: true, html: `<div class="help"><h3>画 上 点 一 点</h3><p>点天空：白天惊起飞鸟，夜里放一盏孔明灯</p><p>点山间：种一棵会长大的树</p><p>点水面：跃出一尾锦鲤　　点水中小洲：惊起一滩鸥鹭</p><p>按住拖动、滚轮：在长卷里穿行</p>${groups}<h3>没 有 声 音 ？</h3><p>看看手机媒体音量（放首歌时按音量键调的那个）；轻点一下画面；在微信里打开的，也可以点右上角“…”换浏览器打开。</p><h3>快 捷 键</h3><p class="muted">1–4 四季 · N 晨昏 · D 召龙 · P 吟诗 · B 百宝箱 · G 赠画 · X 看见数学 · S 落款 · M 声音 · F 全屏 · H 隐藏界面 · 空格 行止</p></div>` });
 };
 })();
 
