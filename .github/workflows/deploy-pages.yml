@@ -43,6 +43,19 @@ jobs:
         working-directory: silence_digital_nexus_deploy
         run: pnpm build
 
+      - name: Add root-level pages
+        # 网站只用这一套部署（Pages 来源 = GitHub Actions）。仓库根目录里另有几样要上线的东西：
+        # 小游戏 sheep-match、旧版 snake.html、IWS 心跳徽章（heartbeat.json 由本机 iws/scripts/heartbeat_export.py 写在根目录）。
+        # 构建完把它们放进网站，并把徽章挂到首页上。
+        run: |
+          OUT=silence_digital_nexus_deploy/dist/public
+          for p in sheep-match snake.html heartbeat.js heartbeat.json; do
+            if [ -e "$p" ]; then cp -R "$p" "$OUT/"; fi
+          done
+          if [ -f "$OUT/heartbeat.js" ] && ! grep -q 'heartbeat.js' "$OUT/index.html"; then
+            sed -i 's#</head>#  <script defer src="/heartbeat.js"></script>\n  </head>#' "$OUT/index.html"
+          fi
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
