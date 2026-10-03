@@ -518,12 +518,10 @@ function buildPine(m, r) {
 }
 
 // 画一棵树：grow∈[0,1] 是生长进度，sway 是风
+// 树上一点（树的坐标 px,py）画在屏幕上的位置：越高的地方被风吹得越偏。黄鹂落枝也用它
+SH.treePt = (m, x, y, s, sway, px, py) => { const k = sway ? Math.pow(clamp(-py / (m.h || 40), 0, 1.4), 2) * sway : 0; return [x + (px + k * 6) * s, y + py * s]; };
 SH.drawTree = (g, m, x, y, s, grow = 1, sway = 0) => {
-  const H = m.h || 40;
-  const P = (px, py) => {
-    const k = sway ? Math.pow(clamp(-py / H, 0, 1.4), 2) * sway : 0;
-    return [x + (px + k * 6) * s, y + py * s];
-  };
+  const P = (px, py) => SH.treePt(m, x, y, s, sway, px, py);
   g.lineCap = 'round';
   for (const sg of m.segs) {
     if (sg.t0 >= grow) continue;
@@ -1172,12 +1170,14 @@ life.plant = (li, X, y, kind = R.pick(PLANT[S.season])) => {                   /
   S.stats.planted++;
 };
 life.onSeason = sn => life.planted.forEach(p => p.m = SH.treeModel(p.kind, p.seed, sn));
+const swayOf = p => Math.sin(S.t * 1.4 + p.ph) * 0.14 * (0.4 + S.wind);
+life.branchPt = (p, sg) => SH.treePt(p.m, SH.toSX(p.X, SH.LAYERS[p.li].p), p.y, p.s, swayOf(p), sg.x1, sg.y1);   // 某根枝梢此刻在屏幕上的位置
 life.drawPlanted = (g, li) => {
   const L = SH.LAYERS[li];
   for (const p of life.planted) if (p.li === li) {
     const x = SH.toSX(p.X, L.p);
     if (x < -80 || x > S.vw + 80) continue;
-    SH.drawTree(g, p.m, x, p.y, p.s, SH.smooth(clamp((S.t - p.born) / 3.6, 0, 1)), Math.sin(S.t * 1.4 + p.ph) * 0.14 * (0.4 + S.wind));
+    SH.drawTree(g, p.m, x, p.y, p.s, SH.smooth(clamp((S.t - p.born) / 3.6, 0, 1)), swayOf(p));
   }
 };
 
@@ -1190,13 +1190,14 @@ life.update = dt => {
   while (life.boats.length < 4) spawnBoat(X0 - R.range(150, 700));
   for (const b of life.boats) b.X += b.v * dt;
   flockTimer -= dt;
-  if (flockTimer < 0 && S.night < 0.6) {
+  if (flockTimer < 0 && S.night < 0.6 && !(S.noBirds > 0)) {
     flockTimer = R.range(16, 30);
     const fromLeft = R() < 0.5, x0 = SH.layerX0(PB), X = fromLeft ? x0 - 60 : x0 + S.vw + 60, y = R.range(150, 420);
     life.spawnFlock(S.season === 2 && R() < 0.7 ? 'geese' : R() < 0.15 ? 'egret' : 'flock', X, y, { dir: fromLeft ? 1 : -1 });
   }
   const bx0 = SH.layerX0(PB);
   life.flocks = life.flocks.filter(f => f.age < 4 || f.birds.some(b => b.X > bx0 - 300 && b.X < bx0 + S.vw + 300 && b.y > -80));
+  if (S.noBirds > 0) for (const f of life.flocks) { f.alt = -300; f.vy = Math.min(f.vy, -45); }   // 千山鸟飞绝：鸟群往高处飞出画面
   life.flocks.forEach(f => updateFlock(f, dt));
   for (const k of life.kois) { k.t += dt; if (k.t >= k.dur) { life.ripple(k.X + k.dx, k.y0, 1); splash(k.X + k.dx, k.y0, 9); SH.audio && SH.audio.splash(0.5); } }
   life.kois = life.kois.filter(k => k.t < k.dur);
@@ -1848,7 +1849,7 @@ SH.DB = { poems: [
 {"t":"梅花","a":"宋 · 王安石","l":["墙角数枝梅","凌寒独自开","遥知不是雪","为有暗香来"],"s":[3],"p":["梅"]},
 {"t":"登鹳雀楼","a":"唐 · 王之涣","l":["白日依山尽","黄河入海流","欲穷千里目","更上一层楼"],"d":["dusk"]},
 {"t":"望庐山瀑布","a":"唐 · 李白","l":["日照香炉生紫烟","遥看瀑布挂前川","飞流直下三千尺","疑是银河落九天"],"s":[0,1,2],"d":["dawn","day"],"need":"fall"},
-{"t":"江雪","a":"唐 · 柳宗元","l":["千山鸟飞绝","万径人踪灭","孤舟蓑笠翁","独钓寒江雪"],"s":[3],"d":["dawn","day","dusk"],"w":["雪"],"p":["渔舟"]},
+{"t":"江雪","a":"唐 · 柳宗元","l":["千山鸟飞绝","万径人踪灭","孤舟蓑笠翁","独钓寒江雪"],"s":[3],"d":["dawn","day","dusk"],"w":["雪"],"p":["渔舟","无鸟"]},
 {"t":"静夜思","a":"唐 · 李白","l":["床前明月光","疑是地上霜","举头望明月","低头思故乡"],"d":["night"],"need":"moon"},
 {"t":"寻隐者不遇","a":"唐 · 贾岛","l":["松下问童子","言师采药去","只在此山中","云深不知处"],"d":["day"],"w":["雾"],"p":["松"]},
 {"t":"赠汪伦","a":"唐 · 李白","l":["李白乘舟将欲行","忽闻岸上踏歌声","桃花潭水深千尺","不及汪伦送我情"],"s":[0],"d":["day"],"p":["渔舟"]},
@@ -3934,37 +3935,49 @@ K.goose = { layer: 'water', dur: 70,
   draw(g, a) { for (const b of a.list) goose(g, sx(b.X, 1), b.y + Math.sin(S.t * 1.6 + b.ph) * 0.8, ys(b.y), Math.sign(b.v), b.ph, a.duck); }
 };
 
-// ---------- 黄鹂：两只在近处枝头跳飞，停下时脚下有一截柳枝 ----------
+// ---------- 黄鹂：两只在近处的树上跳枝鸣叫。只落在画里真实长着的树的枝梢上（树随风晃、随画卷走，鸟跟着）；没有长成的树就绕着飞 ----------
 function oriole(g, x, y, s, dir, flap) {
   g.save(); g.translate(x, y); g.scale(dir * s, s);
-  if (flap == null) {
-    g.strokeStyle = '#5a4630'; g.lineWidth = 1; g.beginPath(); g.moveTo(-12, 5); g.quadraticCurveTo(0, 3, 13, 4.5); g.stroke();
-    g.fillStyle = '#7fa860'; for (let i = 0; i < 5; i++) { g.beginPath(); g.ellipse(-10 + i * 5.5, 7 + (i % 2) * 2, 1.1, 3.4, 0.3, 0, TAU); g.fill(); }
-  }
   g.fillStyle = '#2b2620'; g.beginPath(); g.moveTo(-5, -0.5); g.lineTo(-10.5, -2.2); g.lineTo(-10, 1.4); g.closePath(); g.fill();
   g.fillStyle = '#e9b524'; g.beginPath(); g.ellipse(0, 0, 6, 3.4, -0.15, 0, TAU); g.fill(); g.beginPath(); g.arc(5.2, -2.2, 2.7, 0, TAU); g.fill();
   g.fillStyle = '#2b2620'; g.beginPath(); g.moveTo(3.4, -3.3); g.lineTo(7.4, -2.6); g.lineTo(3.8, -1.7); g.fill();
   g.fillStyle = '#d9853b'; g.beginPath(); g.moveTo(7.6, -2.5); g.lineTo(10.2, -1.9); g.lineTo(7.5, -1.3); g.fill();
   g.fillStyle = '#2b2620'; g.beginPath();
   if (flap == null) g.ellipse(-1.2, -0.6, 3.8, 1.6, -0.1, 0, TAU); else { g.moveTo(-2, -0.8); g.quadraticCurveTo(-3, -1 - 7 * flap, 3, -2 - 6 * flap); g.lineTo(1.5, -0.6); }
-  g.fill(); g.restore();
+  g.fill();
+  if (flap == null) { g.strokeStyle = '#5a4630'; g.lineWidth = 0.8; g.beginPath(); g.moveTo(-1, 3); g.lineTo(-1.5, 5.2); g.moveTo(1.5, 3); g.lineTo(1.8, 5.2); g.stroke(); }   // 停着时露出两只脚
+  g.restore();
 }
-K.oriole = { layer: 'top', dur: 32,
-  init(a) { a.b = [0, 1].map(() => ({ x: S.vw * R.range(0.3, 0.7), y: R.range(520, 600), rest: R.range(0.2, 1), ph: R() * TAU, dir: 1 })); A.oriole(); a.sing = 5; },
+const perches = () => {                                                                     // 画面里已经长成的树，上半截的细枝梢
+  const out = [];
+  for (const p of SH.life.planted) {
+    const x = SH.toSX(p.X, SH.LAYERS[p.li].p);
+    if (S.t - p.born < 3.8 || x < 50 || x > S.vw - 50) continue;
+    for (const sg of p.m.segs) if (!sg.bark && sg.y1 < -p.m.h * 0.35) out.push({ p, sg });
+  }
+  return out;
+};
+K.oriole = { layer: 'top', dur: 34,
+  init(a) { a.b = [0, 1].map(() => ({ x: S.vw * R.range(0.3, 0.7), y: R.range(430, 540), ph: R() * TAU, dir: 1 })); A.oriole(); a.sing = 5; },
   update(a, dt) {
     if ((a.sing -= dt) < 0) { a.sing = R.range(5, 8); A.oriole(); }
     for (const b of a.b) {
-      b.x += S.camDelta * 0.74; b.ph += dt * 18;
-      if (a.t > a.dur - 3) { b.fly = true; b.x += 130 * dt * b.dir; b.y -= 70 * dt; continue; }   // 散场：飞走
-      if ((b.rest -= dt) > 0) { b.fly = false; continue; }
-      if (!b.fly) { b.fly = true; b.tx = clamp(b.x + R.range(-170, 170), 40, S.vw - 40); b.ty = R.range(500, 640); }
-      b.tx += S.camDelta * 0.74;
-      const dx = b.tx - b.x, dy = b.ty - b.y, d = Math.hypot(dx, dy);
-      if (d < 4) { b.rest = R.range(0.8, 2.4); b.fly = false; continue; }
+      b.ph += dt * 18;
+      if (a.t > a.dur - 3) { b.at = null; b.x += 130 * dt * b.dir; b.y -= 70 * dt; continue; }         // 散场：飞走
+      if (b.at) {                                                                            // 停在枝上：位置每帧按那根枝梢重算
+        [b.x, b.y] = SH.life.branchPt(b.at.p, b.at.sg);
+        if ((b.rest -= dt) > 0 && b.x > 20 && b.x < S.vw - 20) continue;
+        b.at = null;                                                                         // 歇够了（或树走出画面）：起飞
+      }
+      if (!b.to && b.tx == null) { const ps = perches(); if (ps.length) b.to = R.pick(ps); else { b.tx = clamp(b.x + R.range(-170, 170), 40, S.vw - 40); b.ty = R.range(420, 560); } }
+      if (!b.to) { b.x += S.camDelta * 0.74; b.tx += S.camDelta * 0.74; }
+      const [tx, ty] = b.to ? SH.life.branchPt(b.to.p, b.to.sg) : [b.tx, b.ty];
+      const dx = tx - b.x, dy = ty - b.y, d = Math.hypot(dx, dy);
+      if (d < 4) { if (b.to) { b.at = b.to; b.rest = R.range(1.5, 3.5); } b.to = null; b.tx = null; continue; }
       const sp = Math.min(d, 160 * dt); b.x += dx / d * sp; b.y += dy / d * sp; b.dir = Math.sign(dx) || b.dir;
     }
   },
-  draw(g, a) { for (const b of a.b) oriole(g, b.x, b.y, 1.5, b.dir, b.fly ? Math.sin(b.ph) : null); }
+  draw(g, a) { for (const b of a.b) oriole(g, b.x, b.y - (b.at ? 7 : 0), 1.5, b.dir, b.at ? null : Math.sin(b.ph)); }   // 停着时往上挪 7，让脚正好踩在枝上
 };
 
 // ---------- 燕：剪刀尾，贴着水面一上一下地掠 ----------
@@ -4302,15 +4315,16 @@ const DO = {
   龙: () => SH.dragon.summon(),
   钟: () => A.bell(), 犬: () => A.bark(3), 猿: () => A.monkey(), 笛: () => A.flute(12), 鼓: () => A.drum(16, 0.32), 爆竹: () => A.crackers(40), 琴: qin,
   雷: () => { A.rumble(); ui.flash(0.35); },
+  无鸟: () => { S.noBirds = 75; },                                                       // 千山鸟飞绝：已有的鸟飞出画面，七十来秒不再来（life.js 听 S.noBirds）
   落花: () => { S.windT = 7; }, 萤: () => { S.fireflyT = 60; }, 荷: () => {},                    // 荷：夏天的汀洲本来就有荷塘，换到夏天即可
-  鹅: () => PR.spawn('goose'), 鸭: () => PR.spawn('goose', { duck: true }), 黄鹂: () => PR.spawn('oriole'), 燕: () => PR.spawn('swallow'),
+  鹅: () => PR.spawn('goose'), 鸭: () => PR.spawn('goose', { duck: true }), 黄鹂: () => { if (!L.planted.some(p => { const x = SH.toSX(p.X, SH.LAYERS[p.li].p); return x > 60 && x < S.vw - 60; })) plant('willow'); PR.spawn('oriole'); },   /* 没树先种柳：黄鹂要落在真枝上 */ 燕: () => PR.spawn('swallow'),
   蝴蝶: () => PR.spawn('butterfly'), 蜻蜓: () => PR.spawn('dragonfly'), 牧童: () => PR.spawn('cowherd'), 龙舟: () => PR.spawn('dboat'),
   纸鸢: () => PR.spawn('kite'), 烟花: () => dark() ? PR.spawn('fireworks') : A.crackers(40), 星河: () => PR.spawn('milkyway'), 鹊桥: () => PR.spawn('queqiao'),
   玉兔: () => PR.spawn('rabbit'), 彩虹: () => PR.spawn('rainbow'), 流星: () => PR.spawn('meteors')
 };
 Object.keys(TREE).forEach(k => { DO[k] = () => plant(TREE[k]); });
 D.can = name => !!DO[name];
-D.cue = p => (p.p || []).forEach((k, i) => setTimeout(() => DO[k] && DO[k](), 1800 + i * 1300));
+D.cue = p => (p.p || []).forEach((k, i) => setTimeout(() => DO[k] && DO[k](), k === '无鸟' ? 0 : 1800 + i * 1300));   // “无鸟”立刻生效，其余一样样出场
 
 // ---------- 换景：季节、时辰、天气；时辰走到了再吟诗 ----------
 let pending = null;
@@ -4334,6 +4348,7 @@ SH.hook('update', dt => {
   if (pending && S.todTarget == null && (pending.wait -= dt) < 0) { const f = pending.then; pending = null; if (f) f(); }
   if (S.windT > 0) S.windT -= dt;
   if (S.fireflyT > 0) S.fireflyT -= dt;
+  if (S.noBirds > 0) S.noBirds -= dt;
 });
 
 // ---------- 农历节日：用浏览器自带的 chinese 历法，不写死日期表 ----------
