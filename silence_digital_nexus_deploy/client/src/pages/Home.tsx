@@ -237,10 +237,10 @@ export default function Home() {
           </div>
 
           <div className="hero-visual">
-            {/* 山河长卷直接在 Hero 里玩：#embed 自动展卷、默认静音；深色模式直接入夜 */}
+            {/* 山河长卷直接在 Hero 里玩：#embed 自动展卷、默认静音；深色模式直接入夜。改了 shanhe 就改 ?v=，否则浏览器会用缓存的旧版 */}
             <iframe
               key={mode}
-              src={`/shanhe/#embed&tod=${dark ? '0.86' : '0.42'}`}
+              src={`/shanhe/?v=20261008b#embed&tod=${dark ? '0.86' : '0.42'}`}
               title="山河长卷：可点击的程序化青绿山水"
               allow="fullscreen; autoplay"
               allowFullScreen
