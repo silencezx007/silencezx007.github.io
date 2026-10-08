@@ -3349,7 +3349,8 @@ const up = e => {
 cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
 if (!SH.Q.has('embed')) cv.addEventListener('wheel', e => { e.preventDefault(); S.camV += (e.deltaY + e.deltaX) * 0.9; S.camTarget = null; }, { passive: false });
 // 嵌在主页里：滚轮交给外层页面往下滚（跨域拿不到 parent 就不拦，交给浏览器）
-else cv.addEventListener('wheel', e => { try { parent.scrollBy(0, e.deltaY * (e.deltaMode ? 40 : 1)); e.preventDefault(); } catch (err) {} }, { passive: false });
+// 必须 behavior:'instant'：外层页面若开了 scroll-behavior:smooth，触控板一串小滚动会互相打断，页面几乎不动；外层滚不动了就不拦；百宝箱等弹窗自己要滚，不转发
+else addEventListener('wheel', e => { if (e.target.closest && e.target.closest('#sheet,#modal,#xpanel')) return; try { const y = parent.scrollY; parent.scrollBy({ top: e.deltaY * (e.deltaMode ? 40 : 1), behavior: 'instant' }); if (parent.scrollY !== y) e.preventDefault(); } catch (err) {} }, { passive: false });
 
 function tap(x, y) {
   if (!S.started) return;
