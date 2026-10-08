@@ -107,6 +107,10 @@ body.dark #toast{color:#f0e6cf;text-shadow:0 0 14px rgba(0,0,0,.9)}
 #modebar .meter{flex:none;width:64px;height:6px;border-radius:3px;background:rgba(255,255,255,.2);overflow:hidden}
 #modebar .meter b{display:block;height:100%;width:0;background:#eab37b}
 body.moding #dock,body.moding #topbar,body.moding #hud{opacity:0;pointer-events:none}
+/* #embed：标题让给主页，竖滑交还给外层页面，宽屏时工具栏靠右避开主页文字 */
+body.embed #hud{display:none}
+body.embed canvas#cv{touch-action:pan-y}
+@media (min-width:900px){body.embed #dock{left:auto;right:14px;transform:none}}
 body.qin canvas#cv{cursor:pointer}
 #modebar button{flex:none;padding:7px 16px;border-radius:20px;background:var(--cinnabar);color:#fbeee2;font-family:var(--kai);letter-spacing:.2em}
 #xpanel{position:fixed;top:calc(64px + env(safe-area-inset-top));right:14px;z-index:6;width:min(330px,calc(100vw - 28px));padding:14px 16px;border-radius:10px;background:rgba(8,20,28,.84);color:#bfefff;font:12.5px/1.75 ui-monospace,"SF Mono",Menlo,monospace;border:1px solid rgba(79,209,255,.35);box-shadow:0 0 30px rgba(79,209,255,.15)}
@@ -3343,7 +3347,9 @@ const up = e => {
   down = null;
 };
 cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
-cv.addEventListener('wheel', e => { e.preventDefault(); S.camV += (e.deltaY + e.deltaX) * 0.9; S.camTarget = null; }, { passive: false });
+if (!SH.Q.has('embed')) cv.addEventListener('wheel', e => { e.preventDefault(); S.camV += (e.deltaY + e.deltaX) * 0.9; S.camTarget = null; }, { passive: false });
+// 嵌在主页里：滚轮交给外层页面往下滚（跨域拿不到 parent 就不拦，交给浏览器）
+else cv.addEventListener('wheel', e => { try { parent.scrollBy(0, e.deltaY * (e.deltaMode ? 40 : 1)); e.preventDefault(); } catch (err) {} }, { passive: false });
 
 function tap(x, y) {
   if (!S.started) return;
@@ -3553,7 +3559,9 @@ function boot() {
   };
   requestAnimationFrame(t => { last = t; frame(t); });
   // 调试/演示：#auto&still&tod=0.9&season=3&dragon=6&xray&poem&feat=ya
-  if (q.has('auto')) { $('openBtn').click(); if (q.has('still')) S.dayLen = 1e9; }
+  // #embed：嵌在个人主页 Hero 里——自动展卷、默认静音（按「寂」开声）、不出提示
+  if (q.has('embed')) { S.sound = false; body.classList.add('embed'); q.set('nohint', ''); $('soundBtn').classList.add('off'); $('soundBtn').textContent = '寂'; }
+  if (q.has('auto') || q.has('embed')) { $('openBtn').click(); if (q.has('still')) S.dayLen = 1e9; }
   if (q.has('dragon')) setTimeout(() => { SH.dragon.summon(); SH.dragon.t = +q.get('dragon') || 0; }, 1600);
   if (q.has('xray')) setTimeout(ACT.xray, 1600);
   if (q.has('poem')) setTimeout(() => SH.poems.show(), 1700);

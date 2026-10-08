@@ -12,15 +12,7 @@ import {
   Play,
   Workflow,
 } from 'lucide-react';
-import { useEffect, useRef } from 'react';
-
-type Particle = {
-  x: number;
-  y: number;
-  size: number;
-  drift: number;
-  tone: 'ink' | 'red' | 'green';
-};
+import { useState } from 'react';
 
 const signals = [
   { label: 'WORKHUB', value: 'Live', detail: '事件队列 / 拟稿 / 采购单' },
@@ -182,149 +174,6 @@ const productTracks = [
   },
 ];
 
-function ParticleField() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const burstRef = useRef<HTMLSpanElement>(null);
-  const frameRef = useRef<number | null>(null);
-  const pointerRef = useRef({ x: 50, y: 50, active: false });
-  const particlesRef = useRef<Particle[]>(
-    Array.from({ length: 3600 }, (_, index) => ({
-      x: (index * 37 + (index % 9) * 3) % 100,
-      y: (index * 61 + (index % 13) * 2) % 100,
-      size: 0.4 + ((index * 7) % 5) * 0.2,
-      drift: 20 + ((index * 13) % 36),
-      tone: index % 10 === 0 ? 'red' : index % 6 === 0 ? 'green' : 'ink',
-    })),
-  );
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const context = canvas.getContext('2d');
-    if (!context) return;
-
-    const colors = {
-      ink: [23, 19, 15],
-      red: [185, 84, 58],
-      green: [84, 115, 91],
-    } satisfies Record<Particle['tone'], [number, number, number]>;
-
-    const draw = () => {
-      const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      const width = rect.width;
-      const height = rect.height;
-
-      if (canvas.width !== Math.round(width * dpr) || canvas.height !== Math.round(height * dpr)) {
-        canvas.width = Math.round(width * dpr);
-        canvas.height = Math.round(height * dpr);
-      }
-
-      context.setTransform(dpr, 0, 0, dpr, 0, 0);
-      context.clearRect(0, 0, width, height);
-
-      const pointer = pointerRef.current;
-      for (const particle of particlesRef.current) {
-        const dx = particle.x - pointer.x;
-        const dy = particle.y - pointer.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        const force = pointer.active ? Math.max(0, 1 - distance / 42) : 0;
-        const angle = Math.atan2(dy, dx);
-        const moveX = Math.cos(angle) * particle.drift * force * 1.35;
-        const moveY = Math.sin(angle) * particle.drift * force * 1.35;
-        const x = (particle.x / 100) * width + moveX;
-        const y = (particle.y / 100) * height + moveY;
-        const [r, g, b] = colors[particle.tone];
-
-        context.beginPath();
-        context.fillStyle = `rgba(${r}, ${g}, ${b}, ${0.32 + force * 0.6})`;
-        context.arc(x, y, particle.size * (1 + force * 1.9), 0, Math.PI * 2);
-        context.fill();
-      }
-    };
-
-    const scheduleDraw = () => {
-      if (frameRef.current) cancelAnimationFrame(frameRef.current);
-      frameRef.current = requestAnimationFrame(draw);
-    };
-
-    const resizeObserver = new ResizeObserver(scheduleDraw);
-    resizeObserver.observe(canvas);
-    scheduleDraw();
-
-    return () => {
-      resizeObserver.disconnect();
-      if (frameRef.current) cancelAnimationFrame(frameRef.current);
-    };
-  }, []);
-
-  const scheduleDraw = () => {
-    if (frameRef.current) cancelAnimationFrame(frameRef.current);
-    frameRef.current = requestAnimationFrame(() => {
-      const canvas = canvasRef.current;
-      const context = canvas?.getContext('2d');
-      if (!canvas || !context) return;
-      const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      const width = rect.width;
-      const height = rect.height;
-      const colors = {
-        ink: [23, 19, 15],
-        red: [185, 84, 58],
-        green: [84, 115, 91],
-      } satisfies Record<Particle['tone'], [number, number, number]>;
-
-      context.setTransform(dpr, 0, 0, dpr, 0, 0);
-      context.clearRect(0, 0, width, height);
-      for (const particle of particlesRef.current) {
-        const pointer = pointerRef.current;
-        const dx = particle.x - pointer.x;
-        const dy = particle.y - pointer.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        const force = pointer.active ? Math.max(0, 1 - distance / 42) : 0;
-        const angle = Math.atan2(dy, dx);
-        const x = (particle.x / 100) * width + Math.cos(angle) * particle.drift * force * 1.35;
-        const y = (particle.y / 100) * height + Math.sin(angle) * particle.drift * force * 1.35;
-        const [r, g, b] = colors[particle.tone];
-        context.beginPath();
-        context.fillStyle = `rgba(${r}, ${g}, ${b}, ${0.32 + force * 0.6})`;
-        context.arc(x, y, particle.size * (1 + force * 1.9), 0, Math.PI * 2);
-        context.fill();
-      }
-    });
-  };
-
-  return (
-    <div
-      className="particle-field"
-      data-particle-count="3600"
-      onPointerMove={(event) => {
-        const rect = event.currentTarget.getBoundingClientRect();
-        pointerRef.current = {
-          x: ((event.clientX - rect.left) / rect.width) * 100,
-          y: ((event.clientY - rect.top) / rect.height) * 100,
-          active: true,
-        };
-        if (burstRef.current) {
-          burstRef.current.style.left = `${pointerRef.current.x}%`;
-          burstRef.current.style.top = `${pointerRef.current.y}%`;
-          burstRef.current.style.opacity = '1';
-        }
-        scheduleDraw();
-      }}
-      onPointerLeave={() => {
-        pointerRef.current = { ...pointerRef.current, active: false };
-        if (burstRef.current) burstRef.current.style.opacity = '0';
-        scheduleDraw();
-      }}
-    >
-      <canvas ref={canvasRef} className="particle-canvas" aria-hidden="true" />
-      <span ref={burstRef} className="particle-burst" />
-    </div>
-  );
-}
-
 function BuildConsole() {
   return (
     <div className="build-console">
@@ -356,6 +205,7 @@ function BuildConsole() {
 export default function Home() {
   const { mode } = useMode();
   const dark = mode !== 'zen';
+  const [playing, setPlaying] = useState(false);
 
   return (
     <Layout>
@@ -376,12 +226,25 @@ export default function Home() {
                 看案例
                 <ArrowUpRight className="h-4 w-4" />
               </a>
+              <a href="/shanhe/" target="_blank" rel="noopener" className="archive-button">
+                全屏展卷
+                <ArrowUpRight className="h-4 w-4" />
+              </a>
             </div>
+            <p className="hero-shanhe-tip">
+              这幅山水是代码实时画的：点山种树，点天空惊起飞鸟、夜里放孔明灯，点水跃出锦鲤。
+            </p>
           </div>
 
-          <div className="hero-visual" aria-label="Zhang Xu AI operator archive hero illustration">
-            <img src="/images/ai-operator-archive-hero.png" alt="" />
-            <ParticleField />
+          <div className="hero-visual">
+            {/* 山河长卷直接在 Hero 里玩：#embed 自动展卷、默认静音；深色模式直接入夜 */}
+            <iframe
+              key={mode}
+              src={`/shanhe/#embed&tod=${dark ? '0.86' : '0.42'}`}
+              title="山河长卷：可点击的程序化青绿山水"
+              allow="fullscreen; autoplay"
+              allowFullScreen
+            />
           </div>
         </section>
 
@@ -602,21 +465,42 @@ export default function Home() {
         </section>
 
         <section className="impact-section">
-          <div className="impact-frame">
-            <div className="rec-line">
-              <span>REC 00:00:00</span>
-              <span>EP.01 拍摄中</span>
-            </div>
-            <div className="impact-center">
-              <Play className="h-7 w-7" />
-              <h2>把做过的事，变成别人能信的资产。</h2>
-              <p>视觉负责吸引注意，证据链负责建立信任。</p>
-            </div>
-            <div className="impact-progress">
-              <span>00:00</span>
-              <div />
-              <span>68%</span>
-            </div>
+          <div className={`impact-frame${playing ? ' is-playing' : ''}`}>
+            {playing ? (
+              <video
+                className="impact-video"
+                src="/videos/ep01-baogongtou.mp4"
+                poster="/videos/ep01-baogongtou.jpg"
+                controls
+                autoPlay
+                playsInline
+                preload="metadata"
+              />
+            ) : (
+              <>
+                <div className="rec-line">
+                  <span>REC 00:00:00</span>
+                  <span>EP.01 · 说唱《包工头》 · 02:00</span>
+                </div>
+                <div className="impact-center">
+                  <button
+                    type="button"
+                    className="impact-play"
+                    aria-label="播放 EP.01 说唱视频《包工头》"
+                    onClick={() => setPlaying(true)}
+                  >
+                    <Play className="h-7 w-7" />
+                  </button>
+                  <h2>把做过的事，变成别人能信的资产。</h2>
+                  <p>视觉负责吸引注意，证据链负责建立信任。</p>
+                </div>
+                <div className="impact-progress">
+                  <span>00:00</span>
+                  <div />
+                  <span>点击播放</span>
+                </div>
+              </>
+            )}
           </div>
         </section>
 
