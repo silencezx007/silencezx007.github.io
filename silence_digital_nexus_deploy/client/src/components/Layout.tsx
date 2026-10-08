@@ -48,7 +48,7 @@ export function Layout({ children }: LayoutProps) {
         </AnimatePresence>
       </div>
 
-      <header className="fixed left-0 right-0 top-0 z-50 mx-4 mt-4 md:mx-8">
+      <header className="relative z-50 mx-4 mt-4 md:mx-8">
         <div className="glass-panel flex h-16 items-center justify-between rounded-xl px-4 md:px-6">
           <a href="#top" className="flex items-center gap-3">
             <div
@@ -99,7 +99,7 @@ export function Layout({ children }: LayoutProps) {
         </div>
       </header>
 
-      <main className="relative z-10 mx-auto flex min-h-screen w-full flex-col px-4 pb-12 pt-28 md:px-8">
+      <main className="relative z-10 mx-auto flex min-h-screen w-full flex-col px-4 pb-12 pt-4 md:px-8">
         {children}
       </main>
 
