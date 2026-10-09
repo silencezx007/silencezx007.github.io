@@ -37,14 +37,6 @@ const awards = '2024 年度：市场开发奖 · 总经理特别奖 · 一线优
 
 const nowItems = [
   {
-    title: 'IWS 智慧工作系统',
-    status: '每天在跑',
-    state: 'live',
-    showStats: true,
-    link: { href: '/iws-graph/', label: '看供应商图谱' },
-    body: '把自己的采购工作搬进一套系统：采购批次、供应商、邮件、线上订单对账都在里面跑。SQLite + FastAPI + HTMX，和 AI 一起写的。',
-  },
-  {
     title: '采购邮件 Agent',
     status: '在建',
     state: 'wip',
@@ -64,41 +56,27 @@ const nowItems = [
   },
 ];
 
+const mainWork = {
+  seal: '智',
+  title: 'IWS 智慧工作系统',
+  tag: '主力作品 · 每天在跑',
+  body: '把自己的采购工作搬进一套系统：采购批次、供应商、邮件、线上订单对账都在里面跑。SQLite + FastAPI + HTMX，和 AI 一起写的。',
+};
+
 const works = [
+  {
+    seal: '网',
+    title: 'IWS 供应商生态图谱',
+    tag: '交互图谱',
+    href: '/iws-graph/',
+    body: 'IWS 里的供应商、地区和客户连成一张网：谁供谁、分布在哪，一眼看清，可拖可点。数据已脱敏。',
+  },
   {
     seal: '山',
     title: '山河长卷',
     tag: '代码画',
     href: '/shanhe/',
     body: '一幅永远画不完的青绿山水。念一句诗，画就变成诗里的样子；没有一张图片、一段录音，全部由代码当场生成。',
-  },
-  {
-    seal: '译',
-    title: 'AI 实时翻译',
-    tag: '现场用',
-    href: '/translator/',
-    body: '中、葡、英三语互译，给机场现场沟通做的。需要自备一个 Gemini 免费 Key。',
-  },
-  {
-    seal: '萌',
-    title: '表情包工坊',
-    tag: '给 Summer',
-    href: '/emoji-workshop/',
-    body: '选个小可爱、配上你的梗，30 秒做出专属表情包；照片和手绘也能当底图。',
-  },
-  {
-    seal: '蛇',
-    title: '小兵贪吃蛇',
-    tag: '小游戏',
-    href: '/snake/',
-    body: '柯基长条版，手机上直接滑。按住加速会喷火，能记名字和最高分。',
-  },
-  {
-    seal: '羊',
-    title: '羊羊消消乐',
-    tag: '小游戏',
-    href: '/sheep-match/',
-    body: '“羊了个羊”那种玩法：三张一样就消掉，七个槽塞满就输，越往后越乱。',
   },
 ];
 
@@ -107,7 +85,7 @@ const profileRows = [
   ['履历', '13 年采购 · 6 年海外 · 机场运维'],
   ['在做', '工作流自动化 · AI 场景落地'],
   ['常用', 'Claude Code · Codex · Obsidian · FastAPI'],
-  ['业余', '说唱、代码画画、小游戏'],
+  ['业余', '说唱、用代码画山水'],
 ];
 
 const beliefs = [
@@ -216,44 +194,13 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-120px' }}
                 transition={{ delay: index * 0.06 }}
-                className={`now-card${item.showStats ? ' is-featured' : ''}`}
+                className="now-card"
               >
-                <div className="now-copy">
-                  <span className="now-status" data-state={item.state}>
-                    {item.status}
-                  </span>
-                  <h3>{item.title}</h3>
-                  <p>{item.body}</p>
-                  {item.link && (
-                    <a href={item.link.href} className="now-link">
-                      {item.link.label}
-                      <ArrowUpRight className="h-4 w-4" />
-                    </a>
-                  )}
-                </div>
-                {item.showStats && heartbeat && (
-                  <div className="now-stats">
-                    <dl>
-                      <div>
-                        <dt>自动化测试</dt>
-                        <dd>{heartbeat.tests}</dd>
-                      </div>
-                      <div>
-                        <dt>采购批次</dt>
-                        <dd>{heartbeat.batches_managed}</dd>
-                      </div>
-                      <div>
-                        <dt>供应商画像</dt>
-                        <dd>{heartbeat.suppliers}</dd>
-                      </div>
-                      <div>
-                        <dt>订单自动对账</dt>
-                        <dd>{heartbeat.adyen_orders}</dd>
-                      </div>
-                    </dl>
-                    <small>数字由系统自动导出，不是手写的 · 截至 {heartbeat.updated_at.slice(0, 10)}</small>
-                  </div>
-                )}
+                <span className="now-status" data-state={item.state}>
+                  {item.status}
+                </span>
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
               </motion.article>
             ))}
           </div>
@@ -263,12 +210,53 @@ export default function Home() {
           <div className="section-heading">
             <div>
               <p className="archive-kicker">WORKS / 作品</p>
-              <h2 className="section-title">点开就能玩</h2>
+              <h2 className="section-title">做出来的东西</h2>
             </div>
             <p className="section-stamp">都是和 AI 一起做出来的</p>
           </div>
 
           <div className="works-grid">
+            <motion.article
+              initial={{ opacity: 0.72, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-120px' }}
+              className="work-card is-main"
+            >
+              <div className="work-main-copy">
+                <span className="work-seal" aria-hidden="true">
+                  {mainWork.seal}
+                </span>
+                <div className="work-copy">
+                  <span className="note-tag">{mainWork.tag}</span>
+                  <h3>{mainWork.title}</h3>
+                  <p>{mainWork.body}</p>
+                </div>
+              </div>
+              {heartbeat && (
+                <div className="now-stats">
+                  <dl>
+                    <div>
+                      <dt>自动化测试</dt>
+                      <dd>{heartbeat.tests}</dd>
+                    </div>
+                    <div>
+                      <dt>采购批次</dt>
+                      <dd>{heartbeat.batches_managed}</dd>
+                    </div>
+                    <div>
+                      <dt>供应商画像</dt>
+                      <dd>{heartbeat.suppliers}</dd>
+                    </div>
+                    <div>
+                      <dt>订单自动对账</dt>
+                      <dd>{heartbeat.adyen_orders}</dd>
+                    </div>
+                  </dl>
+                  <small>数字由系统自动导出，不是手写的 · 截至 {heartbeat.updated_at.slice(0, 10)}</small>
+                </div>
+              )}
+            </motion.article>
+
             {works.map((work, index) => (
               <motion.a
                 key={work.href}
@@ -279,7 +267,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 whileHover={{ y: -3 }}
                 viewport={{ once: true, margin: '-120px' }}
-                transition={{ delay: index * 0.05 }}
+                transition={{ delay: (index + 1) * 0.05 }}
                 className="work-card"
               >
                 <span className="work-seal" aria-hidden="true">
@@ -416,7 +404,7 @@ export default function Home() {
               判断留给自己。
             </h2>
             <p className="section-copy">
-              在机场项目上，这意味着把采购批次、供应商、邮件和订单装进一套自己写的系统；在生活里，它是一幅会动的山水、几个给 Summer 做的小游戏。比起“AI 无所不能”，我更信一件件落了地、能复盘的小系统。
+              在工作里，这意味着把采购批次、供应商、邮件和订单装进一套自己写的系统；在生活里，它是一幅用代码画、永远画不完的山水。比起“AI 无所不能”，我更信一件件落了地、能复盘的小系统。
             </p>
             <div className="profile-table">
               {profileRows.map(([label, value]) => (

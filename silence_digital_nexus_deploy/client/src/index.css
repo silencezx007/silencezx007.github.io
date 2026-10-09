@@ -779,6 +779,10 @@
     gap: 1rem;
   }
 
+  .works-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .now-card,
   .work-card {
     position: relative;
@@ -791,23 +795,6 @@
   .dark .work-card {
     border-color: rgba(244, 239, 230, 0.12);
     background: rgba(244, 239, 230, 0.045);
-  }
-
-  .now-card.is-featured {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 3rem;
-    padding: 2rem;
-    background:
-      radial-gradient(circle at 12% 18%, rgba(185, 84, 58, 0.14), transparent 34%),
-      rgba(255, 252, 246, 0.64);
-  }
-
-  .dark .now-card.is-featured {
-    background:
-      radial-gradient(circle at 12% 18%, rgba(185, 84, 58, 0.18), transparent 34%),
-      rgba(244, 239, 230, 0.05);
   }
 
   .now-status {
@@ -845,12 +832,6 @@
     font-size: 1.55rem;
     line-height: 1.25;
     font-weight: 800;
-  }
-
-  .now-card.is-featured h3 {
-    font-family: Georgia, "Times New Roman", "Songti SC", serif;
-    font-size: 2.4rem;
-    line-height: 1.1;
   }
 
   .now-card p,
@@ -924,17 +905,36 @@
     border-color: rgba(185, 84, 58, 0.55);
   }
 
-  .work-card:first-child {
-    grid-column: span 2;
+  /* 主力作品：占满一行，左边介绍、右边系统实时数字 */
+  .work-card.is-main {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 3rem;
+    padding: 2rem;
     background:
-      radial-gradient(circle at 86% 20%, rgba(84, 115, 91, 0.16), transparent 36%),
+      radial-gradient(circle at 12% 18%, rgba(185, 84, 58, 0.14), transparent 34%),
       rgba(255, 252, 246, 0.64);
   }
 
-  .dark .work-card:first-child {
+  .dark .work-card.is-main {
     background:
-      radial-gradient(circle at 86% 20%, rgba(143, 184, 148, 0.14), transparent 36%),
+      radial-gradient(circle at 12% 18%, rgba(185, 84, 58, 0.18), transparent 34%),
       rgba(244, 239, 230, 0.05);
+  }
+
+  .work-card.is-main:hover {
+    border-color: rgba(23, 19, 15, 0.14);
+  }
+
+  .dark .work-card.is-main:hover {
+    border-color: rgba(244, 239, 230, 0.12);
+  }
+
+  .work-main-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
   }
 
   .work-seal {
@@ -951,7 +951,7 @@
     transform: rotate(-3deg);
   }
 
-  .work-card:first-child .work-seal {
+  .work-card.is-main .work-seal {
     width: 4.4rem;
     height: 4.4rem;
     font-size: 2.3rem;
@@ -964,23 +964,8 @@
     line-height: 1.2;
   }
 
-  .work-card:first-child .work-copy h3 {
+  .work-card.is-main .work-copy h3 {
     font-size: 2.6rem;
-  }
-
-  .work-card:first-child .work-copy p {
-    max-width: 36rem;
-  }
-
-  .now-link {
-    margin-top: 1.4rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    border-bottom: 1px solid currentColor;
-    color: #b9543a;
-    font-size: 0.9rem;
-    font-weight: 700;
   }
 
   .work-open {
@@ -1171,7 +1156,7 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .now-card.is-featured {
+    .work-card.is-main {
       grid-template-columns: 1fr;
       gap: 2rem;
     }
@@ -1251,11 +1236,7 @@
       grid-template-columns: 1fr;
     }
 
-    .work-card:first-child {
-      grid-column: auto;
-    }
-
-    .now-card.is-featured,
+    .work-card.is-main,
     .now-card,
     .work-card {
       padding: 1.2rem;
@@ -1265,8 +1246,7 @@
       min-height: 0;
     }
 
-    .now-card.is-featured h3,
-    .work-card:first-child .work-copy h3 {
+    .work-card.is-main .work-copy h3 {
       font-size: 2rem;
     }
 
