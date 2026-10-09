@@ -185,7 +185,7 @@ export default function Home() {
             <p className="archive-kicker">HELLO · ZHANG XU</p>
             <h1 className="display-title">我是张旭。</h1>
             <p className="hero-subtitle">
-              罗安达内图博士国际机场运维项目总经理，带着 8 个部门、500 多人，把一座新机场从“建”带到“管”。现在把带队伍的办法用到 AI 上，让业务流程自己跑起来。
+              13+年国际采购管理，中国央企对外首个大型机场运维管理（AIAAN），从0到1建立500+团队，现在把带队伍的办法用到 AI 上，让业务流程自己跑起来。
             </p>
             <div className="hero-actions">
               <a href="#now" className="archive-button primary">
