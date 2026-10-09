@@ -1,0 +1,747 @@
+{
+ "nodes": [
+  {
+   "id": "S01",
+   "type": "supplier",
+   "label": "供应商·全球"
+  },
+  {
+   "id": "S02",
+   "type": "supplier",
+   "label": "供应商·泰国"
+  },
+  {
+   "id": "S03",
+   "type": "supplier",
+   "label": "供应商·越南"
+  },
+  {
+   "id": "S04",
+   "type": "supplier",
+   "label": "供应商·马来西亚"
+  },
+  {
+   "id": "S05",
+   "type": "supplier",
+   "label": "供应商·其他"
+  },
+  {
+   "id": "S06",
+   "type": "supplier",
+   "label": "供应商·新加坡"
+  },
+  {
+   "id": "S07",
+   "type": "supplier",
+   "label": "供应商·美国"
+  },
+  {
+   "id": "S08",
+   "type": "supplier",
+   "label": "供应商·新加坡"
+  },
+  {
+   "id": "S09",
+   "type": "supplier",
+   "label": "供应商·印度尼西亚"
+  },
+  {
+   "id": "S10",
+   "type": "supplier",
+   "label": "供应商·美国"
+  },
+  {
+   "id": "S11",
+   "type": "supplier",
+   "label": "供应商·新加坡"
+  },
+  {
+   "id": "S12",
+   "type": "supplier",
+   "label": "供应商·泰国"
+  },
+  {
+   "id": "S13",
+   "type": "supplier",
+   "label": "供应商·其他"
+  },
+  {
+   "id": "S14",
+   "type": "supplier",
+   "label": "供应商·马来西亚"
+  },
+  {
+   "id": "S15",
+   "type": "supplier",
+   "label": "供应商·新加坡"
+  },
+  {
+   "id": "S16",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S17",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S18",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S19",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S20",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S21",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S22",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S23",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S24",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S25",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S26",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S27",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S28",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S29",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S30",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S31",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S32",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S33",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S34",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S35",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S36",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S37",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S38",
+   "type": "supplier",
+   "label": "供应商·马来西亚"
+  },
+  {
+   "id": "S39",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S40",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S41",
+   "type": "supplier",
+   "label": "供应商·中国"
+  },
+  {
+   "id": "S42",
+   "type": "supplier",
+   "label": "供应商·马来西亚"
+  },
+  {
+   "id": "R:北美",
+   "type": "region",
+   "label": "北美"
+  },
+  {
+   "id": "R:东南亚",
+   "type": "region",
+   "label": "东南亚"
+  },
+  {
+   "id": "R:中国",
+   "type": "region",
+   "label": "中国"
+  },
+  {
+   "id": "R:越南",
+   "type": "region",
+   "label": "越南"
+  },
+  {
+   "id": "R:香港",
+   "type": "region",
+   "label": "香港"
+  },
+  {
+   "id": "B:Verifone",
+   "type": "brand",
+   "label": "Verifone"
+  },
+  {
+   "id": "B:EPSON",
+   "type": "brand",
+   "label": "EPSON"
+  },
+  {
+   "id": "B:吉成",
+   "type": "brand",
+   "label": "吉成"
+  },
+  {
+   "id": "B:易联达Elanda",
+   "type": "brand",
+   "label": "易联达Elanda"
+  },
+  {
+   "id": "B:ZYWELL",
+   "type": "brand",
+   "label": "ZYWELL"
+  },
+  {
+   "id": "B:汉印",
+   "type": "brand",
+   "label": "汉印"
+  },
+  {
+   "id": "B:Mdot钱箱",
+   "type": "brand",
+   "label": "Mdot钱箱"
+  },
+  {
+   "id": "B:Aclas",
+   "type": "brand",
+   "label": "Aclas"
+  },
+  {
+   "id": "B:创维",
+   "type": "brand",
+   "label": "创维"
+  },
+  {
+   "id": "B:Yusion",
+   "type": "brand",
+   "label": "Yusion"
+  },
+  {
+   "id": "B:Readmi",
+   "type": "brand",
+   "label": "Readmi"
+  },
+  {
+   "id": "B:新大陆",
+   "type": "brand",
+   "label": "新大陆"
+  },
+  {
+   "id": "B:功诚",
+   "type": "brand",
+   "label": "功诚"
+  },
+  {
+   "id": "B:川田",
+   "type": "brand",
+   "label": "川田"
+  },
+  {
+   "id": "B:新北洋",
+   "type": "brand",
+   "label": "新北洋"
+  },
+  {
+   "id": "B:联想",
+   "type": "brand",
+   "label": "联想"
+  },
+  {
+   "id": "B:飞利浦",
+   "type": "brand",
+   "label": "飞利浦"
+  },
+  {
+   "id": "B:方雅Founya",
+   "type": "brand",
+   "label": "方雅Founya"
+  },
+  {
+   "id": "B:Dickson",
+   "type": "brand",
+   "label": "Dickson"
+  },
+  {
+   "id": "B:商易通",
+   "type": "brand",
+   "label": "商易通"
+  },
+  {
+   "id": "B:嘉洋",
+   "type": "brand",
+   "label": "嘉洋"
+  },
+  {
+   "id": "B:顶尖",
+   "type": "brand",
+   "label": "顶尖"
+  },
+  {
+   "id": "B:映拓",
+   "type": "brand",
+   "label": "映拓"
+  },
+  {
+   "id": "B:TouchKit",
+   "type": "brand",
+   "label": "TouchKit"
+  },
+  {
+   "id": "B:Kami",
+   "type": "brand",
+   "label": "Kami"
+  },
+  {
+   "id": "B:微软",
+   "type": "brand",
+   "label": "微软"
+  },
+  {
+   "id": "B:Nebullar",
+   "type": "brand",
+   "label": "Nebullar"
+  },
+  {
+   "id": "B:欣意",
+   "type": "brand",
+   "label": "欣意"
+  },
+  {
+   "id": "B:银驰",
+   "type": "brand",
+   "label": "银驰"
+  },
+  {
+   "id": "B:斯普瑞",
+   "type": "brand",
+   "label": "斯普瑞"
+  }
+ ],
+ "links": [
+  {
+   "source": "S01",
+   "target": "R:北美"
+  },
+  {
+   "source": "S01",
+   "target": "R:东南亚"
+  },
+  {
+   "source": "S01",
+   "target": "B:Verifone"
+  },
+  {
+   "source": "S02",
+   "target": "R:东南亚"
+  },
+  {
+   "source": "S02",
+   "target": "R:中国"
+  },
+  {
+   "source": "S02",
+   "target": "B:EPSON"
+  },
+  {
+   "source": "S02",
+   "target": "B:吉成"
+  },
+  {
+   "source": "S03",
+   "target": "R:越南"
+  },
+  {
+   "source": "S03",
+   "target": "B:易联达Elanda"
+  },
+  {
+   "source": "S04",
+   "target": "R:东南亚"
+  },
+  {
+   "source": "S04",
+   "target": "R:中国"
+  },
+  {
+   "source": "S04",
+   "target": "B:EPSON"
+  },
+  {
+   "source": "S04",
+   "target": "B:ZYWELL"
+  },
+  {
+   "source": "S04",
+   "target": "B:汉印"
+  },
+  {
+   "source": "S05",
+   "target": "B:ZYWELL"
+  },
+  {
+   "source": "S05",
+   "target": "B:Mdot钱箱"
+  },
+  {
+   "source": "S06",
+   "target": "R:东南亚"
+  },
+  {
+   "source": "S06",
+   "target": "R:中国"
+  },
+  {
+   "source": "S07",
+   "target": "R:北美"
+  },
+  {
+   "source": "S08",
+   "target": "R:东南亚"
+  },
+  {
+   "source": "S09",
+   "target": "R:东南亚"
+  },
+  {
+   "source": "S10",
+   "target": "R:北美"
+  },
+  {
+   "source": "S10",
+   "target": "R:中国"
+  },
+  {
+   "source": "S11",
+   "target": "R:东南亚"
+  },
+  {
+   "source": "S11",
+   "target": "B:Aclas"
+  },
+  {
+   "source": "S12",
+   "target": "R:东南亚"
+  },
+  {
+   "source": "S13",
+   "target": "R:北美"
+  },
+  {
+   "source": "S13",
+   "target": "R:中国"
+  },
+  {
+   "source": "S14",
+   "target": "R:东南亚"
+  },
+  {
+   "source": "S14",
+   "target": "B:EPSON"
+  },
+  {
+   "source": "S15",
+   "target": "R:东南亚"
+  },
+  {
+   "source": "S16",
+   "target": "R:中国"
+  },
+  {
+   "source": "S17",
+   "target": "R:中国"
+  },
+  {
+   "source": "S18",
+   "target": "R:中国"
+  },
+  {
+   "source": "S18",
+   "target": "B:创维"
+  },
+  {
+   "source": "S19",
+   "target": "R:中国"
+  },
+  {
+   "source": "S19",
+   "target": "B:Yusion"
+  },
+  {
+   "source": "S19",
+   "target": "B:Aclas"
+  },
+  {
+   "source": "S19",
+   "target": "B:Readmi"
+  },
+  {
+   "source": "S21",
+   "target": "R:东南亚"
+  },
+  {
+   "source": "S21",
+   "target": "R:中国"
+  },
+  {
+   "source": "S22",
+   "target": "R:中国"
+  },
+  {
+   "source": "S23",
+   "target": "R:中国"
+  },
+  {
+   "source": "S24",
+   "target": "R:中国"
+  },
+  {
+   "source": "S24",
+   "target": "B:汉印"
+  },
+  {
+   "source": "S24",
+   "target": "B:新大陆"
+  },
+  {
+   "source": "S24",
+   "target": "B:功诚"
+  },
+  {
+   "source": "S24",
+   "target": "B:川田"
+  },
+  {
+   "source": "S24",
+   "target": "B:新北洋"
+  },
+  {
+   "source": "S25",
+   "target": "R:中国"
+  },
+  {
+   "source": "S25",
+   "target": "R:香港"
+  },
+  {
+   "source": "S25",
+   "target": "B:联想"
+  },
+  {
+   "source": "S25",
+   "target": "B:飞利浦"
+  },
+  {
+   "source": "S26",
+   "target": "R:东南亚"
+  },
+  {
+   "source": "S26",
+   "target": "B:方雅Founya"
+  },
+  {
+   "source": "S28",
+   "target": "R:东南亚"
+  },
+  {
+   "source": "S28",
+   "target": "B:Dickson"
+  },
+  {
+   "source": "S29",
+   "target": "R:中国"
+  },
+  {
+   "source": "S29",
+   "target": "B:商易通"
+  },
+  {
+   "source": "S29",
+   "target": "B:嘉洋"
+  },
+  {
+   "source": "S29",
+   "target": "B:顶尖"
+  },
+  {
+   "source": "S29",
+   "target": "B:映拓"
+  },
+  {
+   "source": "S30",
+   "target": "R:中国"
+  },
+  {
+   "source": "S31",
+   "target": "R:中国"
+  },
+  {
+   "source": "S32",
+   "target": "R:中国"
+  },
+  {
+   "source": "S32",
+   "target": "B:TouchKit"
+  },
+  {
+   "source": "S33",
+   "target": "R:东南亚"
+  },
+  {
+   "source": "S33",
+   "target": "R:北美"
+  },
+  {
+   "source": "S33",
+   "target": "R:中国"
+  },
+  {
+   "source": "S33",
+   "target": "B:易联达Elanda"
+  },
+  {
+   "source": "S34",
+   "target": "R:东南亚"
+  },
+  {
+   "source": "S34",
+   "target": "R:中国"
+  },
+  {
+   "source": "S34",
+   "target": "B:Kami"
+  },
+  {
+   "source": "S35",
+   "target": "R:中国"
+  },
+  {
+   "source": "S35",
+   "target": "B:微软"
+  },
+  {
+   "source": "S36",
+   "target": "R:中国"
+  },
+  {
+   "source": "S37",
+   "target": "R:东南亚"
+  },
+  {
+   "source": "S37",
+   "target": "R:中国"
+  },
+  {
+   "source": "S38",
+   "target": "R:东南亚"
+  },
+  {
+   "source": "S38",
+   "target": "R:中国"
+  },
+  {
+   "source": "S38",
+   "target": "B:Nebullar"
+  },
+  {
+   "source": "S39",
+   "target": "R:中国"
+  },
+  {
+   "source": "S40",
+   "target": "R:中国"
+  },
+  {
+   "source": "S41",
+   "target": "R:中国"
+  },
+  {
+   "source": "S41",
+   "target": "B:欣意"
+  },
+  {
+   "source": "S41",
+   "target": "B:银驰"
+  },
+  {
+   "source": "S41",
+   "target": "B:斯普瑞"
+  },
+  {
+   "source": "S41",
+   "target": "B:新大陆"
+  },
+  {
+   "source": "S42",
+   "target": "R:东南亚"
+  }
+ ]
+}
