@@ -236,154 +236,49 @@
    "label": "香港"
   },
   {
-   "id": "B:Verifone",
-   "type": "brand",
-   "label": "Verifone"
+   "id": "C:支付终端",
+   "type": "category",
+   "label": "支付终端"
   },
   {
-   "id": "B:EPSON",
-   "type": "brand",
-   "label": "EPSON"
+   "id": "C:POS 收银机",
+   "type": "category",
+   "label": "POS 收银机"
   },
   {
-   "id": "B:吉成",
-   "type": "brand",
-   "label": "吉成"
+   "id": "C:小票打印机",
+   "type": "category",
+   "label": "小票打印机"
   },
   {
-   "id": "B:易联达Elanda",
-   "type": "brand",
-   "label": "易联达Elanda"
+   "id": "C:钱箱",
+   "type": "category",
+   "label": "钱箱"
   },
   {
-   "id": "B:ZYWELL",
-   "type": "brand",
-   "label": "ZYWELL"
+   "id": "C:电子秤",
+   "type": "category",
+   "label": "电子秤"
   },
   {
-   "id": "B:汉印",
-   "type": "brand",
-   "label": "汉印"
+   "id": "C:其他周边",
+   "type": "category",
+   "label": "其他周边"
   },
   {
-   "id": "B:Mdot钱箱",
-   "type": "brand",
-   "label": "Mdot钱箱"
+   "id": "C:显示屏/广告机",
+   "type": "category",
+   "label": "显示屏/广告机"
   },
   {
-   "id": "B:Aclas",
-   "type": "brand",
-   "label": "Aclas"
+   "id": "C:电脑/平板",
+   "type": "category",
+   "label": "电脑/平板"
   },
   {
-   "id": "B:创维",
-   "type": "brand",
-   "label": "创维"
-  },
-  {
-   "id": "B:Yusion",
-   "type": "brand",
-   "label": "Yusion"
-  },
-  {
-   "id": "B:Readmi",
-   "type": "brand",
-   "label": "Readmi"
-  },
-  {
-   "id": "B:新大陆",
-   "type": "brand",
-   "label": "新大陆"
-  },
-  {
-   "id": "B:功诚",
-   "type": "brand",
-   "label": "功诚"
-  },
-  {
-   "id": "B:川田",
-   "type": "brand",
-   "label": "川田"
-  },
-  {
-   "id": "B:新北洋",
-   "type": "brand",
-   "label": "新北洋"
-  },
-  {
-   "id": "B:联想",
-   "type": "brand",
-   "label": "联想"
-  },
-  {
-   "id": "B:飞利浦",
-   "type": "brand",
-   "label": "飞利浦"
-  },
-  {
-   "id": "B:方雅Founya",
-   "type": "brand",
-   "label": "方雅Founya"
-  },
-  {
-   "id": "B:Dickson",
-   "type": "brand",
-   "label": "Dickson"
-  },
-  {
-   "id": "B:商易通",
-   "type": "brand",
-   "label": "商易通"
-  },
-  {
-   "id": "B:嘉洋",
-   "type": "brand",
-   "label": "嘉洋"
-  },
-  {
-   "id": "B:顶尖",
-   "type": "brand",
-   "label": "顶尖"
-  },
-  {
-   "id": "B:映拓",
-   "type": "brand",
-   "label": "映拓"
-  },
-  {
-   "id": "B:TouchKit",
-   "type": "brand",
-   "label": "TouchKit"
-  },
-  {
-   "id": "B:Kami",
-   "type": "brand",
-   "label": "Kami"
-  },
-  {
-   "id": "B:微软",
-   "type": "brand",
-   "label": "微软"
-  },
-  {
-   "id": "B:Nebullar",
-   "type": "brand",
-   "label": "Nebullar"
-  },
-  {
-   "id": "B:欣意",
-   "type": "brand",
-   "label": "欣意"
-  },
-  {
-   "id": "B:银驰",
-   "type": "brand",
-   "label": "银驰"
-  },
-  {
-   "id": "B:斯普瑞",
-   "type": "brand",
-   "label": "斯普瑞"
+   "id": "C:扫码/支付终端",
+   "type": "category",
+   "label": "扫码/支付终端"
   }
  ],
  "links": [
@@ -397,7 +292,7 @@
   },
   {
    "source": "S01",
-   "target": "B:Verifone"
+   "target": "C:支付终端"
   },
   {
    "source": "S02",
@@ -409,11 +304,15 @@
   },
   {
    "source": "S02",
-   "target": "B:EPSON"
+   "target": "C:POS 收银机"
   },
   {
    "source": "S02",
-   "target": "B:吉成"
+   "target": "C:小票打印机"
+  },
+  {
+   "source": "S02",
+   "target": "C:钱箱"
   },
   {
    "source": "S03",
@@ -421,7 +320,11 @@
   },
   {
    "source": "S03",
-   "target": "B:易联达Elanda"
+   "target": "C:POS 收银机"
+  },
+  {
+   "source": "S03",
+   "target": "C:小票打印机"
   },
   {
    "source": "S04",
@@ -433,23 +336,23 @@
   },
   {
    "source": "S04",
-   "target": "B:EPSON"
+   "target": "C:POS 收银机"
   },
   {
    "source": "S04",
-   "target": "B:ZYWELL"
-  },
-  {
-   "source": "S04",
-   "target": "B:汉印"
+   "target": "C:小票打印机"
   },
   {
    "source": "S05",
-   "target": "B:ZYWELL"
+   "target": "C:POS 收银机"
   },
   {
    "source": "S05",
-   "target": "B:Mdot钱箱"
+   "target": "C:小票打印机"
+  },
+  {
+   "source": "S05",
+   "target": "C:钱箱"
   },
   {
    "source": "S06",
@@ -458,6 +361,10 @@
   {
    "source": "S06",
    "target": "R:中国"
+  },
+  {
+   "source": "S06",
+   "target": "C:POS 收银机"
   },
   {
    "source": "S07",
@@ -472,6 +379,10 @@
    "target": "R:东南亚"
   },
   {
+   "source": "S09",
+   "target": "C:POS 收银机"
+  },
+  {
    "source": "S10",
    "target": "R:北美"
   },
@@ -480,18 +391,30 @@
    "target": "R:中国"
   },
   {
+   "source": "S10",
+   "target": "C:POS 收银机"
+  },
+  {
    "source": "S11",
    "target": "R:东南亚"
   },
   {
    "source": "S11",
-   "target": "B:Aclas"
+   "target": "C:电子秤"
   },
   {
    "source": "S12",
    "target": "R:东南亚"
   },
   {
+   "source": "S12",
+   "target": "C:其他周边"
+  },
+  {
+   "source": "S12",
+   "target": "C:POS 收银机"
+  },
+  {
    "source": "S13",
    "target": "R:北美"
   },
@@ -500,32 +423,52 @@
    "target": "R:中国"
   },
   {
+   "source": "S13",
+   "target": "C:POS 收银机"
+  },
+  {
    "source": "S14",
    "target": "R:东南亚"
   },
   {
    "source": "S14",
-   "target": "B:EPSON"
+   "target": "C:小票打印机"
   },
   {
    "source": "S15",
    "target": "R:东南亚"
   },
   {
+   "source": "S15",
+   "target": "C:POS 收银机"
+  },
+  {
    "source": "S16",
    "target": "R:中国"
+  },
+  {
+   "source": "S16",
+   "target": "C:其他周边"
   },
   {
    "source": "S17",
    "target": "R:中国"
   },
   {
+   "source": "S17",
+   "target": "C:POS 收银机"
+  },
+  {
    "source": "S18",
    "target": "R:中国"
   },
   {
    "source": "S18",
-   "target": "B:创维"
+   "target": "C:显示屏/广告机"
+  },
+  {
+   "source": "S18",
+   "target": "C:其他周边"
   },
   {
    "source": "S19",
@@ -533,15 +476,15 @@
   },
   {
    "source": "S19",
-   "target": "B:Yusion"
+   "target": "C:其他周边"
   },
   {
    "source": "S19",
-   "target": "B:Aclas"
+   "target": "C:电子秤"
   },
   {
    "source": "S19",
-   "target": "B:Readmi"
+   "target": "C:电脑/平板"
   },
   {
    "source": "S21",
@@ -552,36 +495,44 @@
    "target": "R:中国"
   },
   {
+   "source": "S21",
+   "target": "C:小票打印机"
+  },
+  {
    "source": "S22",
    "target": "R:中国"
+  },
+  {
+   "source": "S22",
+   "target": "C:POS 收银机"
   },
   {
    "source": "S23",
    "target": "R:中国"
   },
   {
+   "source": "S23",
+   "target": "C:其他周边"
+  },
+  {
    "source": "S24",
    "target": "R:中国"
   },
   {
    "source": "S24",
-   "target": "B:汉印"
+   "target": "C:POS 收银机"
   },
   {
    "source": "S24",
-   "target": "B:新大陆"
+   "target": "C:小票打印机"
   },
   {
    "source": "S24",
-   "target": "B:功诚"
+   "target": "C:扫码/支付终端"
   },
   {
    "source": "S24",
-   "target": "B:川田"
-  },
-  {
-   "source": "S24",
-   "target": "B:新北洋"
+   "target": "C:其他周边"
   },
   {
    "source": "S25",
@@ -593,11 +544,15 @@
   },
   {
    "source": "S25",
-   "target": "B:联想"
+   "target": "C:其他周边"
   },
   {
    "source": "S25",
-   "target": "B:飞利浦"
+   "target": "C:电脑/平板"
+  },
+  {
+   "source": "S25",
+   "target": "C:显示屏/广告机"
   },
   {
    "source": "S26",
@@ -605,7 +560,7 @@
   },
   {
    "source": "S26",
-   "target": "B:方雅Founya"
+   "target": "C:显示屏/广告机"
   },
   {
    "source": "S28",
@@ -613,7 +568,7 @@
   },
   {
    "source": "S28",
-   "target": "B:Dickson"
+   "target": "C:电子秤"
   },
   {
    "source": "S29",
@@ -621,35 +576,35 @@
   },
   {
    "source": "S29",
-   "target": "B:商易通"
+   "target": "C:其他周边"
   },
   {
    "source": "S29",
-   "target": "B:嘉洋"
-  },
-  {
-   "source": "S29",
-   "target": "B:顶尖"
-  },
-  {
-   "source": "S29",
-   "target": "B:映拓"
+   "target": "C:电子秤"
   },
   {
    "source": "S30",
    "target": "R:中国"
   },
   {
+   "source": "S30",
+   "target": "C:其他周边"
+  },
+  {
    "source": "S31",
    "target": "R:中国"
   },
   {
+   "source": "S31",
+   "target": "C:其他周边"
+  },
+  {
    "source": "S32",
    "target": "R:中国"
   },
   {
    "source": "S32",
-   "target": "B:TouchKit"
+   "target": "C:显示屏/广告机"
   },
   {
    "source": "S33",
@@ -665,7 +620,7 @@
   },
   {
    "source": "S33",
-   "target": "B:易联达Elanda"
+   "target": "C:POS 收银机"
   },
   {
    "source": "S34",
@@ -677,7 +632,7 @@
   },
   {
    "source": "S34",
-   "target": "B:Kami"
+   "target": "C:钱箱"
   },
   {
    "source": "S35",
@@ -685,13 +640,21 @@
   },
   {
    "source": "S35",
-   "target": "B:微软"
+   "target": "C:其他周边"
+  },
+  {
+   "source": "S35",
+   "target": "C:电脑/平板"
   },
   {
    "source": "S36",
    "target": "R:中国"
   },
   {
+   "source": "S36",
+   "target": "C:小票打印机"
+  },
+  {
    "source": "S37",
    "target": "R:东南亚"
   },
@@ -700,6 +663,10 @@
    "target": "R:中国"
   },
   {
+   "source": "S37",
+   "target": "C:小票打印机"
+  },
+  {
    "source": "S38",
    "target": "R:东南亚"
   },
@@ -709,11 +676,15 @@
   },
   {
    "source": "S38",
-   "target": "B:Nebullar"
+   "target": "C:其他周边"
   },
   {
    "source": "S39",
    "target": "R:中国"
+  },
+  {
+   "source": "S39",
+   "target": "C:其他周边"
   },
   {
    "source": "S40",
@@ -725,23 +696,27 @@
   },
   {
    "source": "S41",
-   "target": "B:欣意"
+   "target": "C:POS 收银机"
   },
   {
    "source": "S41",
-   "target": "B:银驰"
+   "target": "C:其他周边"
   },
   {
    "source": "S41",
-   "target": "B:斯普瑞"
+   "target": "C:小票打印机"
   },
   {
    "source": "S41",
-   "target": "B:新大陆"
+   "target": "C:扫码/支付终端"
   },
   {
    "source": "S42",
    "target": "R:东南亚"
+  },
+  {
+   "source": "S42",
+   "target": "C:POS 收银机"
   }
  ]
 }
