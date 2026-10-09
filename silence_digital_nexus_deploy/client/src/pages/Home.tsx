@@ -169,12 +169,12 @@ export default function Home() {
               罗安达内图博士国际机场运维项目总经理，带着 8 个部门、500 多人，把一座新机场从“建”带到“管”。现在把带队伍的办法用到 AI 上，让业务流程自己跑起来。
             </p>
             <div className="hero-actions">
-              <a href="#career" className="archive-button primary">
-                看经历
+              <a href="#now" className="archive-button primary">
+                我在做什么
                 <ArrowUpRight className="h-4 w-4" />
               </a>
-              <a href="#now" className="archive-button">
-                我在做什么
+              <a href="#career" className="archive-button">
+                看经历
                 <ArrowUpRight className="h-4 w-4" />
               </a>
               <a href="/shanhe/" target="_blank" rel="noopener" className="archive-button">
@@ -196,6 +196,106 @@ export default function Home() {
               allow="fullscreen; autoplay"
               allowFullScreen
             />
+          </div>
+        </section>
+
+        <section id="now" className="archive-section now-section">
+          <div className="section-heading">
+            <div>
+              <p className="archive-kicker">NOW / 在做</p>
+              <h2 className="section-title">最近在忙的几件事</h2>
+            </div>
+            <p className="section-stamp">更新于 {LAST_UPDATED}</p>
+          </div>
+
+          <div className="now-grid">
+            {nowItems.map((item, index) => (
+              <motion.article
+                key={item.title}
+                initial={{ opacity: 0.72, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-120px' }}
+                transition={{ delay: index * 0.06 }}
+                className={`now-card${item.showStats ? ' is-featured' : ''}`}
+              >
+                <div className="now-copy">
+                  <span className="now-status" data-state={item.state}>
+                    {item.status}
+                  </span>
+                  <h3>{item.title}</h3>
+                  <p>{item.body}</p>
+                  {item.link && (
+                    <a href={item.link.href} className="now-link">
+                      {item.link.label}
+                      <ArrowUpRight className="h-4 w-4" />
+                    </a>
+                  )}
+                </div>
+                {item.showStats && heartbeat && (
+                  <div className="now-stats">
+                    <dl>
+                      <div>
+                        <dt>自动化测试</dt>
+                        <dd>{heartbeat.tests}</dd>
+                      </div>
+                      <div>
+                        <dt>采购批次</dt>
+                        <dd>{heartbeat.batches_managed}</dd>
+                      </div>
+                      <div>
+                        <dt>供应商画像</dt>
+                        <dd>{heartbeat.suppliers}</dd>
+                      </div>
+                      <div>
+                        <dt>订单自动对账</dt>
+                        <dd>{heartbeat.adyen_orders}</dd>
+                      </div>
+                    </dl>
+                    <small>数字由系统自动导出，不是手写的 · 截至 {heartbeat.updated_at.slice(0, 10)}</small>
+                  </div>
+                )}
+              </motion.article>
+            ))}
+          </div>
+        </section>
+
+        <section id="works" className="archive-section works-section">
+          <div className="section-heading">
+            <div>
+              <p className="archive-kicker">WORKS / 作品</p>
+              <h2 className="section-title">点开就能玩</h2>
+            </div>
+            <p className="section-stamp">都是和 AI 一起做出来的</p>
+          </div>
+
+          <div className="works-grid">
+            {works.map((work, index) => (
+              <motion.a
+                key={work.href}
+                href={work.href}
+                target="_blank"
+                rel="noopener"
+                initial={{ opacity: 0.72, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                whileHover={{ y: -3 }}
+                viewport={{ once: true, margin: '-120px' }}
+                transition={{ delay: index * 0.05 }}
+                className="work-card"
+              >
+                <span className="work-seal" aria-hidden="true">
+                  {work.seal}
+                </span>
+                <div className="work-copy">
+                  <span className="note-tag">{work.tag}</span>
+                  <h3>{work.title}</h3>
+                  <p>{work.body}</p>
+                </div>
+                <span className="work-open">
+                  打开
+                  <ArrowUpRight className="h-4 w-4" />
+                </span>
+              </motion.a>
+            ))}
           </div>
         </section>
 
@@ -299,106 +399,6 @@ export default function Home() {
                 </div>
               </>
             )}
-          </div>
-        </section>
-
-        <section id="now" className="archive-section now-section">
-          <div className="section-heading">
-            <div>
-              <p className="archive-kicker">NOW / 在做</p>
-              <h2 className="section-title">最近在忙的几件事</h2>
-            </div>
-            <p className="section-stamp">更新于 {LAST_UPDATED}</p>
-          </div>
-
-          <div className="now-grid">
-            {nowItems.map((item, index) => (
-              <motion.article
-                key={item.title}
-                initial={{ opacity: 0.72, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-120px' }}
-                transition={{ delay: index * 0.06 }}
-                className={`now-card${item.showStats ? ' is-featured' : ''}`}
-              >
-                <div className="now-copy">
-                  <span className="now-status" data-state={item.state}>
-                    {item.status}
-                  </span>
-                  <h3>{item.title}</h3>
-                  <p>{item.body}</p>
-                  {item.link && (
-                    <a href={item.link.href} className="now-link">
-                      {item.link.label}
-                      <ArrowUpRight className="h-4 w-4" />
-                    </a>
-                  )}
-                </div>
-                {item.showStats && heartbeat && (
-                  <div className="now-stats">
-                    <dl>
-                      <div>
-                        <dt>自动化测试</dt>
-                        <dd>{heartbeat.tests}</dd>
-                      </div>
-                      <div>
-                        <dt>采购批次</dt>
-                        <dd>{heartbeat.batches_managed}</dd>
-                      </div>
-                      <div>
-                        <dt>供应商画像</dt>
-                        <dd>{heartbeat.suppliers}</dd>
-                      </div>
-                      <div>
-                        <dt>订单自动对账</dt>
-                        <dd>{heartbeat.adyen_orders}</dd>
-                      </div>
-                    </dl>
-                    <small>数字由系统自动导出，不是手写的 · 截至 {heartbeat.updated_at.slice(0, 10)}</small>
-                  </div>
-                )}
-              </motion.article>
-            ))}
-          </div>
-        </section>
-
-        <section id="works" className="archive-section works-section">
-          <div className="section-heading">
-            <div>
-              <p className="archive-kicker">WORKS / 作品</p>
-              <h2 className="section-title">点开就能玩</h2>
-            </div>
-            <p className="section-stamp">都是和 AI 一起做出来的</p>
-          </div>
-
-          <div className="works-grid">
-            {works.map((work, index) => (
-              <motion.a
-                key={work.href}
-                href={work.href}
-                target="_blank"
-                rel="noopener"
-                initial={{ opacity: 0.72, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                whileHover={{ y: -3 }}
-                viewport={{ once: true, margin: '-120px' }}
-                transition={{ delay: index * 0.05 }}
-                className="work-card"
-              >
-                <span className="work-seal" aria-hidden="true">
-                  {work.seal}
-                </span>
-                <div className="work-copy">
-                  <span className="note-tag">{work.tag}</span>
-                  <h3>{work.title}</h3>
-                  <p>{work.body}</p>
-                </div>
-                <span className="work-open">
-                  打开
-                  <ArrowUpRight className="h-4 w-4" />
-                </span>
-              </motion.a>
-            ))}
           </div>
         </section>
 

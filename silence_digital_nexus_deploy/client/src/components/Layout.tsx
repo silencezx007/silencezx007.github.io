@@ -9,9 +9,9 @@ interface LayoutProps {
 }
 
 const navigationItems = [
-  { href: '#career', label: '经历' },
   { href: '#now', label: '在做' },
   { href: '#works', label: '作品' },
+  { href: '#career', label: '经历' },
   { href: '#about', label: '关于' },
   { href: '#contact', label: '联系' },
 ];
