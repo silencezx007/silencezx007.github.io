@@ -35,24 +35,26 @@ const careerPath = [
 
 const awards = '2024 年度：市场开发奖 · 总经理特别奖 · 一线优秀管理人才';
 
-const nowItems = [
+const nowLines = [
   {
-    title: '采购邮件 Agent',
-    status: '在建',
-    state: 'wip',
-    body: '读审批回复、匹配供应商、拟好询价邮件，直接放进工作邮箱的草稿箱。发不发，我说了算。',
+    no: '01',
+    title: '工作流自动化',
+    lead: '把重复的流程交给系统，人只守最后一道关。',
+    body: '采购批次、供应商、邮件、线上订单对账，这些每天重复的活已经装进 IWS 跑起来；下一步让 Agent 把询价邮件直接拟进草稿箱。',
+    items: [
+      { name: 'IWS 智慧工作系统', note: '采购全流程在里面跑，数字见下方作品', status: '每天在跑', state: 'live' },
+      { name: '采购邮件 Agent', note: '读审批回复、拟询价邮件，发不发我说了算', status: '在建', state: 'wip' },
+    ],
   },
   {
-    title: 'Obsidian 三库',
-    status: '每天在用',
-    state: 'live',
-    body: '网页、AI 对话、工作里的判断，都沉淀进三个长期库。下次再问，AI 能接着上次往下说。',
-  },
-  {
-    title: 'Agent 分工',
-    status: '实验中',
-    state: 'wip',
-    body: 'Codex、Hermes、OpenClaw 各管一摊：目录分开、记忆分开，先用真实任务看谁接得住，再放权。',
+    no: '02',
+    title: 'AI 应用场景落地',
+    lead: '从真实业务里找 AI 能接手的环节，做到每天在用。',
+    body: '先让 AI 在我自己的工作里跑通：给它长期记忆，给它分工和边界，在真实任务里验证过，再往外推。',
+    items: [
+      { name: 'Obsidian 三库', note: '网页、对话、工作判断沉淀成 AI 的长期记忆', status: '每天在用', state: 'live' },
+      { name: 'Agent 分工', note: 'Codex、Hermes、OpenClaw 各管一摊，先验证再放权', status: '实验中', state: 'wip' },
+    ],
   },
 ];
 
@@ -69,7 +71,7 @@ const works = [
     title: 'IWS 供应商生态图谱',
     tag: '交互图谱',
     href: '/iws-graph/',
-    body: 'IWS 里的供应商、地区和客户连成一张网：谁供谁、分布在哪，一眼看清，可拖可点。数据已脱敏。',
+    body: '供应商—地区—客户关系网，41 家供应商、101 家客户门店，按合作批次连线。',
   },
   {
     seal: '山',
@@ -103,6 +105,24 @@ const beliefs = [
   },
 ];
 
+const offerSteps = [
+  {
+    no: '01',
+    title: '诊断',
+    body: '一起把现有流程走一遍，找出最费人、最容易出错的环节，判断哪些值得自动化、先做哪一步。',
+  },
+  {
+    no: '02',
+    title: '搭建',
+    body: '用 AI 加轻量系统把这一环做出来：数据有地方存，结果落进草稿箱和表格，关键节点留给人确认。',
+  },
+  {
+    no: '03',
+    title: '陪跑',
+    body: '上线后跟着用一段时间，按真实使用情况调整，直到团队自己接得住。',
+  },
+];
+
 const links = [
   { label: 'GitHub', value: 'github.com/silencezx007', href: 'https://github.com/silencezx007' },
   { label: 'Email', value: 'silencezx009@gmail.com', href: 'mailto:silencezx009@gmail.com' },
@@ -117,6 +137,26 @@ type Heartbeat = {
 };
 
 // IWS 的计数由本机 heartbeat_export.py 推到站点根目录；读不到就不显示，不影响页面。
+// 图谱数据由本机每天刷新；首页卡片上的数字跟着它走，读不到就用卡片里写的数字。
+function useGraphCounts() {
+  const [counts, setCounts] = useState<{ suppliers: number; customers: number } | null>(null);
+
+  useEffect(() => {
+    fetch('/iws-graph/data.json', { cache: 'no-cache' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!d || !Array.isArray(d.nodes)) return;
+        const count = (kind: string) => d.nodes.filter((n: { kind?: string }) => n.kind === kind).length;
+        const suppliers = count('supplier');
+        const customers = count('customer');
+        if (suppliers && customers) setCounts({ suppliers, customers });
+      })
+      .catch(() => {});
+  }, []);
+
+  return counts;
+}
+
 function useHeartbeat() {
   const [data, setData] = useState<Heartbeat | null>(null);
 
@@ -135,6 +175,7 @@ export default function Home() {
   const dark = mode !== 'zen';
   const [playing, setPlaying] = useState(false);
   const heartbeat = useHeartbeat();
+  const graphCounts = useGraphCounts();
 
   return (
     <Layout>
@@ -181,26 +222,36 @@ export default function Home() {
           <div className="section-heading">
             <div>
               <p className="archive-kicker">NOW / 在做</p>
-              <h2 className="section-title">最近在忙的几件事</h2>
+              <h2 className="section-title">最近在忙的两条主线</h2>
             </div>
             <p className="section-stamp">更新于 {LAST_UPDATED}</p>
           </div>
 
           <div className="now-grid">
-            {nowItems.map((item, index) => (
+            {nowLines.map((line, index) => (
               <motion.article
-                key={item.title}
+                key={line.title}
                 initial={{ opacity: 0.72, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-120px' }}
                 transition={{ delay: index * 0.06 }}
                 className="now-card"
               >
-                <span className="now-status" data-state={item.state}>
-                  {item.status}
-                </span>
-                <h3>{item.title}</h3>
-                <p>{item.body}</p>
+                <span className="now-no">{line.no} / 主线</span>
+                <h3>{line.title}</h3>
+                <p className="now-lead">{line.lead}</p>
+                <p>{line.body}</p>
+                <ul className="now-items">
+                  {line.items.map((item) => (
+                    <li key={item.name}>
+                      <strong>{item.name}</strong>
+                      <span className="now-status" data-state={item.state}>
+                        {item.status}
+                      </span>
+                      <small>{item.note}</small>
+                    </li>
+                  ))}
+                </ul>
               </motion.article>
             ))}
           </div>
@@ -276,7 +327,11 @@ export default function Home() {
                 <div className="work-copy">
                   <span className="note-tag">{work.tag}</span>
                   <h3>{work.title}</h3>
-                  <p>{work.body}</p>
+                  <p>
+                    {work.href === '/iws-graph/' && graphCounts
+                      ? `供应商—地区—客户关系网，${graphCounts.suppliers} 家供应商、${graphCounts.customers} 家客户门店，按合作批次连线。`
+                      : work.body}
+                  </p>
                 </div>
                 <span className="work-open">
                   打开
@@ -439,9 +494,21 @@ export default function Home() {
         </section>
 
         <section id="contact" className="contact-section">
-          <p className="archive-kicker">CONTACT / 联系</p>
+          <p className="archive-kicker">WORK WITH ME / 合作</p>
           <h2 className="display-title">Let's build.</h2>
-          <p>想聊 AI 怎么进真实工作、采购流程怎么自动化、一人公司怎么起步，或者只是想说一句山水好看——发邮件最快。</p>
+          <p>
+            如果你的团队每天在 Excel、邮件和聊天记录之间来回倒腾采购、订单和供应商信息，我可以帮你把这条流程理清、搭起来、跑稳。
+          </p>
+          <ol className="offer-steps">
+            {offerSteps.map((step) => (
+              <li key={step.no}>
+                <span>{step.no}</span>
+                <h3>{step.title}</h3>
+                <p>{step.body}</p>
+              </li>
+            ))}
+          </ol>
+          <p className="offer-fit">适合：中资海外项目、外贸和采购团队——流程里有大量邮件、表格和供应商往来的。想先聊聊，发邮件最快。</p>
           <div className="contact-links">
             {links.map((link) => (
               <a key={link.href} href={link.href}>
