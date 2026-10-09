@@ -1,0 +1,987 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IWS 供应商图谱 | 张旭</title>
+<meta name="description" content="IWS 在日常采购里沉淀的供应商画像，脱敏后连成一张可交互的网：供应商、品类、服务区域。">
+<link rel="icon" href="/images/logo.png">
+<style>
+  :root {
+    --paper: #f4efe6;
+    --card: rgba(255, 252, 246, 0.66);
+    --surface: #fbf8f2;
+    --ink: #17130f;
+    --muted: rgba(23, 19, 15, 0.66);
+    --faint: rgba(23, 19, 15, 0.46);
+    --line: rgba(23, 19, 15, 0.16);
+    --line-strong: rgba(23, 19, 15, 0.3);
+    --grid: rgba(23, 19, 15, 0.05);
+    --accent: #b9543a;
+    --accent-soft: rgba(185, 84, 58, 0.12);
+    /* 图谱配色：两种节点色已过色盲校验（dataviz validate_palette），供应商用中性灰 */
+    --cat: #eb6834;
+    --reg: #2a78d6;
+    --sup: #8a857c;
+    --edge: rgba(23, 19, 15, 0.16);
+    --serif: Georgia, "Times New Roman", "Songti SC", "STSong", serif;
+    --mono: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    --sans: "Inter", "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #11100e;
+      --card: rgba(244, 239, 230, 0.045);
+      --surface: #1c1a17;
+      --ink: #f4efe6;
+      --muted: rgba(244, 239, 230, 0.68);
+      --faint: rgba(244, 239, 230, 0.46);
+      --line: rgba(244, 239, 230, 0.14);
+      --line-strong: rgba(244, 239, 230, 0.3);
+      --grid: rgba(244, 239, 230, 0.04);
+      --accent: #d36a4e;
+      --accent-soft: rgba(211, 106, 78, 0.16);
+      --cat: #d95926;
+      --reg: #3987e5;
+      --sup: #8f8a80;
+      --edge: rgba(244, 239, 230, 0.16);
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    background:
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+      linear-gradient(0deg, var(--grid) 1px, transparent 1px),
+      radial-gradient(circle at 82% 10%, var(--accent-soft), transparent 26%),
+      var(--paper);
+    background-size: 88px 88px, 88px 88px, auto, auto;
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; }
+
+  .page {
+    width: min(1180px, 100% - 32px);
+    margin: 0 auto;
+    padding: 20px 0 64px;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 6px 0 22px;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--faint);
+  }
+
+  .topbar a {
+    text-decoration: none;
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .topbar a:hover { color: var(--accent); }
+
+  .panel {
+    position: relative;
+    margin-top: 16px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--card);
+    padding: 56px;
+  }
+
+  .kicker {
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+  }
+
+  h1, h2 {
+    font-family: var(--serif);
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  h1 {
+    margin-top: 14px;
+    font-size: clamp(2.3rem, 6vw, 4.2rem);
+    line-height: 1.05;
+  }
+
+  h2 {
+    font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+    line-height: 1.15;
+  }
+
+  .lead {
+    margin-top: 22px;
+    max-width: 46rem;
+    color: var(--muted);
+    font-size: 1.05rem;
+    line-height: 2;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-top: 36px;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .stats div { padding: 20px 20px 4px 0; }
+  .stats div + div { padding-left: 20px; border-left: 1px solid var(--line); }
+
+  .stats strong {
+    display: block;
+    font-size: 2.6rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .stats span {
+    display: block;
+    margin-top: 8px;
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    color: var(--faint);
+  }
+
+  /* ---------- 图谱 ---------- */
+  .viz-panel { padding: 40px; }
+
+  .viz-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px 24px;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 18px;
+    margin-top: 22px;
+  }
+
+  .seg {
+    display: inline-flex;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    padding: 3px;
+  }
+
+  .seg button {
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    padding: 7px 14px;
+    font: inherit;
+    font-size: 0.86rem;
+    cursor: pointer;
+  }
+
+  .seg button[aria-pressed="true"] {
+    background: var(--ink);
+    color: var(--paper);
+    font-weight: 700;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    font-size: 0.84rem;
+    color: var(--muted);
+    list-style: none;
+  }
+
+  .legend li { display: inline-flex; align-items: center; gap: 7px; }
+  .legend svg { overflow: visible; }
+
+  .viz {
+    position: relative;
+    margin-top: 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    overflow: hidden;
+  }
+
+  .viz svg {
+    display: block;
+    width: 100%;
+    height: clamp(420px, 62vh, 620px);
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .viz-status {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--faint);
+    font-size: 0.9rem;
+    pointer-events: none;
+  }
+
+  .viz-hint {
+    position: absolute;
+    left: 14px;
+    bottom: 12px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--faint);
+    pointer-events: none;
+  }
+
+  .edge { stroke: var(--edge); stroke-width: 1; transition: stroke-opacity 0.2s, opacity 0.2s; }
+  .edge.cat { stroke: var(--cat); stroke-opacity: 0.28; }
+  .edge.reg { stroke: var(--reg); stroke-opacity: 0.28; }
+
+  .node { cursor: grab; transition: opacity 0.2s; }
+  .node:active { cursor: grabbing; }
+  .node:focus { outline: none; }
+  .node .hit { fill: transparent; }
+  .node.supplier .mark { fill: var(--sup); stroke: var(--surface); stroke-width: 2; }
+  .node.category .mark { fill: var(--cat); stroke: var(--surface); stroke-width: 2; }
+  .node.region .mark { fill: var(--surface); stroke: var(--reg); stroke-width: 3.5; }
+  .node:focus-visible .mark,
+  .node.is-focus .mark { stroke: var(--ink); stroke-width: 2.5; }
+  .node.region:focus-visible .mark,
+  .node.region.is-focus .mark { stroke: var(--reg); stroke-width: 5; }
+
+  .node text {
+    fill: var(--ink);
+    font-size: 12.5px;
+    font-weight: 700;
+    paint-order: stroke;
+    stroke: var(--surface);
+    stroke-width: 4px;
+    stroke-linejoin: round;
+    pointer-events: none;
+  }
+
+  .node .count { fill: var(--muted); font-weight: 400; font-size: 11px; }
+  svg.is-narrow .node text { font-size: 17px; }
+  svg.is-narrow .node .count { font-size: 15px; }
+
+  .is-hidden { display: none; }
+
+  svg.has-focus .node:not(.is-near) { opacity: 0.16; }
+  svg.has-focus .edge:not(.is-near) { opacity: 0.08; }
+  svg.has-focus .edge.is-near { stroke-opacity: 0.85; stroke-width: 1.6; }
+
+  .tip {
+    position: absolute;
+    z-index: 2;
+    min-width: 168px;
+    max-width: 260px;
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    background: var(--surface);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
+    padding: 10px 12px;
+    font-size: 0.84rem;
+    line-height: 1.6;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.12s, transform 0.12s;
+  }
+
+  .tip.is-on { opacity: 1; transform: none; }
+  .tip strong { display: block; font-size: 1rem; }
+  .tip .tip-name { color: var(--muted); }
+  .tip .tip-line { margin-top: 6px; color: var(--muted); }
+  .tip .key {
+    display: inline-block;
+    width: 12px;
+    height: 2px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  .insights {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+    list-style: none;
+  }
+
+  .insights li {
+    border-left: 2px solid var(--accent);
+    padding: 4px 0 4px 12px;
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.7;
+  }
+
+  .insights b { color: var(--ink); }
+
+  /* ---------- 表格视图 ---------- */
+  .tables {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    align-items: start;
+    gap: 28px;
+    margin-top: 28px;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+
+  caption {
+    padding-bottom: 10px;
+    text-align: left;
+    font-weight: 800;
+  }
+
+  th, td {
+    padding: 9px 8px 9px 0;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: var(--faint);
+  }
+
+  td:first-child { white-space: nowrap; }
+  td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.mix, .mix-inline { color: var(--muted); font-size: 0.84rem; }
+  .mix-inline { display: none; margin-top: 3px; white-space: normal; font-size: 0.78rem; }
+
+  .bar {
+    display: inline-block;
+    height: 6px;
+    margin-left: 8px;
+    border-radius: 0 4px 4px 0;
+    vertical-align: middle;
+  }
+
+  .note {
+    margin-top: 22px;
+    color: var(--faint);
+    font-size: 0.84rem;
+    line-height: 1.8;
+  }
+
+  .next {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .next p { max-width: 40rem; color: var(--muted); line-height: 1.9; }
+
+  .button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 13px 18px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  @media (max-width: 900px) {
+    .panel { padding: 36px 28px; }
+    .viz-panel { padding: 28px 20px; }
+    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .stats div:nth-child(3) { padding-left: 0; border-left: 0; }
+    .stats div:nth-child(n + 3) { border-top: 1px solid var(--line); }
+    .insights, .tables { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 560px) {
+    .panel { padding: 28px 18px; border-radius: 12px; }
+    .viz-panel { padding: 22px 12px; }
+    .stats strong { font-size: 2.1rem; }
+    .viz svg { height: 560px; }
+    th:nth-child(3), td.mix { display: none; }
+    .mix-inline { display: block; }
+    .viz-hint { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .edge, .node, .tip { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <nav class="topbar">
+      <a href="/">← 张旭的主页</a>
+      <span>WORKS / 作品 · IWS</span>
+    </nav>
+
+    <header class="panel">
+      <p class="kicker">IWS · SUPPLIER GRAPH / 供应商图谱</p>
+      <h1 id="title">供应商，一张网</h1>
+      <p class="lead">
+        IWS 在日常采购里，把每家供应商能供什么品类、服务哪些区域，都沉淀成了画像。把画像连起来就是这张网：橙色方块是品类，蓝色圆环是服务区域，灰点是供应商。拖一拖、点一点，看谁连着谁。
+      </p>
+      <div class="stats">
+        <div><strong id="stat-sup">–</strong><span>家供应商</span></div>
+        <div><strong id="stat-cat">–</strong><span>个品类</span></div>
+        <div><strong id="stat-reg">–</strong><span>个服务区域</span></div>
+        <div><strong id="stat-link">–</strong><span>条供应关系</span></div>
+      </div>
+    </header>
+
+    <section class="panel viz-panel" aria-labelledby="viz-title">
+      <div class="viz-head">
+        <h2 id="viz-title">谁连着谁</h2>
+      </div>
+      <div class="controls">
+        <div class="seg" role="group" aria-label="切换视图">
+          <button type="button" data-view="all" aria-pressed="true">全部关系</button>
+          <button type="button" data-view="cat" aria-pressed="false">只看品类</button>
+          <button type="button" data-view="reg" aria-pressed="false">只看区域</button>
+        </div>
+        <ul class="legend" aria-label="图例">
+          <li><svg width="14" height="14" aria-hidden="true"><rect x="1" y="1" width="12" height="12" rx="2.5" fill="var(--cat)"/></svg>品类</li>
+          <li><svg width="14" height="14" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="var(--reg)" stroke-width="3"/></svg>服务区域</li>
+          <li><svg width="14" height="14" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="var(--sup)"/></svg>供应商</li>
+        </ul>
+      </div>
+
+      <div class="viz" id="viz">
+        <svg id="graph" role="img" aria-labelledby="viz-title viz-desc">
+          <desc id="viz-desc">供应商与品类、服务区域的关系网络图；同样的数据在下方表格中逐项列出。</desc>
+          <g id="edges"></g>
+          <g id="nodes"></g>
+        </svg>
+        <div class="viz-status" id="viz-status">正在加载图谱…</div>
+        <div class="viz-hint">悬停或点击节点看关系 · 可拖动</div>
+        <div class="tip" id="tip" role="status" aria-live="polite"></div>
+      </div>
+
+      <ul class="insights" id="insights"></ul>
+
+      <div class="tables" id="tables"></div>
+      <p class="note" id="note">
+        数据说明：节点来自我在 Obsidian 里由 IWS 沉淀的供应商画像，由本机脚本导出后脱敏：供应商只保留所在国家，品牌一律归到品类，不含供应商名称、联系人、城市和价格。
+      </p>
+    </section>
+
+    <section class="panel next">
+      <p>这张网不是手画的，是采购流程跑出来的副产品：采购批次在 IWS 里全流程留痕，供应商画像就跟着长。这正是我在做的事——把重复的流程交给系统，让数据自己沉淀下来。</p>
+      <a class="button" href="/#now">看我在做什么 →</a>
+    </section>
+  </div>
+
+  <script>
+  (function () {
+    var SVGNS = 'http://www.w3.org/2000/svg';
+    var svg = document.getElementById('graph');
+    var gEdges = document.getElementById('edges');
+    var gNodes = document.getElementById('nodes');
+    var tip = document.getElementById('tip');
+    var viz = document.getElementById('viz');
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var TYPE_NAME = { category: '品类', region: '服务区域', supplier: '供应商' };
+
+    function el(tag, attrs, parent) {
+      var e = document.createElementNS(SVGNS, tag);
+      for (var k in attrs) e.setAttribute(k, attrs[k]);
+      if (parent) parent.appendChild(e);
+      return e;
+    }
+
+    function html(tag, text, cls) {
+      var e = document.createElement(tag);
+      if (text != null) e.textContent = text;
+      if (cls) e.className = cls;
+      return e;
+    }
+
+    fetch('/supplier-graph.json', { cache: 'no-cache' })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(init)
+      .catch(function () {
+        document.getElementById('viz-status').textContent = '图谱数据暂时加载不了，稍后再试。';
+      });
+
+    function init(data) {
+      // ---------- 整理数据 ----------
+      var byId = {};
+      var nodes = data.nodes.map(function (n) {
+        var o = { id: n.id, type: n.type, label: n.label, cats: [], regs: [], sups: [], x: 0, y: 0, vx: 0, vy: 0 };
+        byId[n.id] = o;
+        return o;
+      });
+      var links = [];
+      data.links.forEach(function (l) {
+        var s = byId[l.source], t = byId[l.target];
+        if (!s || !t) return;
+        if (t.type === 'supplier') { var tmp = s; s = t; t = tmp; }
+        if (s.type !== 'supplier' || (t.type !== 'category' && t.type !== 'region')) return;
+        var kind = t.type === 'category' ? 'cat' : 'reg';
+        links.push({ s: s, t: t, kind: kind });
+        (kind === 'cat' ? s.cats : s.regs).push(t);
+        t.sups.push(s);
+      });
+
+      var suppliers = nodes.filter(function (n) { return n.type === 'supplier'; });
+      var cats = nodes.filter(function (n) { return n.type === 'category'; });
+      var regs = nodes.filter(function (n) { return n.type === 'region'; });
+      suppliers.forEach(function (n) { n.country = n.label.split('·')[1] || '其他'; });
+      var drawn = nodes.filter(function (n) { return n.type !== 'supplier' || n.cats.length + n.regs.length > 0; });
+      var isolated = suppliers.length - drawn.filter(function (n) { return n.type === 'supplier'; }).length;
+
+      document.getElementById('title').textContent = suppliers.length + ' 家供应商，一张网';
+      document.getElementById('stat-sup').textContent = suppliers.length;
+      document.getElementById('stat-cat').textContent = cats.length;
+      document.getElementById('stat-reg').textContent = regs.length;
+      document.getElementById('stat-link').textContent = links.length;
+
+      function countryMix(list) {
+        var c = {};
+        list.forEach(function (s) { c[s.country] = (c[s.country] || 0) + 1; });
+        return Object.keys(c).sort(function (a, b) { return c[b] - c[a]; }).map(function (k) { return [k, c[k]]; });
+      }
+      function bySize(a, b) { return b.sups.length - a.sups.length; }
+
+      // ---------- 读图要点（按数据实时计算） ----------
+      var topCat = cats.slice().sort(bySize)[0];
+      var topReg = regs.slice().sort(bySize)[0];
+      var mix = countryMix(suppliers);
+      var multi = suppliers.filter(function (s) { return s.cats.length >= 2; }).length;
+      var ins = document.getElementById('insights');
+      function insight(parts) {
+        var li = document.createElement('li');
+        parts.forEach(function (p, i) { li.appendChild(i % 2 ? html('b', p) : document.createTextNode(p)); });
+        ins.appendChild(li);
+      }
+      if (topCat) insight(['供应商最多的品类是', topCat.label, '，有 ', topCat.sups.length + ' 家', ' 能供。']);
+      if (mix.length) insight(['', Math.round(mix[0][1] / suppliers.length * 100) + '%', ' 的供应商在' + mix[0][0] + '（' + mix[0][1] + '/' + suppliers.length + ' 家）；服务区域覆盖最广的是', topReg ? topReg.label : '', '。']);
+      insight(['', multi + ' 家', '供应商能同时供 2 个以上品类。']);
+
+      // ---------- 布局：自写的力导向，三种视图各算一次 ----------
+      function visible(n, view) {
+        if (view === 'all') return true;
+        if (view === 'cat') return n.type === 'category' || (n.type === 'supplier' && n.cats.length > 0);
+        return n.type === 'region' || (n.type === 'supplier' && n.regs.length > 0);
+      }
+      function viewLinks(view) {
+        return links.filter(function (l) { return view === 'all' || l.kind === view; });
+      }
+      function radius(n) {
+        return n.type === 'supplier' ? 5 : 8 + Math.sqrt(n.sups.length) * 2.6;
+      }
+      drawn.forEach(function (n) { n.r = radius(n); });
+
+      function prepare(view) {
+        var ns = drawn.filter(function (n) { return visible(n, view); });
+        var ls = viewLinks(view);
+        var deg = {};
+        ls.forEach(function (l) { deg[l.s.id] = (deg[l.s.id] || 0) + 1; deg[l.t.id] = (deg[l.t.id] || 0) + 1; });
+        ls.forEach(function (l) {
+          var a = deg[l.s.id], b = deg[l.t.id];
+          l.bias = a / (a + b);
+          l.str = 1 / Math.min(a, b);
+        });
+        return { ns: ns, ls: ls, view: view };
+      }
+
+      // 宽屏横排（品类在左、区域在右），窄屏竖排（品类在上、区域在下）
+      var narrow = viz.clientWidth < 640;
+      function target(n, view) {
+        if (view !== 'all') return 0;
+        return n.type === 'category' ? -300 : n.type === 'region' ? 300 : 0;
+      }
+
+      function tick(sim, alpha) {
+        var ns = sim.ns, i, j, a, b, dx, dy, l2, w;
+        for (i = 0; i < ns.length; i++) {
+          a = ns[i];
+          for (j = i + 1; j < ns.length; j++) {
+            b = ns[j];
+            dx = b.x - a.x; dy = b.y - a.y; l2 = dx * dx + dy * dy;
+            if (l2 < 1) { dx = (i - j) * 0.01 + 0.5; dy = 0.5; l2 = 1; }
+            if (l2 > 250000) continue;
+            var qa = a.type === 'supplier' ? -45 : -280;
+            var qb = b.type === 'supplier' ? -45 : -280;
+            w = alpha / l2;
+            a.vx += dx * qb * w; a.vy += dy * qb * w;
+            b.vx -= dx * qa * w; b.vy -= dy * qa * w;
+          }
+        }
+        sim.ls.forEach(function (l) {
+          var s = l.s, t = l.t;
+          dx = t.x + t.vx - s.x - s.vx; dy = t.y + t.vy - s.y - s.vy;
+          var d = Math.sqrt(dx * dx + dy * dy) || 1e-6;
+          var k = (d - (sim.view === 'all' ? 78 : 64)) / d * alpha * l.str;
+          dx *= k; dy *= k;
+          t.vx -= dx * l.bias; t.vy -= dy * l.bias;
+          s.vx += dx * (1 - l.bias); s.vy += dy * (1 - l.bias);
+        });
+        // 主轴放宽、副轴收紧，让图铺满容器
+        ns.forEach(function (n) {
+          var main = sim.view === 'all' ? (n.type === 'supplier' ? 0.012 : 0.12) : 0.025;
+          if (narrow) {
+            n.vy += (target(n, sim.view) - n.y) * main * alpha;
+            n.vx += -n.x * (n.type === 'supplier' ? 0.09 : 0.05) * alpha;
+          } else {
+            n.vx += (target(n, sim.view) - n.x) * main * alpha;
+            n.vy += -n.y * 0.09 * alpha;
+          }
+        });
+        for (i = 0; i < ns.length; i++) {
+          a = ns[i];
+          for (j = i + 1; j < ns.length; j++) {
+            b = ns[j];
+            var hubs = (a.type === 'supplier' ? 0 : 1) + (b.type === 'supplier' ? 0 : 1);
+            var pad = hubs === 2 ? (narrow ? 64 : 46) : hubs * 14;
+            var rr = a.r + b.r + 3 + pad;
+            dx = b.x + b.vx - a.x - a.vx; dy = b.y + b.vy - a.y - a.vy; l2 = dx * dx + dy * dy;
+            if (l2 < rr * rr) {
+              var l = Math.sqrt(l2) || 1e-6;
+              var m = (rr - l) / l * 0.5;
+              a.vx -= dx * m * 0.5; a.vy -= dy * m * 0.5;
+              b.vx += dx * m * 0.5; b.vy += dy * m * 0.5;
+            }
+          }
+        }
+        ns.forEach(function (n) {
+          if (n.fx != null) { n.x = n.fx; n.y = n.fy; n.vx = 0; n.vy = 0; return; }
+          n.vx *= 0.6; n.vy *= 0.6;
+          n.x += n.vx; n.y += n.vy;
+        });
+      }
+
+      var DECAY = 1 - Math.pow(0.001, 1 / 300);
+      function settle(view) {
+        var sim = prepare(view);
+        sim.ns.forEach(function (n, i) {
+          var r = 10 * Math.sqrt(0.5 + i), ang = i * Math.PI * (3 - Math.sqrt(5));
+          n.x = r * Math.cos(ang); n.y = r * Math.sin(ang); n.vx = 0; n.vy = 0;
+          if (narrow) n.y += target(n, view) * 0.5; else n.x += target(n, view) * 0.5;
+        });
+        var alpha = 1;
+        for (var t = 0; t < 320; t++) { alpha += -alpha * DECAY; tick(sim, alpha); }
+        var pos = {};
+        sim.ns.forEach(function (n) { pos[n.id] = { x: n.x, y: n.y }; });
+        return pos;
+      }
+
+      var layouts;
+      function computeLayouts() {
+      layouts = { all: settle('all'), cat: settle('cat'), reg: settle('reg') };
+      svg.classList.toggle('is-narrow', narrow);
+
+      // 三种视图共用一个视窗，切换时不跳
+      var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      Object.keys(layouts).forEach(function (v) {
+        Object.keys(layouts[v]).forEach(function (id) {
+          var p = layouts[v][id], r = byId[id].r + (byId[id].type === 'supplier' ? 4 : 28);
+          minX = Math.min(minX, p.x - r - (byId[id].type === 'supplier' ? 0 : 30));
+          maxX = Math.max(maxX, p.x + r + (byId[id].type === 'supplier' ? 0 : 30));
+          minY = Math.min(minY, p.y - r); maxY = Math.max(maxY, p.y + r);
+        });
+      });
+      var pad = 16;
+      svg.setAttribute('viewBox', [minX - pad, minY - pad, maxX - minX + pad * 2, maxY - minY + pad * 2].join(' '));
+      svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+      // 窄屏按图的比例定高度，免得上下大片留白
+      var vbW = maxX - minX + pad * 2, vbH = maxY - minY + pad * 2;
+      svg.style.height = narrow ? Math.round(Math.min(720, Math.max(380, vbH * viz.clientWidth / vbW))) + 'px' : '';
+      }
+      computeLayouts();
+
+      // ---------- 画 ----------
+      links.forEach(function (l) {
+        l.el = el('line', { class: 'edge ' + l.kind }, gEdges);
+      });
+      drawn.forEach(function (n) {
+        var g = el('g', { class: 'node ' + n.type }, gNodes);
+        n.el = g;
+        el('circle', { class: 'hit', r: Math.max(n.r + 6, 12) }, g);
+        if (n.type === 'category') {
+          el('rect', { class: 'mark', x: -n.r, y: -n.r, width: n.r * 2, height: n.r * 2, rx: 3 }, g);
+        } else {
+          el('circle', { class: 'mark', r: n.r }, g);
+        }
+        if (n.type !== 'supplier') {
+          g.setAttribute('tabindex', '0');
+          g.setAttribute('role', 'button');
+          g.setAttribute('aria-label', n.label + '，' + TYPE_NAME[n.type] + '，' + n.sups.length + ' 家供应商');
+          var tx = el('text', { y: n.r + 15, 'text-anchor': 'middle' }, g);
+          tx.textContent = n.label;
+          var c = el('tspan', { class: 'count', dx: 4 }, tx);
+          c.textContent = n.sups.length;
+        }
+        bindNode(n);
+      });
+      document.getElementById('viz-status').remove();
+
+      var current = 'all';
+      var live = prepare('all');
+      function placeAt(view) {
+        Object.keys(layouts[view]).forEach(function (id) { byId[id].x = layouts[view][id].x; byId[id].y = layouts[view][id].y; });
+      }
+      placeAt('all');
+      applyVisibility('all');
+      render();
+
+      var resizeTimer = null;
+      window.addEventListener('resize', function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () {
+          var nowNarrow = viz.clientWidth < 640;
+          if (nowNarrow === narrow) return;
+          narrow = nowNarrow;
+          computeLayouts();
+          live = prepare(current);
+          placeAt(current);
+          render();
+        }, 200);
+      });
+
+      function render() {
+        links.forEach(function (l) {
+          l.el.setAttribute('x1', l.s.x); l.el.setAttribute('y1', l.s.y);
+          l.el.setAttribute('x2', l.t.x); l.el.setAttribute('y2', l.t.y);
+        });
+        drawn.forEach(function (n) {
+          n.el.setAttribute('transform', 'translate(' + n.x.toFixed(1) + ',' + n.y.toFixed(1) + ')');
+        });
+      }
+
+      function applyVisibility(view) {
+        drawn.forEach(function (n) { n.el.classList.toggle('is-hidden', !visible(n, view)); });
+        links.forEach(function (l) { l.el.classList.toggle('is-hidden', !(view === 'all' || l.kind === view)); });
+      }
+
+      // ---------- 切换视图：在两套算好的位置之间补间 ----------
+      var anim = null;
+      function switchView(view) {
+        if (view === current) return;
+        current = view;
+        clearFocus(true);
+        document.querySelectorAll('.seg button').forEach(function (b) {
+          b.setAttribute('aria-pressed', String(b.dataset.view === view));
+        });
+        live = prepare(view);
+        var target = layouts[view];
+        var from = {};
+        drawn.forEach(function (n) { from[n.id] = { x: n.x, y: n.y }; });
+        applyVisibility(view);
+        if (anim) cancelAnimationFrame(anim);
+        if (reduceMotion) {
+          Object.keys(target).forEach(function (id) { byId[id].x = target[id].x; byId[id].y = target[id].y; });
+          render();
+          return;
+        }
+        var t0 = performance.now();
+        (function step(now) {
+          var k = Math.min(1, (now - t0) / 650);
+          var e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+          Object.keys(target).forEach(function (id) {
+            var n = byId[id];
+            n.x = from[id].x + (target[id].x - from[id].x) * e;
+            n.y = from[id].y + (target[id].y - from[id].y) * e;
+          });
+          render();
+          if (k < 1) anim = requestAnimationFrame(step);
+        })(t0);
+      }
+      document.querySelectorAll('.seg button').forEach(function (b) {
+        b.addEventListener('click', function () { switchView(b.dataset.view); });
+      });
+
+      // ---------- 悬停 / 点击 / 键盘：高亮邻居 + 提示 ----------
+      var pinned = null;
+      function neighbors(n) {
+        var set = {}; set[n.id] = true;
+        links.forEach(function (l) {
+          if (!(current === 'all' || l.kind === current)) return;
+          if (l.s === n) set[l.t.id] = true;
+          if (l.t === n) set[l.s.id] = true;
+        });
+        return set;
+      }
+
+      function focusNode(n, anchor) {
+        var near = neighbors(n);
+        svg.classList.add('has-focus');
+        drawn.forEach(function (m) {
+          m.el.classList.toggle('is-near', !!near[m.id]);
+          m.el.classList.toggle('is-focus', m === n);
+        });
+        links.forEach(function (l) { l.el.classList.toggle('is-near', l.s === n || l.t === n); });
+        showTip(n, anchor);
+      }
+
+      function clearFocus(force) {
+        if (pinned && !force) { focusNode(pinned); return; }
+        pinned = null;
+        svg.classList.remove('has-focus');
+        drawn.forEach(function (m) { m.el.classList.remove('is-near', 'is-focus'); });
+        links.forEach(function (l) { l.el.classList.remove('is-near'); });
+        tip.classList.remove('is-on');
+      }
+
+      function tipLine(color, text) {
+        var p = html('div', null, 'tip-line');
+        if (color) { var k = html('span', null, 'key'); k.style.background = color; p.appendChild(k); }
+        p.appendChild(document.createTextNode(text));
+        return p;
+      }
+
+      function showTip(n, anchor) {
+        tip.textContent = '';
+        if (n.type === 'supplier') {
+          var cs = current === 'reg' ? [] : n.cats, rs = current === 'cat' ? [] : n.regs;
+          tip.appendChild(html('strong', n.label));
+          if (cs.length) tip.appendChild(tipLine('var(--cat)', '品类：' + cs.map(function (c) { return c.label; }).join('、')));
+          if (rs.length) tip.appendChild(tipLine('var(--reg)', '服务区域：' + rs.map(function (r) { return r.label; }).join('、')));
+        } else {
+          tip.appendChild(html('strong', n.sups.length + ' 家供应商'));
+          tip.appendChild(html('div', n.label + ' · ' + TYPE_NAME[n.type], 'tip-name'));
+          tip.appendChild(tipLine(null, countryMix(n.sups).map(function (c) { return c[0] + ' ' + c[1]; }).join(' · ')));
+        }
+        var box = viz.getBoundingClientRect();
+        var ax, ay;
+        if (anchor) { ax = anchor.clientX - box.left; ay = anchor.clientY - box.top; }
+        else { var r = n.el.getBoundingClientRect(); ax = r.left + r.width / 2 - box.left; ay = r.top - box.top; }
+        tip.classList.add('is-on');
+        var tw = tip.offsetWidth, th = tip.offsetHeight;
+        var left = Math.min(Math.max(8, ax + 14), box.width - tw - 8);
+        var top = ay - th - 14 < 8 ? ay + 18 : ay - th - 14;
+        tip.style.left = left + 'px';
+        tip.style.top = Math.min(top, box.height - th - 8) + 'px';
+      }
+
+      // 拖动时只跑当前视图的模拟
+      var loop = null, alpha = 0, alphaTarget = 0;
+      function runLoop() {
+        if (loop) return;
+        (function step() {
+          alpha += (alphaTarget - alpha) * DECAY * 3;
+          tick(live, alpha);
+          render();
+          if (alpha > 0.005 || alphaTarget > 0) loop = requestAnimationFrame(step);
+          else loop = null;
+        })();
+      }
+
+      function svgPoint(evt) {
+        var pt = svg.createSVGPoint();
+        pt.x = evt.clientX; pt.y = evt.clientY;
+        return pt.matrixTransform(svg.getScreenCTM().inverse());
+      }
+
+      function bindNode(n) {
+        var g = n.el, start = null, moved = false;
+        g.addEventListener('pointerenter', function (e) { if (!pinned && e.pointerType === 'mouse') focusNode(n, e); });
+        g.addEventListener('pointermove', function (e) { if (!pinned && !start && e.pointerType === 'mouse') showTip(n, e); });
+        g.addEventListener('pointerleave', function (e) { if (!start && e.pointerType === 'mouse') clearFocus(); });
+        g.addEventListener('focus', function () { if (!pinned) focusNode(n); });
+        g.addEventListener('blur', function () { if (!pinned) clearFocus(); });
+        g.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pinned = pinned === n ? null : n; pinned ? focusNode(n) : clearFocus(true); }
+          if (e.key === 'Escape') clearFocus(true);
+        });
+        g.addEventListener('pointerdown', function (e) {
+          e.preventDefault();
+          g.setPointerCapture(e.pointerId);
+          start = { x: e.clientX, y: e.clientY };
+          moved = false;
+        });
+        g.addEventListener('pointermove', function (e) {
+          if (!start) return;
+          if (!moved && Math.hypot(e.clientX - start.x, e.clientY - start.y) < 4) return;
+          if (!moved) {
+            moved = true;
+            if (anim) cancelAnimationFrame(anim);
+            alpha = Math.max(alpha, 0.3); alphaTarget = 0.3;
+            runLoop();
+          }
+          var p = svgPoint(e);
+          n.fx = p.x; n.fy = p.y;
+          showTip(n, e);
+        });
+        function end(e) {
+          if (!start) return;
+          start = null;
+          if (moved) {
+            n.fx = null; n.fy = null; alphaTarget = 0;
+          } else {
+            pinned = pinned === n ? null : n;
+            pinned ? focusNode(n, e) : clearFocus(true);
+          }
+        }
+        g.addEventListener('pointerup', end);
+        g.addEventListener('pointercancel', end);
+      }
+
+      svg.addEventListener('click', function (e) {
+        if (e.target === svg && pinned) clearFocus(true);
+      });
+
+      // ---------- 表格视图：同一份数据，逐项列出 ----------
+      var tables = document.getElementById('tables');
+      function makeTable(caption, rows, color, withMix) {
+        var t = document.createElement('table');
+        t.appendChild(html('caption', caption));
+        var head = document.createElement('tr');
+        head.appendChild(html('th', caption.indexOf('品类') > -1 ? '品类' : '服务区域'));
+        head.appendChild(html('th', '供应商'));
+        if (withMix) head.appendChild(html('th', '按所在国家'));
+        var thead = document.createElement('thead'); thead.appendChild(head); t.appendChild(thead);
+        var tb = document.createElement('tbody');
+        var max = rows.length ? rows[0].sups.length : 1;
+        rows.forEach(function (r) {
+          var tr = document.createElement('tr');
+          var name = html('td', r.label);
+          var mixText = countryMix(r.sups).map(function (c) { return c[0] + ' ' + c[1]; }).join(' · ');
+          if (withMix) name.appendChild(html('small', mixText, 'mix-inline'));
+          tr.appendChild(name);
+          var td = html('td', r.sups.length + ' 家', 'num');
+          var bar = html('span', null, 'bar');
+          bar.style.width = Math.max(4, r.sups.length / max * 90) + 'px';
+          bar.style.background = color;
+          td.appendChild(bar);
+          tr.appendChild(td);
+          if (withMix) tr.appendChild(html('td', mixText, 'mix'));
+          tb.appendChild(tr);
+        });
+        t.appendChild(tb);
+        return t;
+      }
+      tables.appendChild(makeTable('按品类', cats.slice().sort(bySize), 'var(--cat)', true));
+      tables.appendChild(makeTable('按服务区域', regs.slice().sort(bySize), 'var(--reg)', false));
+      if (isolated > 0) {
+        document.getElementById('note').appendChild(document.createTextNode('另有 ' + isolated + ' 家供应商暂无品类和区域记录，没有画进图里。'));
+      }
+    }
+  })();
+  </script>
+</body>
+</html>

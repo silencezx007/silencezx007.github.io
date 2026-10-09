@@ -41,6 +41,7 @@ const nowItems = [
     status: '每天在跑',
     state: 'live',
     showStats: true,
+    link: { href: '/iws-graph/', label: '看供应商图谱' },
     body: '把自己的采购工作搬进一套系统：采购批次、供应商、邮件、线上订单对账都在里面跑。SQLite + FastAPI + HTMX，和 AI 一起写的。',
   },
   {
@@ -326,6 +327,12 @@ export default function Home() {
                   </span>
                   <h3>{item.title}</h3>
                   <p>{item.body}</p>
+                  {item.link && (
+                    <a href={item.link.href} className="now-link">
+                      {item.link.label}
+                      <ArrowUpRight className="h-4 w-4" />
+                    </a>
+                  )}
                 </div>
                 {item.showStats && heartbeat && (
                   <div className="now-stats">

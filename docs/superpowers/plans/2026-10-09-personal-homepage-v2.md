@@ -89,7 +89,7 @@
 | 4 | 二级页 `/airport/` + 架构图数据（已完成） | 云上 | 1 |
 | 5 | 供应商图谱截图（快档） | 本地 Mac | — |
 | 6 | `supplier_graph_export.py` 脱敏导出（好档，已推 `supplier-graph.json`） | 本地 Mac | — |
-| 7 | `/iws-graph/` 渲染页 | 云上 | 6 |
+| 7 | `/iws-graph/` 渲染页（已完成） | 云上 | 6 |
 | 8 | 修复 heartbeat 导出（7 月 9 日后停了） | 本地 Mac | — |
 
 本地任务的产物（截图、JSON）提交到同一分支，或者直接发到对话里。

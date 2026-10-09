@@ -972,6 +972,17 @@
     max-width: 36rem;
   }
 
+  .now-link {
+    margin-top: 1.4rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-bottom: 1px solid currentColor;
+    color: #b9543a;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
   .work-open {
     margin-top: auto;
     display: inline-flex;
