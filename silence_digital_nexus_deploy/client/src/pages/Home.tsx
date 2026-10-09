@@ -40,20 +40,20 @@ const nowLines = [
     no: '01',
     title: '工作流自动化',
     lead: '把重复的流程交给系统，人只守最后一道关。',
-    body: '采购批次、供应商、邮件、线上订单对账，这些每天重复的活已经装进 IWS 跑起来；下一步让 Agent 把询价邮件直接拟进草稿箱。',
+    body: '采购批次、供应商、邮件、线上订单对账，这些每天重复的活已经装进 IWS 跑起来；询价和回信由 Agent 拟进企业邮箱草稿箱，我审完再发。',
     items: [
       { name: 'IWS 智慧工作系统', note: '采购全流程在里面跑，数字见下方作品', status: '每天在跑', state: 'live' },
-      { name: '采购邮件 Agent', note: '读审批回复、拟询价邮件，发不发我说了算', status: '在建', state: 'wip' },
+      { name: '采购邮件 Agent', note: '读审批回复、拟询价邮件，发不发我说了算', status: '每天在用', state: 'live' },
     ],
   },
   {
     no: '02',
     title: 'AI 应用场景落地',
     lead: '从真实业务里找 AI 能接手的环节，做到每天在用。',
-    body: '先让 AI 在我自己的工作里跑通：给它长期记忆，给它分工和边界，在真实任务里验证过，再往外推。',
+    body: '先让 AI 在我自己的工作里跑通：给它长期记忆，把它当生产工具，在真实任务里验证过，再往外推。',
     items: [
       { name: 'Obsidian 三库', note: '网页、对话、工作判断沉淀成 AI 的长期记忆', status: '每天在用', state: 'live' },
-      { name: 'Agent 分工', note: 'Codex、Hermes、OpenClaw 各管一摊，先验证再放权', status: '实验中', state: 'wip' },
+      { name: 'Claude Code + Codex', note: '不当搜索框用：写系统、拟邮件、做比价分析，都交给它们干', status: '每天在用', state: 'live' },
     ],
   },
 ];
