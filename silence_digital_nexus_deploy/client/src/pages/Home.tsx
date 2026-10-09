@@ -182,8 +182,8 @@ export default function Home() {
       <div id="top" className="archive-page mx-auto flex w-full max-w-[1520px] flex-col">
         <section className="archive-hero">
           <div className="hero-copy">
-            <p className="archive-kicker">HELLO · ZHANG XU</p>
-            <h1 className="display-title">我是张旭。</h1>
+            <p className="archive-kicker">采购 · 运维 · AI 落地</p>
+            <h1 className="display-title">我是张旭</h1>
             <p className="hero-subtitle">
               13+年国际采购管理，中国央企对外首个大型机场运维管理（AIAAN），从0到1建立500+团队，现在把带队伍的办法用到 AI 上，让业务流程自己跑起来。
             </p>
