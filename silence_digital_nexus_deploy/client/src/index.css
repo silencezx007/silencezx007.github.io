@@ -593,6 +593,185 @@
     color: rgba(244, 239, 230, 0.46);
   }
 
+  .career-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: 3rem;
+    align-items: start;
+  }
+
+  .career-lead {
+    max-width: 40rem;
+    color: rgba(23, 19, 15, 0.72);
+    font-size: 1.08rem;
+    line-height: 2;
+  }
+
+  .career-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 2rem;
+    margin: 2rem 0 2.2rem;
+    border-top: 1px solid rgba(23, 19, 15, 0.22);
+  }
+
+  .career-stats div {
+    display: flex;
+    flex-direction: column;
+    padding: 1.2rem 0;
+    border-bottom: 1px solid rgba(23, 19, 15, 0.12);
+  }
+
+  .career-stats dd {
+    order: -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.4rem;
+  }
+
+  .career-stats strong {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 3.4rem;
+    line-height: 1;
+  }
+
+  .career-stats dd span {
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .career-stats dt,
+  .career-path-note,
+  .career-when {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+  }
+
+  .career-stats dt,
+  .career-path-note {
+    margin-top: 0.5rem;
+    color: rgba(23, 19, 15, 0.48);
+  }
+
+  .career-path {
+    border: 1px solid rgba(23, 19, 15, 0.14);
+    background: rgba(255, 252, 246, 0.58);
+    padding: 2rem;
+  }
+
+  .career-path .belief-heading {
+    margin-bottom: 0;
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .career-path-note {
+    margin: 0.4rem 0 1.8rem;
+  }
+
+  .career-path ol {
+    display: grid;
+    gap: 1.6rem;
+    margin-left: 0.35rem;
+    padding-left: 1.6rem;
+    border-left: 1px solid rgba(23, 19, 15, 0.18);
+  }
+
+  .career-path li {
+    position: relative;
+  }
+
+  .career-path li::before {
+    content: "";
+    position: absolute;
+    top: 0.2rem;
+    left: calc(-1.6rem - 0.36rem);
+    width: 0.7rem;
+    height: 0.7rem;
+    border: 1px solid rgba(23, 19, 15, 0.4);
+    border-radius: 999px;
+    background: #f4efe6;
+  }
+
+  .career-path li.is-current::before {
+    border-color: #b9543a;
+    background: #b9543a;
+    box-shadow: 0 0 0 4px rgba(185, 84, 58, 0.18);
+  }
+
+  .career-when {
+    font-weight: 800;
+    color: #b9543a;
+  }
+
+  .career-path h3 {
+    margin-top: 0.35rem;
+    font-size: 1.15rem;
+    line-height: 1.4;
+    font-weight: 800;
+  }
+
+  .career-path li p {
+    margin-top: 0.35rem;
+    color: rgba(23, 19, 15, 0.64);
+    line-height: 1.8;
+  }
+
+  .career-awards {
+    margin-top: 1.8rem;
+    border-top: 1px dashed rgba(23, 19, 15, 0.22);
+    padding-top: 1rem;
+    color: rgba(23, 19, 15, 0.6);
+    font-size: 0.86rem;
+    line-height: 1.8;
+  }
+
+  .dark .career-lead {
+    color: rgba(244, 239, 230, 0.72);
+  }
+
+  .dark .career-stats {
+    border-top-color: rgba(244, 239, 230, 0.22);
+  }
+
+  .dark .career-stats div {
+    border-bottom-color: rgba(244, 239, 230, 0.1);
+  }
+
+  .dark .career-stats dt,
+  .dark .career-path-note {
+    color: rgba(244, 239, 230, 0.46);
+  }
+
+  .dark .career-path {
+    border-color: rgba(244, 239, 230, 0.12);
+    background: rgba(244, 239, 230, 0.045);
+  }
+
+  .dark .career-path ol {
+    border-left-color: rgba(244, 239, 230, 0.18);
+  }
+
+  .dark .career-path li::before {
+    border-color: rgba(244, 239, 230, 0.4);
+    background: #11100e;
+  }
+
+  .dark .career-path li.is-current::before {
+    border-color: #d36a4e;
+    background: #d36a4e;
+  }
+
+  .dark .career-path li p,
+  .dark .career-awards {
+    color: rgba(244, 239, 230, 0.64);
+  }
+
+  .dark .career-awards {
+    border-top-color: rgba(244, 239, 230, 0.2);
+  }
+
   .now-grid,
   .works-grid {
     display: grid;
@@ -971,7 +1150,8 @@
 
   @media (max-width: 1024px) {
     .archive-hero,
-    .about-grid {
+    .about-grid,
+    .career-grid {
       grid-template-columns: 1fr;
     }
 
@@ -1081,6 +1261,18 @@
 
     .now-stats dd {
       font-size: 2.1rem;
+    }
+
+    .career-stats {
+      column-gap: 1.2rem;
+    }
+
+    .career-stats strong {
+      font-size: 2.5rem;
+    }
+
+    .career-path {
+      padding: 1.2rem;
     }
 
     .hero-visual {

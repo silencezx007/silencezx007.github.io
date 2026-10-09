@@ -7,6 +7,34 @@ import { useEffect, useState } from 'react';
 // 页面上的文字都集中在这一段，改内容只动这里。改完记得顺手更新 LAST_UPDATED。
 const LAST_UPDATED = '2026 年 10 月';
 
+const careerStats = [
+  { value: '8', unit: '个部门', note: '直接领导' },
+  { value: '500+', unit: '人', note: '中方 104 · 属地 400+' },
+  { value: '5', unit: '个专业部门', note: '从零组建' },
+  { value: '100+', unit: '项操作规程', note: '引入中国民航标准' },
+];
+
+const careerPath = [
+  {
+    when: '2010 起',
+    title: '坦桑尼亚、乌干达 · 海外采购',
+    body: '在乌干达从无到有建起采购、物流、清关体系。',
+  },
+  {
+    when: '2017–2023',
+    title: '14 亿美元机场工程 · 供应与物流',
+    body: '负责项目全部设备物资供应和海陆物流。',
+  },
+  {
+    when: '2024 至今',
+    title: '罗安达内图博士国际机场 · 运维项目总经理',
+    body: '建转营窗口期牵头做运维方案，2024 年 9 月签下数千万美元级运维合同。',
+    current: true,
+  },
+];
+
+const awards = '2024 年度：市场开发奖 · 总经理特别奖 · 一线优秀管理人才';
+
 const nowItems = [
   {
     title: 'IWS 智慧工作系统',
@@ -74,8 +102,9 @@ const works = [
 ];
 
 const profileRows = [
-  ['现场', '海外机场项目 · 采购与运维'],
-  ['在做', '用 AI 搭一人公司的工作系统'],
+  ['现职', '罗安达机场运维项目总经理'],
+  ['履历', '13 年采购 · 6 年海外 · 机场运维'],
+  ['在做', '工作流自动化 · AI 场景落地'],
   ['常用', 'Claude Code · Codex · Obsidian · FastAPI'],
   ['业余', '说唱、代码画画、小游戏'],
 ];
@@ -136,15 +165,15 @@ export default function Home() {
             <p className="archive-kicker">HELLO · ZHANG XU</p>
             <h1 className="display-title">我是张旭。</h1>
             <p className="hero-subtitle">
-              在海外机场项目里管采购、盯供应商，顺手用 AI 把自己的活做成了一套系统；也写小游戏、用代码画山水。正在试一件事：一个人，能不能干成一家公司。
+              罗安达内图博士国际机场运维项目总经理，带着 8 个部门、500 多人，把一座新机场从“建”带到“管”。现在把带队伍的办法用到 AI 上，让业务流程自己跑起来。
             </p>
             <div className="hero-actions">
-              <a href="#now" className="archive-button primary">
-                我在做什么
+              <a href="#career" className="archive-button primary">
+                看经历
                 <ArrowUpRight className="h-4 w-4" />
               </a>
-              <a href="#works" className="archive-button">
-                能玩的东西
+              <a href="#now" className="archive-button">
+                我在做什么
                 <ArrowUpRight className="h-4 w-4" />
               </a>
               <a href="/shanhe/" target="_blank" rel="noopener" className="archive-button">
@@ -166,6 +195,109 @@ export default function Home() {
               allow="fullscreen; autoplay"
               allowFullScreen
             />
+          </div>
+        </section>
+
+        <section id="career" className="archive-section career-section">
+          <div className="section-heading">
+            <div>
+              <p className="archive-kicker">CAREER / 经历</p>
+              <h2 className="section-title">
+                把一座新机场，
+                <br />
+                从“建”带到“管”。
+              </h2>
+            </div>
+            <p className="section-stamp">安哥拉 · 罗安达 · 2024 至今</p>
+          </div>
+
+          <div className="career-grid">
+            <motion.div
+              initial={{ opacity: 0.72, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-120px' }}
+              className="career-main"
+            >
+              <p className="career-lead">
+                我是罗安达内图博士国际机场运维项目的总经理。机场由建转营那段窗口期，我牵头做运维方案，跟了一年多拿下运维合同；之后从零搭队伍、立规矩、上系统。
+              </p>
+              <dl className="career-stats">
+                {careerStats.map((stat) => (
+                  <div key={stat.note}>
+                    <dt>{stat.note}</dt>
+                    <dd>
+                      <strong>{stat.value}</strong>
+                      <span>{stat.unit}</span>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+              <a href="/airport/" className="archive-button primary">
+                看团队架构
+                <ArrowUpRight className="h-4 w-4" />
+              </a>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0.72, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-120px' }}
+              transition={{ delay: 0.08 }}
+              className="career-path"
+            >
+              <p className="belief-heading">一路走过来</p>
+              <p className="career-path-note">累计 13 年采购经验，其中 6 年在海外</p>
+              <ol>
+                {careerPath.map((step) => (
+                  <li key={step.when} className={step.current ? 'is-current' : undefined}>
+                    <span className="career-when">{step.when}</span>
+                    <h3>{step.title}</h3>
+                    <p>{step.body}</p>
+                  </li>
+                ))}
+              </ol>
+              <p className="career-awards">{awards}</p>
+            </motion.div>
+          </div>
+        </section>
+
+        <section className="impact-section">
+          <div className={`impact-frame${playing ? ' is-playing' : ''}`}>
+            {playing ? (
+              <video
+                className="impact-video"
+                src="/videos/ep01-baogongtou.mp4"
+                poster="/videos/ep01-baogongtou.jpg"
+                controls
+                autoPlay
+                playsInline
+                preload="metadata"
+              />
+            ) : (
+              <>
+                <div className="rec-line">
+                  <span>REC 00:00:00</span>
+                  <span>EP.01 · 一人公司说唱 · 02:00</span>
+                </div>
+                <div className="impact-center">
+                  <button
+                    type="button"
+                    className="impact-play"
+                    aria-label="播放 EP.01 说唱视频《包工头》"
+                    onClick={() => setPlaying(true)}
+                  >
+                    <Play className="h-7 w-7" />
+                  </button>
+                  <h2>《包工头》</h2>
+                  <p>一人公司说唱第一集，从海外唱到回国。点一下，听两分钟。</p>
+                </div>
+                <div className="impact-progress">
+                  <span>00:00</span>
+                  <div />
+                  <span>点击播放</span>
+                </div>
+              </>
+            )}
           </div>
         </section>
 
@@ -260,46 +392,6 @@ export default function Home() {
                 </span>
               </motion.a>
             ))}
-          </div>
-        </section>
-
-        <section className="impact-section">
-          <div className={`impact-frame${playing ? ' is-playing' : ''}`}>
-            {playing ? (
-              <video
-                className="impact-video"
-                src="/videos/ep01-baogongtou.mp4"
-                poster="/videos/ep01-baogongtou.jpg"
-                controls
-                autoPlay
-                playsInline
-                preload="metadata"
-              />
-            ) : (
-              <>
-                <div className="rec-line">
-                  <span>REC 00:00:00</span>
-                  <span>EP.01 · 一人公司说唱 · 02:00</span>
-                </div>
-                <div className="impact-center">
-                  <button
-                    type="button"
-                    className="impact-play"
-                    aria-label="播放 EP.01 说唱视频《包工头》"
-                    onClick={() => setPlaying(true)}
-                  >
-                    <Play className="h-7 w-7" />
-                  </button>
-                  <h2>《包工头》</h2>
-                  <p>一人公司说唱第一集，从海外唱到回国。点一下，听两分钟。</p>
-                </div>
-                <div className="impact-progress">
-                  <span>00:00</span>
-                  <div />
-                  <span>点击播放</span>
-                </div>
-              </>
-            )}
           </div>
         </section>
 
