@@ -694,7 +694,7 @@
     background: #f4efe6;
   }
 
-  .career-path li.is-current::before {
+  .career-path li.is-latest::before {
     border-color: #b9543a;
     background: #b9543a;
     box-shadow: 0 0 0 4px rgba(185, 84, 58, 0.18);
@@ -758,7 +758,7 @@
     background: #11100e;
   }
 
-  .dark .career-path li.is-current::before {
+  .dark .career-path li.is-latest::before {
     border-color: #d36a4e;
     background: #d36a4e;
   }

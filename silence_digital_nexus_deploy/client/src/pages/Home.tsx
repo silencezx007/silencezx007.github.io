@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 const LAST_UPDATED = '2026 年 10 月';
 
 const careerStats = [
-  { value: '8', unit: '个部门', note: '直接领导' },
+  { value: '8', unit: '个部门', note: '直接领导过' },
   { value: '500+', unit: '人', note: '中方 104 · 属地 400+' },
   { value: '5', unit: '个专业部门', note: '从零组建' },
   { value: '100+', unit: '项操作规程', note: '引入中国民航标准' },
@@ -26,10 +26,10 @@ const careerPath = [
     body: '负责项目全部设备物资供应和海陆物流。',
   },
   {
-    when: '2024 至今',
-    title: '罗安达内图博士国际机场 · 运维项目总经理',
+    when: '上一站',
+    title: '前 · 罗安达内图博士国际机场运维项目总经理',
     body: '建转营窗口期牵头做运维方案，2024 年 9 月签下数千万美元级运维合同。',
-    current: true,
+    latest: true,
   },
 ];
 
@@ -83,7 +83,7 @@ const works = [
 ];
 
 const profileRows = [
-  ['现职', '罗安达机场运维项目总经理'],
+  ['曾任', '罗安达内图博士国际机场运维项目总经理'],
   ['履历', '13 年采购 · 6 年海外 · 机场运维'],
   ['在做', '工作流自动化 · AI 场景落地'],
   ['常用', 'Claude Code · Codex · Obsidian · FastAPI'],
@@ -352,7 +352,7 @@ export default function Home() {
                 从“建”带到“管”。
               </h2>
             </div>
-            <p className="section-stamp">安哥拉 · 罗安达 · 2024 至今</p>
+            <p className="section-stamp">安哥拉 · 罗安达 · 上一站</p>
           </div>
 
           <div className="career-grid">
@@ -363,7 +363,7 @@ export default function Home() {
               className="career-main"
             >
               <p className="career-lead">
-                我是罗安达内图博士国际机场运维项目的总经理。机场由建转营那段窗口期，我牵头做运维方案，跟了一年多拿下运维合同；之后从零搭队伍、立规矩、上系统。
+                我曾任罗安达内图博士国际机场运维项目总经理。机场由建转营那段窗口期，我牵头做运维方案，跟了一年多拿下运维合同；之后从零搭队伍、立规矩、上系统。
               </p>
               <dl className="career-stats">
                 {careerStats.map((stat) => (
@@ -393,7 +393,7 @@ export default function Home() {
               <p className="career-path-note">累计 13 年采购经验，其中 6 年在海外</p>
               <ol>
                 {careerPath.map((step) => (
-                  <li key={step.when} className={step.current ? 'is-current' : undefined}>
+                  <li key={step.when} className={step.latest ? 'is-latest' : undefined}>
                     <span className="career-when">{step.when}</span>
                     <h3>{step.title}</h3>
                     <p>{step.body}</p>
