@@ -3589,7 +3589,9 @@ const guide = () => {
   if (/iPhone|iPad|iPod/i.test(ua)) return '点底部分享按钮 → 添加到主屏幕';
   return '浏览器菜单 → 添加到桌面 / 添加至主屏幕';
 };
-const content = () => '<h3>装 到 桌 面</h3><p>把一卷山河留在桌面，打开一次后，断网也能展卷。</p>' + (promptEvent ? '<div class="btns"><button class="go" data-pwa-install>装到桌面</button></div>' : '<p>' + guide() + '</p>');
+// 小米、vivo、OPPO 等常默认不许浏览器往桌面放图标，点了添加没反应
+const permit = () => /Android/i.test(navigator.userAgent) ? '<p class="muted">若桌面不见图标：设置 → 应用 → 浏览器 → 权限，打开「桌面快捷方式」</p>' : '';
+const content = () => '<h3>装 到 桌 面</h3><p>把一卷山河留在桌面，打开一次后，断网也能展卷。</p>' + (promptEvent ? '<div class="btns"><button class="go" data-pwa-install>装到桌面</button></div>' : '<p>' + guide() + '</p>' + permit());
 const refresh = () => { const el = document.getElementById('pwaInstall'); if (el) { el.hidden = embedded() || installed(); el.innerHTML = el.hidden ? '' : content(); } };
 SH.pwa = { section: () => embedded() || installed() ? '' : '<section id="pwaInstall">' + content() + '</section>' };
 addEventListener('beforeinstallprompt', e => { e.preventDefault(); if (embedded() || installed() || manualBrowser()) return; promptEvent = e; refresh(); });
