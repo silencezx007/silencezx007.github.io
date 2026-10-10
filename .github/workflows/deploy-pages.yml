@@ -46,6 +46,7 @@ jobs:
       - name: Add root-level pages
         # 网站只用这一套部署（Pages 来源 = GitHub Actions）。仓库根目录里另有几样要上线的东西：
         # 小游戏 sheep-match、旧版 snake.html、IWS 心跳徽章（heartbeat.json 由本机 iws/scripts/heartbeat_export.py 写在根目录）。
+        # （/iws-graph/ 的数据在 client/public/iws-graph/data.json，随构建带上，不在这里复制。）
         # 构建完把它们放进网站，并把徽章挂到首页上。
         run: |
           OUT=silence_digital_nexus_deploy/dist/public
