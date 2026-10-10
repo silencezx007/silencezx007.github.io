@@ -3607,6 +3607,13 @@ if (/^https?:$/.test(location.protocol) && location.pathname.indexOf('/shanhe/')
   document.getElementById('pwaManifest').href = './manifest.webmanifest';
   document.getElementById('pwaAppleIcon').href = './apple-touch-icon.png';
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(() => {});
+  // 百度统计：只计正式网址的访问；主页 Hero 里嵌的那卷不计，本地镜像不计
+  if (location.hostname === 'silencezx007.github.io' && !embedded()) {
+    const hmt = window._hmt = window._hmt || [], ev = a => hmt.push(['_trackEvent', '装到桌面', a]);
+    const s = document.createElement('script'); s.async = true; s.src = 'https://hm.baidu.com/hm.js?6a86fa7a668d50fdcb8bfd106ac8d0fd'; document.head.appendChild(s);
+    if (installed()) ev('从桌面打开');
+    addEventListener('appinstalled', () => ev('装好'));
+  }
 }
 })();
 
@@ -4779,7 +4786,7 @@ function ask(p, opts) {
 SH.feat.help = () => {
   const install = SH.pwa.section();
   const groups = ui.catalog.map(([g, items]) => `<h3>${esc(g)}</h3>` + items.map(([, , name, desc]) => `<p><b>${esc(name)}</b>　${esc(desc)}</p>`).join('')).join('');
-  ui.modal({ title: '玩 法 总 览', wide: true, html: `<div class="help"><h3>画 上 点 一 点</h3><p>点天空：白天惊起飞鸟，夜里放一盏孔明灯</p><p>点山间：种一棵会长大的树</p><p>点水面：跃出一尾锦鲤　　点水中小洲：惊起一滩鸥鹭</p><p>按住拖动、滚轮：在长卷里穿行</p>${groups}${install}<h3>没 有 声 音 ？</h3><p>看看手机媒体音量（放首歌时按音量键调的那个）；轻点一下画面；在微信里打开的，也可以点右上角“…”换浏览器打开。</p><h3>快 捷 键</h3><p class="muted">1–4 四季 · N 晨昏 · D 召龙 · P 吟诗 · B 百宝箱 · G 赠画 · X 看见数学 · S 落款 · M 声音 · F 全屏 · H 隐藏界面 · 空格 行止</p></div>` });
+  ui.modal({ title: '玩 法 总 览', wide: true, html: `<div class="help"><h3>画 上 点 一 点</h3><p>点天空：白天惊起飞鸟，夜里放一盏孔明灯</p><p>点山间：种一棵会长大的树</p><p>点水面：跃出一尾锦鲤　　点水中小洲：惊起一滩鸥鹭</p><p>按住拖动、滚轮：在长卷里穿行</p>${groups}${install}<h3>没 有 声 音 ？</h3><p>看看手机媒体音量（放首歌时按音量键调的那个）；轻点一下画面；在微信里打开的，也可以点右上角“…”换浏览器打开。</p><h3>快 捷 键</h3><p class="muted">1–4 四季 · N 晨昏 · D 召龙 · P 吟诗 · B 百宝箱 · G 赠画 · X 看见数学 · S 落款 · M 声音 · F 全屏 · H 隐藏界面 · 空格 行止</p><p class="muted">本页用百度统计记录访问量</p></div>` });
 };
 })();
 
