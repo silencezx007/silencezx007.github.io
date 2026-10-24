@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>罗安达机场运维 · 团队架构 | 张旭</title>
+<meta name="description" content="张旭曾任安哥拉罗安达内图博士国际机场运维项目总经理：从拿下运维合同，到从零组建 5 个专业部门、带领 8 个部门 500 多人的团队架构。">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<style>
+  :root {
+    --paper: #f4efe6;
+    --card: rgba(255, 252, 246, 0.66);
+    --ink: #17130f;
+    --muted: rgba(23, 19, 15, 0.66);
+    --faint: rgba(23, 19, 15, 0.46);
+    --line: rgba(23, 19, 15, 0.16);
+    --line-strong: rgba(23, 19, 15, 0.3);
+    --grid: rgba(23, 19, 15, 0.05);
+    --accent: #b9543a;
+    --accent-soft: rgba(185, 84, 58, 0.12);
+    --green: #54735b;
+    --serif: Georgia, "Times New Roman", "Songti SC", "STSong", serif;
+    --mono: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    --sans: "Inter", "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #11100e;
+      --card: rgba(244, 239, 230, 0.045);
+      --ink: #f4efe6;
+      --muted: rgba(244, 239, 230, 0.68);
+      --faint: rgba(244, 239, 230, 0.46);
+      --line: rgba(244, 239, 230, 0.14);
+      --line-strong: rgba(244, 239, 230, 0.3);
+      --grid: rgba(244, 239, 230, 0.04);
+      --accent: #d36a4e;
+      --accent-soft: rgba(211, 106, 78, 0.16);
+      --green: #8fb894;
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    background:
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+      linear-gradient(0deg, var(--grid) 1px, transparent 1px),
+      radial-gradient(circle at 18% 12%, var(--accent-soft), transparent 26%),
+      var(--paper);
+    background-size: 88px 88px, 88px 88px, auto, auto;
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; }
+
+  .page {
+    width: min(1180px, 100% - 32px);
+    margin: 0 auto;
+    padding: 20px 0 64px;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 6px 0 22px;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--faint);
+  }
+
+  .topbar a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .topbar a:hover { color: var(--accent); }
+
+  .panel {
+    position: relative;
+    margin-top: 16px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--card);
+    padding: 56px;
+    overflow: hidden;
+  }
+
+  .panel::before {
+    content: "";
+    position: absolute;
+    inset: 18px;
+    border: 1px solid var(--line);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .kicker {
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+  }
+
+  h1, h2 {
+    font-family: var(--serif);
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  h1 {
+    margin-top: 14px;
+    font-size: clamp(2.4rem, 6vw, 4.4rem);
+    line-height: 1.05;
+  }
+
+  h2 {
+    margin-top: 10px;
+    font-size: clamp(1.9rem, 4vw, 3rem);
+    line-height: 1.1;
+  }
+
+  .lead {
+    margin-top: 22px;
+    max-width: 44rem;
+    color: var(--muted);
+    font-size: 1.05rem;
+    line-height: 2;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 22px;
+  }
+
+  .meta span {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    color: var(--muted);
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-top: 40px;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .stats div {
+    padding: 20px 20px 4px 0;
+  }
+
+  .stats div + div {
+    padding-left: 20px;
+    border-left: 1px solid var(--line);
+  }
+
+  .stats strong {
+    display: block;
+    font-family: var(--serif);
+    font-size: 3rem;
+    line-height: 1;
+  }
+
+  .stats strong small {
+    margin-left: 4px;
+    font-family: var(--sans);
+    font-size: 0.95rem;
+  }
+
+  .stats span {
+    display: block;
+    margin-top: 8px;
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    color: var(--faint);
+  }
+
+  .section-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+
+  .section-head p {
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    color: var(--faint);
+  }
+
+  /* ---------- 组织架构图 ---------- */
+  .org-head {
+    position: relative;
+    width: max-content;
+    max-width: 100%;
+    margin: 0 auto;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    padding: 16px 28px;
+    text-align: center;
+  }
+
+  .org-head strong {
+    display: block;
+    font-family: var(--serif);
+    font-size: 1.4rem;
+  }
+
+  .org-head span {
+    display: block;
+    margin-top: 6px;
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    opacity: 0.72;
+  }
+
+  .org-head em {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #f4efe6;
+    padding: 2px 9px;
+    font-style: normal;
+    font-size: 0.72rem;
+    font-weight: 800;
+  }
+
+  .org-branches {
+    --gap: 20px;
+    position: relative;
+    display: grid;
+    grid-template-columns: 5fr 3fr;
+    gap: var(--gap);
+    margin-top: 56px;
+  }
+
+  /* 总经理往下一根线，再分到两组 */
+  .org-head::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    width: 1px;
+    height: 28px;
+    background: var(--line-strong);
+  }
+
+  .org-branches::before {
+    content: "";
+    position: absolute;
+    top: -28px;
+    left: calc((100% - var(--gap)) * 5 / 16);
+    right: calc((100% - var(--gap)) * 3 / 16);
+    height: 1px;
+    background: var(--line-strong);
+  }
+
+  .org-group {
+    position: relative;
+  }
+
+  .org-group::before {
+    content: "";
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    width: 1px;
+    height: 28px;
+    background: var(--line-strong);
+  }
+
+  .org-group-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 1px solid var(--line-strong);
+    background: var(--paper);
+    padding: 10px 14px;
+    font-weight: 800;
+  }
+
+  .org-group-title small {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--faint);
+  }
+
+  .org-group-title .badge {
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 3px 9px;
+    font-size: 0.72rem;
+  }
+
+  .dept-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+    list-style: none;
+  }
+
+  .org-group.is-functional .dept-list {
+    grid-template-columns: 1fr;
+  }
+
+  .dept {
+    border: 1px solid var(--line);
+    background: var(--card);
+    padding: 18px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .dept:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .dept-no {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--faint);
+  }
+
+  .dept h3 {
+    margin-top: 8px;
+    font-family: var(--serif);
+    font-size: 1.3rem;
+  }
+
+  .dept ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 14px;
+    list-style: none;
+  }
+
+  .dept li {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .org-group.is-functional .dept {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding: 16px 18px;
+  }
+
+  .org-group.is-functional .dept h3 {
+    margin-top: 0;
+  }
+
+  .org-note {
+    margin-top: 28px;
+    font-size: 0.86rem;
+    color: var(--faint);
+    text-align: center;
+  }
+
+  /* ---------- 体系 ---------- */
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .pillar {
+    border: 1px solid var(--line);
+    background: var(--card);
+    padding: 24px;
+  }
+
+  .pillar span {
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .pillar h3 {
+    margin-top: 22px;
+    font-size: 1.35rem;
+    line-height: 1.3;
+  }
+
+  .pillar p {
+    margin-top: 10px;
+    color: var(--muted);
+    line-height: 1.85;
+  }
+
+  .awards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 28px;
+    list-style: none;
+  }
+
+  .awards li {
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 8px 14px;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+
+  .next {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .next p {
+    max-width: 40rem;
+    color: var(--muted);
+    line-height: 1.9;
+  }
+
+  .button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 13px 18px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 0.2s;
+  }
+
+  .button:hover { transform: translateY(-2px); }
+
+  @media (max-width: 900px) {
+    .panel { padding: 36px 28px; }
+    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .stats div:nth-child(3) { padding-left: 0; border-left: 0; }
+    .stats div:nth-child(n + 3) { border-top: 1px solid var(--line); }
+    .org-branches { grid-template-columns: 1fr; gap: 40px; }
+    .org-branches::before { display: none; }
+    .org-group::before { top: -40px; height: 40px; }
+    .org-group + .org-group::before { display: none; }
+    .org-group.is-functional .dept-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .org-group.is-functional .dept { display: block; }
+    .pillars { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 560px) {
+    .panel { padding: 28px 18px; border-radius: 12px; }
+    .panel::before { inset: 10px; }
+    .stats strong { font-size: 2.3rem; }
+    .section-head { flex-direction: column; align-items: flex-start; }
+    h2 { font-size: 1.7rem; }
+    .org-group.is-functional .dept-list { grid-template-columns: 1fr; }
+    .org-group.is-functional .dept { display: flex; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dept, .button { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <nav class="topbar">
+      <a href="/">← 张旭的主页</a>
+      <span>CAREER / 经历 · 二级页</span>
+    </nav>
+
+    <header class="panel">
+      <p class="kicker">LUANDA · AIAAN / 罗安达机场运维</p>
+      <h1>从“建机场”<br>到“管机场”</h1>
+      <p class="lead">
+        机场由建转营的窗口期，我牵头做运维方案，跟了一年多，2024 年 9 月签下数千万美元级的运维合同。之后的事情是从零开始：搭队伍、立规矩、上系统。
+      </p>
+      <div class="meta">
+        <span>安哥拉 · 罗安达</span>
+        <span>内图博士国际机场</span>
+        <span>前 · 运维项目总经理</span>
+      </div>
+      <div class="stats">
+        <div><strong>8<small>个</small></strong><span>直接领导过的部门</span></div>
+        <div><strong>104<small>人</small></strong><span>中方员工</span></div>
+        <div><strong>400+<small>人</small></strong><span>属地员工</span></div>
+        <div><strong>100+<small>项</small></strong><span>操作规程</span></div>
+      </div>
+    </header>
+
+    <section class="panel" aria-labelledby="org-title">
+      <div class="section-head">
+        <div>
+          <p class="kicker">ORG / 团队架构</p>
+          <h2 id="org-title">8 个部门，一张图</h2>
+        </div>
+        <p>只写到部门，不写人名</p>
+      </div>
+      <div id="org"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="system-title">
+      <div class="section-head">
+        <div>
+          <p class="kicker">SYSTEM / 体系</p>
+          <h2 id="system-title">标准化、流程化、数字化</h2>
+        </div>
+      </div>
+      <div class="pillars">
+        <article class="pillar">
+          <span>01 / 标准</span>
+          <h3>引入中国民航标准</h3>
+          <p>把国内机场成熟的运维标准带到罗安达，作为整个团队干活的底线。</p>
+        </article>
+        <article class="pillar">
+          <span>02 / 规程</span>
+          <h3>百余项操作规程</h3>
+          <p>每类设备、每个岗位怎么做、做到什么程度，都写成规程，新人照着就能上手。</p>
+        </article>
+        <article class="pillar">
+          <span>03 / 平台</span>
+          <h3>自建智慧运维平台</h3>
+          <p>信息技术部自主搭建：设备资产、巡检、告警、工单全部线上流转，形成数字化闭环。</p>
+        </article>
+      </div>
+      <ul class="awards" aria-label="2024 年度荣誉">
+        <li>2024 市场开发奖</li>
+        <li>总经理特别奖</li>
+        <li>一线优秀管理人才</li>
+      </ul>
+    </section>
+
+    <section class="panel next">
+      <p>带过 500 多人的队伍，靠的是标准、规程和系统。现在我把同一套办法用到 AI 上：把重复的流程交给系统，人只守最后一道关。</p>
+      <a class="button" href="/#now">看我现在在做什么 →</a>
+    </section>
+  </div>
+
+  <script>
+    // 架构数据：只写部门和岗位，不写人名。改架构只改这里。
+    var ORG = {
+      head: { title: '运维项目总经理', note: '中方 104 人 · 属地 400+ 人', tag: '曾任' },
+      groups: [
+        {
+          name: '专业部门',
+          badge: '从零组建',
+          depts: [
+            { name: '空管设备部', scope: ['通信', '导航', '监视', '气象'] },
+            { name: '信息技术部', scope: ['航站楼弱电系统', '附属楼宇弱电系统', '智慧运维平台'] },
+            { name: '动力能源部', scope: ['供排水', '变配电', '空调制冷', '污水及固废'] },
+            { name: '飞行区运维部', scope: ['助航灯光', '站坪高杆灯', '割草', '排水沟清淤'] },
+            { name: '特种设备部', scope: ['直梯', '扶梯', '自动步道'] }
+          ]
+        },
+        {
+          name: '职能部门',
+          functional: true,
+          depts: [{ name: '翻译部' }, { name: '综管部' }, { name: '安质部' }]
+        }
+      ]
+    };
+
+    (function render() {
+      var el = document.getElementById('org');
+      var n = 0;
+      function esc(t) {
+        return String(t).replace(/[&<>"]/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+        });
+      }
+      var html =
+        '<div class="org-head"><strong>' + esc(ORG.head.title) + '</strong>' +
+        '<span>' + esc(ORG.head.note) + '</span>' +
+        (ORG.head.tag ? '<em>' + esc(ORG.head.tag) + '</em>' : '') + '</div>' +
+        '<div class="org-branches">';
+      ORG.groups.forEach(function (g) {
+        html += '<div class="org-group' + (g.functional ? ' is-functional' : '') + '">' +
+          '<div class="org-group-title">' + esc(g.name) + '<small>' + g.depts.length + ' 个</small>' +
+          (g.badge ? '<span class="badge">' + esc(g.badge) + '</span>' : '') + '</div><ul class="dept-list">';
+        g.depts.forEach(function (d) {
+          n += 1;
+          html += '<li class="dept"><span class="dept-no">' + (n < 10 ? '0' : '') + n + '</span>' +
+            '<h3>' + esc(d.name) + '</h3>' +
+            (d.scope ? '<ul>' + d.scope.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>' : '') +
+            '</li>';
+        });
+        html += '</ul></div>';
+      });
+      html += '</div><p class="org-note">5 个专业部门从零组建；3 个职能部门负责翻译、综合管理和安全质量。</p>';
+      el.innerHTML = html;
+    })();
+  </script>
+</body>
+</html>

@@ -1,18 +1,20 @@
 import { useMode } from '@/contexts/ModeContext';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowUpRight, Sparkles } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { ReactNode } from 'react';
 import { ModeSwitcher } from './ModeSwitcher';
+import { SealLogo } from './SealLogo';
 
 interface LayoutProps {
   children: ReactNode;
 }
 
 const navigationItems = [
-  { href: '#proof', label: 'PROOF' },
-  { href: '#cases', label: 'CASES' },
-  { href: '#build', label: 'BUILD' },
-  { href: '#contact', label: 'CONTACT' },
+  { href: '#now', label: '在做' },
+  { href: '#works', label: '作品' },
+  { href: '#career', label: '经历' },
+  { href: '#about', label: '关于' },
+  { href: '#contact', label: '联系' },
 ];
 
 export function Layout({ children }: LayoutProps) {
@@ -50,20 +52,8 @@ export function Layout({ children }: LayoutProps) {
 
       <header className="relative z-50 mx-4 mt-4 md:mx-8">
         <div className="glass-panel flex h-16 items-center justify-between rounded-xl px-4 md:px-6">
-          <a href="#top" className="flex items-center gap-3">
-            <div
-              className={`flex h-10 w-10 items-center justify-center rounded-2xl border transition-colors ${
-                mode === 'zen'
-                  ? 'border-black/5 bg-white text-foreground'
-                  : 'border-emerald-300/30 bg-background/70 text-emerald-200'
-              }`}
-            >
-              <Sparkles className="h-4 w-4" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-serif text-lg font-semibold text-foreground/90">ZX</span>
-              <span className="text-xs uppercase tracking-[0.16em] text-muted-foreground">AI Operator</span>
-            </div>
+          <a href="#top" aria-label="张旭 · 回到顶部" className="flex items-center">
+            <SealLogo className="h-11 w-11 transition-transform duration-300 hover:-rotate-3" />
           </a>
 
           <nav className="hidden items-center gap-2 md:flex">
@@ -84,14 +74,14 @@ export function Layout({ children }: LayoutProps) {
 
           <div className="flex items-center gap-3">
             <a
-              href="#build"
+              href="mailto:silencezx009@gmail.com"
               className={`hidden items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all md:inline-flex ${
                 mode === 'zen'
                   ? 'bg-foreground text-background hover:opacity-90'
                   : 'bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/20'
               }`}
             >
-              看证据链
+              打个招呼
               <ArrowUpRight className="h-4 w-4" />
             </a>
             <ModeSwitcher />
