@@ -1,8 +1,8 @@
 {
-  "updated_at": "2026-11-03 08:30",
-  "batches_managed": 174,
-  "batches_active_7d": 58,
-  "suppliers": 53,
+  "updated_at": "2026-11-04 08:30",
+  "batches_managed": 178,
+  "batches_active_7d": 71,
+  "suppliers": 55,
   "adyen_orders": 40,
-  "tests": 1493
+  "tests": 1520
 }
