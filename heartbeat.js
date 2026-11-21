@@ -7,6 +7,12 @@
     .then(function (d) {
       if (!d) return;
 
+      // 本机导出停了，数据会越放越旧：超过 7 天就不再说“本周”，改为标出截至日期。
+      var stale = Date.now() - new Date(d.updated_at.replace(" ", "T")) > 7 * 864e5;
+      var weekText = stale
+        ? "截至 " + d.updated_at.slice(0, 10) + " 的一周推进 "
+        : "本周推进 ";
+
       var pill = document.createElement("button");
       pill.id = "sys-heartbeat";
       pill.type = "button";
@@ -14,8 +20,8 @@
       pill.innerHTML =
         '<span class="hb-dot"></span>' +
         '<span class="hb-text">系统心跳 · ' + d.tests + ' 项自动化测试在守护 · ' +
-        d.batches_managed + ' 个采购批次数字化管理 · 本周推进 ' +
-        d.batches_active_7d + ' 批 · ' + d.suppliers + ' 家供应商画像</span>' +
+        d.batches_managed + ' 个采购批次数字化管理 · ' +
+        (stale ? '' : weekText + d.batches_active_7d + ' 批 · ') + d.suppliers + ' 家供应商画像</span>' +
         '<span class="hb-time">' + d.updated_at + '</span>';
 
       var card = document.createElement("div");
@@ -27,7 +33,7 @@
         '<ul>' +
         '<li><strong>' + d.tests + '</strong> 项自动化测试守护着系统每一次改动</li>' +
         '<li><strong>' + d.batches_managed + '</strong> 个国际采购批次全流程数字化管理</li>' +
-        '<li>本周 <strong>' + d.batches_active_7d + '</strong> 批在推进 · <strong>' +
+        '<li>' + weekText + '<strong>' + d.batches_active_7d + '</strong> 批 · <strong>' +
         d.suppliers + '</strong> 家供应商画像 · <strong>' + d.adyen_orders + '</strong> 个线上订单自动对账</li>' +
         '</ul>' +
         '<p class="hbc-tech">技术栈：SQLite + FastAPI + HTMX，AI 协作开发，' +

@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IWS 供应商生态图谱 | 张旭</title>
+<meta name="description" content="IWS 智慧工作系统在日常采购中沉淀出的供应商—地区—客户关系网。">
+<style>
+  :root { --bg:#12161f; --panel:#1a1f2b; --line:#2a3140; --ink:#e9e4da; --muted:#8d93a0;
+          --sup:#c4573b; --reg:#6f8f77; --cus:#e9e4da; --accent:#d9774f; }
+  * { box-sizing:border-box; }
+  html, body { margin:0; background:var(--bg); color:var(--ink);
+    font:15px/1.7 Inter,"PingFang SC","Noto Sans SC",sans-serif; }
+  body { background:radial-gradient(1200px 600px at 80% -10%, #22314a 0%, transparent 60%), var(--bg); min-height:100vh; }
+  .wrap { max-width:1240px; margin:0 auto; padding:24px 16px 48px; }
+  nav { display:flex; justify-content:space-between; font-size:13px; color:var(--muted); }
+  nav a { color:var(--ink); text-decoration:none; }
+  .eyebrow { margin:40px 0 8px; color:var(--accent); font:600 12px/1 ui-monospace,Menlo,monospace; letter-spacing:.18em; }
+  h1 { margin:0; font:700 clamp(34px,6vw,60px)/1.1 "Songti SC","Noto Serif SC",serif; }
+  .lead { max-width:720px; color:#c9c4ba; margin:16px 0 0; }
+  .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; margin:28px 0; background:var(--line);
+    border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+  .stats div { background:var(--panel); padding:16px 18px; }
+  .stats b { display:block; font:700 30px/1.2 "Songti SC",serif; }
+  .stats span { color:var(--muted); font-size:12px; }
+  .legend { display:flex; flex-wrap:wrap; gap:16px; font-size:13px; color:var(--muted); margin-bottom:10px; }
+  .legend i { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:-1px; }
+  #graph-wrap { position:relative; background:var(--panel); border:1px solid var(--line); border-radius:16px; overflow:hidden; }
+  #graph { display:block; width:100%; touch-action:none; }
+  #gtip { position:fixed; display:none; pointer-events:none; background:#0c0f15; border:1px solid var(--line);
+    padding:6px 10px; border-radius:8px; font-size:12px; z-index:9; }
+  .hint { position:absolute; left:14px; bottom:10px; font-size:12px; color:var(--muted); }
+  .note { color:var(--muted); font-size:13px; margin-top:16px; }
+  .cta { display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; margin-top:32px;
+    padding:20px; border:1px solid var(--line); border-radius:14px; background:var(--panel); }
+  .cta a { background:var(--ink); color:var(--bg); padding:10px 16px; border-radius:8px; text-decoration:none; font-weight:600; white-space:nowrap; }
+  @media (max-width:640px) { .stats { grid-template-columns:repeat(2,1fr); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav><a href="/">← 张旭的主页</a><span>WORKS / 作品 · IWS</span></nav>
+  <div class="eyebrow">IWS · SUPPLIER ECOSYSTEM</div>
+  <h1>供应商生态图谱</h1>
+  <p class="lead">IWS 智慧工作系统每处理一个采购批次，就把「哪家供应商、发往哪个地区、服务哪家门店」记下来。日积月累，就长成了这张网——不是手画的，是采购流程跑出来的副产品。</p>
+  <div class="stats">
+    <div><b id="st-s">—</b><span>家供应商</span></div>
+    <div><b id="st-r">—</b><span>个地区</span></div>
+    <div><b id="st-c">—</b><span>家客户门店</span></div>
+    <div><b id="st-b">—</b><span>条合作关系</span></div>
+  </div>
+  <div class="legend">
+    <span><i style="background:var(--sup)"></i>供应商</span>
+    <span><i style="background:var(--reg)"></i>地区</span>
+    <span><i style="background:var(--cus)"></i>客户</span>
+    <span>圆越大、线越粗 = 合作批次越多</span>
+  </div>
+  <div id="graph-wrap"><svg id="graph"></svg><div class="hint">滚轮 / 双指缩放 · 拖动平移 · 节点可拖</div></div>
+  <div id="gtip"></div>
+  <p class="note" id="note">数据来自 IWS，每天自动更新；只含名称和合作批次数，不含金额。</p>
+  <div class="cta"><span>把重复的流程交给系统，让数据自己沉淀下来——这就是我在做的事。</span><a href="/">看我在做什么 →</a></div>
+</div>
+<script src="./d3.v7.9.0.min.js"></script>
+<script>
+fetch("./data.json", { cache: "no-cache" }).then(r => r.json()).then(data => {
+  const cnt = k => data.nodes.filter(n => n.kind === k).length;
+  document.getElementById("st-s").textContent = cnt("supplier");
+  document.getElementById("st-r").textContent = cnt("region");
+  document.getElementById("st-c").textContent = cnt("customer");
+  document.getElementById("st-b").textContent = data.links.length;
+  if (data.updated_at) document.getElementById("note").textContent += "（截至 " + data.updated_at + "）";
+
+  const wrap = document.getElementById("graph-wrap");
+  const W = wrap.clientWidth, narrow = W < 640, H = narrow ? 560 : Math.max(680, Math.min(860, innerHeight - 120));
+  const svg = d3.select("#graph").attr("viewBox", [0, 0, W, H]).attr("height", H);
+  const canvas = svg.append("g");
+  const zoom = d3.zoom().scaleExtent([0.25, 4]).on("zoom", e => canvas.attr("transform", e.transform));
+  svg.call(zoom);
+  if (narrow) svg.call(zoom.transform, d3.zoomIdentity.translate(W * 0.25, H * 0.25).scale(0.5));
+
+  const color = { supplier: "#c4573b", region: "#6f8f77", customer: "#e9e4da" };
+  const rScale = d3.scaleSqrt().domain([0, d3.max(data.nodes, d => d.n) || 1]).range([4, 28]);
+  const wScale = d3.scaleSqrt().domain([0, d3.max(data.links, l => l.n) || 1]).range([0.6, 5]);
+
+  const sim = d3.forceSimulation(data.nodes)
+    .force("link", d3.forceLink(data.links).id(d => d.id).distance(100).strength(0.4))
+    .force("charge", d3.forceManyBody().strength(-300))
+    .force("center", d3.forceCenter(W / 2, H / 2))
+    .force("x", d3.forceX(W / 2).strength(0.07))   // 拉住孤立小团，别飞出画面
+    .force("y", d3.forceY(H / 2).strength(0.09))
+    .force("collide", d3.forceCollide().radius(d => rScale(d.n) + 14));
+
+  const link = canvas.append("g").selectAll("line").data(data.links).join("line")
+    .attr("stroke", "#c4573b").attr("stroke-opacity", 0.3).attr("stroke-width", l => wScale(l.n));
+
+  const node = canvas.append("g").selectAll("g").data(data.nodes).join("g").style("cursor", "grab")
+    .call(d3.drag()
+      .on("start", (e, d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; })
+      .on("end", (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
+
+  node.append("circle").attr("r", d => rScale(d.n)).attr("fill", d => color[d.kind])
+    .attr("fill-opacity", d => d.kind === "customer" ? 0.15 : 0.9)
+    .attr("stroke", d => color[d.kind]).attr("stroke-width", 1.5)
+    .style("filter", d => d.kind === "supplier" ? "drop-shadow(0 0 6px rgba(196,87,59,.6))" : null);
+
+  node.append("text").text(d => d.name.length > 12 ? d.name.slice(0, 12) + "…" : d.name)
+    .attr("dy", d => rScale(d.n) + 13).attr("text-anchor", "middle")
+    .style("font", "11px Inter,'PingFang SC',sans-serif").style("fill", "#c9c4ba").style("pointer-events", "none");
+
+  const tip = document.getElementById("gtip");
+  const kindName = { supplier: "供应商", region: "地区", customer: "客户" };
+  node.on("mousemove", (e, d) => {
+    tip.style.display = "block"; tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 10) + "px";
+    tip.innerHTML = "<b>" + d.name + "</b> · " + kindName[d.kind] + "<br>合作 " + d.n + " 批";
+  }).on("mouseleave", () => tip.style.display = "none");
+
+  sim.on("tick", () => {
+    link.attr("x1", l => l.source.x).attr("y1", l => l.source.y).attr("x2", l => l.target.x).attr("y2", l => l.target.y);
+    node.attr("transform", d => `translate(${d.x},${d.y})`);
+  });
+  // 布局稳定后缩放到全部节点可见（只做一次，之后交给用户）
+  sim.on("end.fit", () => {
+    sim.on("end.fit", null);
+    const [x0, x1] = d3.extent(data.nodes, d => d.x), [y0, y1] = d3.extent(data.nodes, d => d.y);
+    const k = Math.min(1.2, 0.92 / Math.max((x1 - x0 + 80) / W, (y1 - y0 + 80) / H));
+    svg.transition().duration(600).call(zoom.transform,
+      d3.zoomIdentity.translate(W / 2, H / 2).scale(k).translate(-(x0 + x1) / 2, -(y0 + y1) / 2));
+  });
+}).catch(() => { document.getElementById("note").textContent = "图谱数据暂时加载不了，稍后再试。"; });
+</script>
+</body>
+</html>
